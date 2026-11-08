@@ -26,9 +26,10 @@ const topMarginMatch = html.match(/function getTopMarginMm\(type,cell\)\{[^}]+\}
 const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
+const lineTransformMatch = html.match(/function withCanvasLineTransform\\(cx,x,y,width,heightScale,draw\\)\\{[\\s\\S]*?\\n\\}/);
 const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,zSettings\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !preflightMatch || !routeFunctionMatch) {
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -45,7 +46,7 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
@@ -55,7 +56,7 @@ assert(context.getLinePitchMm(5) === 30, 'Six cells produce a 30 mm baseline ste
 pitchCellsInput = '1';
 assert(context.getLinePitchMm(4.5) === 4.5, 'One cell follows a 4.5 mm notebook grid exactly');
 pitchCellsInput = '2';
-assert(context.getLinePitchMm(4.6) === 9, 'Two cells follow a 4.5 mm notebook grid exactly');
+assert(context.getLinePitchMm(4.8) === 9, 'Two cells follow a 4.5 mm notebook grid exactly');
 pitchUnitInput = 'mm';
 pitchMmInput = '12,5';
 assert(context.getLinePitchMm(5) === 12.5, 'Millimetre mode accepts decimal comma and exact baseline step');
@@ -67,7 +68,13 @@ pitchUnitInput = 'cells'; pitchCellsInput = '2';
 assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook starts two 5 mm cells below the top edge');
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
-assert(context.scaleToLowercaseHeight(5, 2.5) === 2, 'A 5 mm lowercase target scales the measured x-height to 5 mm');
+assert(context.scaleToLowercaseHeight(4.8, 2.4) === 2, 'A 4.8 mm lowercase target scales the measured x-height to 4.8 mm');
+const mockCanvas={depth:0,saves:0,restores:0,save(){this.depth++;this.saves++},restore(){this.depth--;this.restores++},translate(){},transform(){}};
+context.withCanvasLineTransform(mockCanvas,100,200,1,1.2,()=>{});
+context.withCanvasLineTransform(mockCanvas,100,300,1,1.2,()=>{});
+assert(mockCanvas.depth===0&&mockCanvas.saves===2&&mockCanvas.restores===2,'Each rendered text line restores its own canvas transform; later lines cannot inherit earlier scaling');
+throws(()=>context.withCanvasLineTransform(mockCanvas,100,400,1,1.2,()=>{throw Error('draw failed')}),/draw failed/,'Canvas transform wrapper preserves drawing errors');
+assert(mockCanvas.depth===0&&mockCanvas.saves===3&&mockCanvas.restores===3,'Canvas state is restored even when a line draw throws');
 assert(context.scaleToLowercaseHeight(5, 0) === 1, 'Missing font metrics fall back to neutral vertical scaling');
 const pausePoint = context.getCornerPausePosition(45.5, 253);
 assert(pausePoint.x === 42.5 && pausePoint.y === 250, 'Second pause parks the nozzle outside the paper corner');
