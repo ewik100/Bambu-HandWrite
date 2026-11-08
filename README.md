@@ -1,4 +1,4 @@
-# Bambu HandWrite 4.0
+# Bambu HandWrite 4.1
 
 **Bambu HandWrite** — небольшое браузерное приложение, которое превращает набранный текст в рукописный макет и строит для него G-code: команды перемещения головки 3D-принтера.
 
@@ -6,9 +6,9 @@
 
 ## Запустить программу
 
-**Самый простой способ:** откройте [отдельную версию 4.0](releases/Bambu-HandWrite-4.0.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
+**Самый простой способ:** откройте [отдельную версию 4.1](releases/Bambu-HandWrite-4.1.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.0](releases/Bambu-HandWrite-4.0.html).
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.1](releases/Bambu-HandWrite-4.1.html).
 
 ## Что умеет программа
 
@@ -19,7 +19,7 @@
 - Не добавлять искусственный наклон к буквам ни в предпросмотре, ни в растре для G-code.
 - Растягивать промежуточные строки до правого края; работает и для строк, введённых через Enter, если следующая строка не пустая.
 - Задавать высоту именно строчной буквы: при значении 5 мм строчные знаки имеют целевую высоту 5 мм, а заглавные естественно выше.
-- Менять шаг строк и отступы; начальный отступ от левого края — 10 мм (две клетки по 5 мм).
+- Менять шаг строк и отступы; на странице в клетку текст начинается в 10 мм от левого края и в 10 мм (две клетки) от верхнего края.
 - Выбирать стандартный лист или задать собственные ширину и высоту обычной страницы (40–420 мм).
 - Показывать схему листа на рабочей пластине Bambu A1 и отмечать опасную область у переднего язычка пластины.
 - Строить траекторию пера и проигрывать её по штрихам.
@@ -104,4 +104,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 4.0 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 4.1 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
