@@ -8,7 +8,7 @@
 
 **Самый простой способ:** откройте [отдельную версию 4.0](releases/Bambu-HandWrite-4.0.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.0](releases/Bambu-HandWrite-3.7.html).
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.0](releases/Bambu-HandWrite-4.0.html).
 
 ## Что умеет программа
 
