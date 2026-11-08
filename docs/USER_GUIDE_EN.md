@@ -15,7 +15,7 @@ This guide walks through opening the app, preparing a page, checking the toolpat
 1. Open `index.html` in your browser. No installation, server, or build step is needed.
 2. Enter a short sample phrase first. Do not begin with a full page.
 3. Enter your work title in **Work title / G-code filename**. Cyrillic text is immediately transliterated to Latin for the download filename and the G-code `Title` comment. For example, `Домашняя работа по физике` becomes `Domashnyaya_rabota_po_fizike.gcode`. The filename and title comment contain no Cyrillic characters. The title is not printed on the paper.
-4. Choose paper type, orientation, handwriting profile, letter size, and line spacing. The default 5 mm value now means the actual lowercase x-height (for example, `x` or `х`); uppercase letters are naturally taller. The default left inset on notebook paper is 10 mm (two 5 mm grid cells). You can also choose **Custom paper size** and enter the actual width and height in millimetres (40–420 mm).
+4. Choose paper type, orientation, handwriting profile, letter size, and line spacing. The default 5 mm value means lowercase x-height; uppercase letters are naturally taller. Notebook text starts 10 mm (two 5 mm cells) from the left edge. Choose Custom paper size to enter a page width and height from 40 to 420 mm. The default 5 mm value now means the actual lowercase x-height (for example, `x` or `х`); uppercase letters are naturally taller. The default left inset on notebook paper is 10 mm (two 5 mm grid cells). You can also choose **Custom paper size** and enter the actual width and height in millimetres (40–420 mm).
 5. Inspect the page preview and the printer-bed preview. Red and hatched regions indicate areas that must be avoided.
 6. Generate G-code, show the pen paths, and play the route stroke by stroke. Check every letter and punctuation mark.
 7. Download the G-code file using the work title you entered. Regenerate it after every text, title, or setting change.
@@ -43,6 +43,6 @@ The timer may not be displayed as a countdown on the printer. If you need more t
 
 ## Safety and compatibility
 
-This is an experimental community tool, not an official Bambu Lab product. The current version has not been physically verified with a Bambu Lab A1 and a real pen holder. Never leave the printer unattended. Read [SAFETY.md](SAFETY.md) and [COMPATIBILITY.md](COMPATIBILITY.md) before using the generated file. Do not run it on another printer model.
+Bambu HandWrite is an independent community project, not an official Bambu Lab product. Bambu Lab A1 is the first target model. Before each job, inspect the holder, calibrate the pen-tip clearance, secure the paper, and confirm the full motion path on your own setup. Never leave the printer unattended. Read [SAFETY.md](SAFETY.md) and [COMPATIBILITY.md](COMPATIBILITY.md) before using the generated file. Do not run it on another printer model without a separate adaptation.
 
 The app uses browser canvas/SVG and saves settings in local browser storage. Optional handwriting fonts may load from Google Fonts; the interface has a system-font fallback when offline.
