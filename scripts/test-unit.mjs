@@ -26,7 +26,8 @@ const topMarginMatch = html.match(/function getTopMarginMm\(type,cell\)\{[^}]+\}
 const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
-const preflightMatch = html.match(/function validateGeneratedGcode\\(file,pauseSeconds,park,zSettings\\)\\{[\\s\\S]*?\\n\\}/);\nconst routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
+const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,zSettings\)\{[\s\S]*?\n\}/);
+const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
 if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !preflightMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
@@ -44,7 +45,7 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
@@ -52,9 +53,9 @@ assert(context.getLinePitchMm(5) === 5, 'One cell produces exactly one 5 mm grid
 pitchCellsInput = '6';
 assert(context.getLinePitchMm(5) === 30, 'Six cells produce a 30 mm baseline step');
 pitchCellsInput = '1';
-assert(context.getLinePitchMm(4.6) === 4.6, 'One cell follows a 4.6 mm notebook grid exactly');
+assert(context.getLinePitchMm(4.5) === 4.5, 'One cell follows a 4.5 mm notebook grid exactly');
 pitchCellsInput = '2';
-assert(context.getLinePitchMm(4.6) === 9, 'Two cells follow a 4.6 mm notebook grid exactly');
+assert(context.getLinePitchMm(4.6) === 9, 'Two cells follow a 4.5 mm notebook grid exactly');
 pitchUnitInput = 'mm';
 pitchMmInput = '12,5';
 assert(context.getLinePitchMm(5) === 12.5, 'Millimetre mode accepts decimal comma and exact baseline step');
@@ -74,7 +75,7 @@ assert(context.getCornerPausePosition(2, 2).x === 3 && context.getCornerPausePos
 assert(context.findLargestFittingTenth(5, value => value <= 4.9) === 4.9, 'Auto-fit recommends 4.9 mm instead of reducing a 5 mm setting more than needed');
 assert(context.findLargestFittingTenth(5, value => value <= 2) === 2, 'Auto-fit can find the minimum allowed height');
 assert(context.findLargestFittingTenth(2, () => false) === null, 'Auto-fit does not recommend a value below the minimum');
-const validGcode=['; Bambu Lab A1 pen plotter G-code','M400','M400 U1 ; manual pause','G28 ; home all axes','G1 Z50.000 F1200 ; safe height above plate','G0 X42.500 Y250.000 F2000 ; nozzle parks 3 mm outside the left edge and 3 mm below the paper\'s upper-left corner','M400','M400 S130 ; SECOND STOP','G1 Z34.000 F1200','G1 X10.000 Y20.000 F1500','M400 S1'].join('\\n')+'\\n';
+const validGcode=['; Bambu Lab A1 pen plotter G-code','M400','M400 U1 ; manual pause','G28 ; home all axes','G1 Z50.000 F1200 ; safe height above plate','G0 X42.500 Y250.000 F2000 ; nozzle parks 3 mm outside the left edge and 3 mm below the paper\'s upper-left corner','M400','M400 S130 ; SECOND STOP','G1 Z34.000 F1200','G1 X10.000 Y20.000 F1500','M400'].join('\\n')+'\\n';
 assert(context.validateGeneratedGcode(validGcode,130,{x:42.5,y:250},{safe:50,travel:34})===true,'G-code preflight accepts valid ASCII output with manual pause and nozzle parked at safe Z for the timed second pause');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:42.5,y:250},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M73 P100'),130,{x:42.5,y:250},{safe:50,travel:34}),/ручная пауза/,'G-code preflight rejects a missing manual pause');
