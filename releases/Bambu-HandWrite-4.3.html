@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f1e8">
+<title>Bambu HandWrite 4.3 — отдельный релиз</title>
+<!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#20252b;background:#f5f1e8;--ink:#183c70;--muted:#65707b;--line:#dce4e9;--accent:#263b54}*{box-sizing:border-box}body{margin:0;padding:14px;max-width:980px;margin-inline:auto}header{padding:8px 2px 12px}h1{font-size:25px;margin:0 0 5px}h2{font-size:17px;margin:0 0 12px}.sub{margin:0;color:var(--muted);font-size:14px;line-height:1.45}.card{background:#fff;border:1px solid #e2ddd3;border-radius:17px;padding:15px;margin:11px 0;box-shadow:0 2px 12px #00000008}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.wide{grid-column:1/-1}label{display:block;font-size:13px;color:#4d5660}input,textarea,select{width:100%;padding:11px;border:1px solid #cfd5db;border-radius:10px;font:inherit;margin-top:5px;background:white;color:#20252b}textarea{min-height:116px;resize:vertical;line-height:1.4}input:focus,textarea:focus,select:focus{outline:2px solid #96b5d2;outline-offset:1px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.btn{border:0;border-radius:11px;padding:12px 15px;font-weight:650;background:var(--accent);color:white;min-height:44px;cursor:pointer}.btn.secondary{background:#e8edf2;color:#263b54}.btn.ghost{background:#f8f8f7;color:#263b54;border:1px solid #d8dee3}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.status{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.4}.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;border-radius:999px;background:#eef4ef;color:#2f6544}.pill.loading{background:#fff3dc;color:#76551c}.pill.offline{background:#fff0ed;color:#884132}.pill:before{content:"";height:7px;width:7px;border-radius:50%;background:currentColor}.preview-head{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}.paper-wrap{overflow:auto;background:#e8e4dc;padding:12px;border-radius:13px;margin-top:12px}#paper{display:block;background:white;max-width:100%;height:auto;box-shadow:0 2px 12px #0002;margin:auto}.status.ok{color:#28613a;font-weight:650}.status.bad{color:#a12c25;font-weight:700}.warning{background:#fff4dc;border:1px solid #f0d28b;border-radius:12px;padding:12px;color:#694c13;font-size:13px;line-height:1.45}.good{background:#edf5ef;border:1px solid #cde1d1;border-radius:12px;padding:12px;color:#315e3b;font-size:13px;line-height:1.45}.tiny{font-size:11px;color:var(--muted)}.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check{border:1px solid #e1e5e8;border-radius:10px;padding:9px;font-size:12px}.check b{display:block;font-size:13px;margin-bottom:3px}.mono{font-variant-numeric:tabular-nums}.orientation-guide{margin-top:12px;padding:12px;border:1px solid #d5e2eb;border-radius:12px;background:#f4f8fb;color:#29445c;font-size:13px;line-height:1.45}.orientation-head{font-weight:700;margin-bottom:8px}.orientation-flow{display:grid;grid-template-columns:1fr;justify-items:center;gap:5px;text-align:center}.orientation-edge{font-size:11px;font-weight:700;letter-spacing:.02em;color:#53697b}.orientation-arrow{font-size:13px;font-weight:700;color:#315e86}.orientation-sheet{width:min(190px,70%);min-height:118px;border:2px solid #95a8b6;border-radius:5px;background:repeating-linear-gradient(0deg,transparent 0 15px,#d8e8f1 15px 16px),repeating-linear-gradient(90deg,transparent 0 15px,#d8e8f1 15px 16px),#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:9px 5px;box-shadow:0 2px 5px #00000010}.orientation-sheet strong{font-size:10px;color:#53697b}.orientation-sheet span{font-family:cursive;color:#244e79;font-size:19px}.orientation-axes{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:650}.orientation-explain{margin:8px 0 0;color:#465b6d}.orientation-guide .note{font-size:11px;color:#647584;margin:6px 0 0}
+.bed-card{margin-top:14px;padding:13px;border:1px solid #d7dfe4;border-radius:13px;background:#f7fafb}
+.bed-card h3{font-size:15px;margin:0 0 7px}.bed-svg-wrap{overflow:auto;background:#e9edf0;border-radius:10px;padding:8px}
+#bedPreview{display:block;width:min(100%,440px);height:auto;margin:auto;box-shadow:0 2px 8px #00000010}
+.bed-status{margin:9px 0 0;font-size:13px;line-height:1.45}.pause-guide{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.pause-item{background:#fff;border:1px solid #dde4e8;border-radius:10px;padding:9px;font-size:12px;line-height:1.4}.pause-item b{display:block;margin-bottom:4px}
+@media(max-width:520px){.pause-guide{grid-template-columns:1fr}}
+
+.bed-status.ok{color:#28613a;font-weight:650}.bed-status.bad{color:#a12c25;font-weight:700}
+.route-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px}
+.route-btn{border:1px solid #cdd8df;border-radius:10px;background:#fff;color:#304454;padding:10px 7px;font:inherit;font-size:12px;font-weight:700;min-height:48px;cursor:pointer}
+.route-btn[aria-pressed="true"]{background:#e8f2eb;border-color:#4c9b65;color:#205c35;box-shadow:inset 0 0 0 1px #4c9b65}
+.route-status{background:#f1f6f8;border:1px solid #d7e2e8;border-radius:11px;padding:10px 12px;margin-top:9px;font-size:12px;line-height:1.45;color:#334b5d}
+.route-legend{display:flex;flex-wrap:wrap;gap:8px 13px;margin-top:8px;font-size:11px;color:#52616b}
+.route-legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1px solid #fff;box-shadow:0 0 0 1px #71808b}
+.dot.corner{background:#23824a}.dot.textstart{background:#2770bd}.dot.red{background:#c63c36}
+.autosave{font-size:11px;color:#63717b;margin:6px 1px 0}
+@media(max-width:420px){.route-btn{font-size:11px;padding:8px 4px}}
+
+
+@media(max-width:520px){body{padding:10px}.card{padding:13px}.grid{gap:9px}h1{font-size:22px}.checks{grid-template-columns:1fr}}
+@media print{body{max-width:none;background:white;padding:0}.no-print,header,.card.controls,.warning,.good{display:none!important}.card.preview{border:0;box-shadow:none;padding:0;margin:0}.paper-wrap{background:white;padding:0;overflow:visible}#paper{max-width:100%;box-shadow:none}}
+
+#gcodeInstruction ol{margin:8px 0 0}#gcodeDetails .check{background:#f7fafb}
+.gcode-ready{color:#28613a;font-weight:700}.gcode-error{color:#a12c25;font-weight:700}
+.gcode-download{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#28613a;color:#fff;border-radius:11px;padding:12px 15px;font-weight:750;min-height:44px;margin-top:8px}.gcode-download[hidden]{display:none!important}
+.preview-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:9px}.preview-tools .status{margin:0}
+#penRouteLayer{pointer-events:none}#routeOverlayBtn{flex:0 0 auto}
+
+.recommended-settings{border:1px solid #d9e4ec;background:#f7fafc;border-radius:12px;padding:12px;line-height:1.45}.recommended-settings> b{display:block;margin-bottom:8px;color:#29465d}.recommended-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13px}.recommended-settings p{margin:9px 0 0}.paper-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.paper-choice{display:flex;flex-direction:column;gap:7px;align-items:stretch;text-align:left;padding:9px;border:1px solid #d7dfe4;border-radius:12px;background:#fbfcfd;color:#293743;cursor:pointer;min-width:0}
+.paper-choice[aria-pressed="true"]{border:2px solid #315f83;background:#f0f6fa;padding:8px;box-shadow:0 0 0 2px #315f8314}
+.paper-thumb{height:88px;border:1px solid #c8d0d6;border-radius:4px;background:#fff;position:relative;overflow:hidden;box-shadow:0 2px 5px #0000000d}
+.paper-thumb.math{background-color:#fff;background-image:linear-gradient(#b9d6e8 .7px,transparent .7px),linear-gradient(90deg,#b9d6e8 .7px,transparent .7px);background-size:2.7px 2.7px;background-position:0 0}
+.paper-thumb.math:after,.paper-thumb.russian:after{content:"";position:absolute;top:0;bottom:0;right:19%;width:1px;background:#d85c5c}
+.paper-thumb.russian{background-color:#fff;background-image:linear-gradient(to bottom,transparent 0 4px,#b9d6e8 4px 4.5px);background-size:100% 4.3px}
+.paper-thumb span{position:absolute;left:15%;top:38%;font-family:cursive;font-size:17px;color:#244b75;white-space:nowrap}
+.paper-choice b{font-size:12px;line-height:1.25}.paper-choice small{font-size:10px;color:#6b7780;line-height:1.25}
+.paper-info{font-size:12px;color:#52616b;margin:9px 2px 0;line-height:1.4}
+.font-profile-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.font-profile-head>b{margin:0!important;font-size:14px}
+.font-profile-tag{display:inline-flex;align-items:center;border-radius:999px;background:#e9f1f7;color:#315b79;padding:5px 9px;font-size:10px;font-weight:800;letter-spacing:.04em}
+.font-profile>p:not(.tiny){margin:7px 0 10px;font-size:13px;color:#43515d;line-height:1.4}
+.font-profile .recommended-grid{padding-top:9px;border-top:1px solid #e1e8ed}
+
+.layout-options{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+.option-toggle{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid #d9e2e8;border-radius:12px;background:#f8fafb;cursor:pointer;color:#2b3d4a}
+.option-toggle input{appearance:auto;flex:0 0 auto;width:19px;height:19px;margin:1px 0 0;accent-color:#315f83}
+.option-toggle span{display:block;min-width:0}
+.option-toggle b{display:block;font-size:13px;color:#263b54;margin-bottom:3px}
+.option-toggle small{display:block;font-size:11px;line-height:1.4;color:#687783}
+
+@media(max-width:520px){.paper-gallery{gap:6px}.paper-choice{padding:6px}.paper-choice[aria-pressed="true"]{padding:5px}.paper-thumb{height:70px}.paper-choice b{font-size:11px}.paper-choice small{font-size:9px}}
+
+.route-playback{margin-top:10px;padding:12px;border:1px solid #d8e2e8;border-radius:12px;background:#f8fafb}
+.route-playback[hidden]{display:none!important}.route-playback-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.route-playback button{border:1px solid #cbd7df;border-radius:9px;background:#fff;color:#294052;padding:10px 6px;min-height:42px;font:inherit;font-size:12px;font-weight:700}
+.route-playback input[type=range]{padding:0;margin:7px 0;accent-color:#315f83}
+.route-playback .route-stat{font-size:12px;line-height:1.45;color:#3d5262;margin:8px 0 0}
+.route-legend .dot.gray{background:#aeb6be}.route-legend .dot.orange{background:#ed922c}.route-legend .dot.blue{background:#2776bd}
+.quality-panel{padding:12px;border:1px solid #dce3e8;border-radius:12px;background:#f8fafb;font-size:13px;line-height:1.45}
+.quality-panel.ok{border-color:#cde1d1;background:#edf5ef;color:#315e3b}.quality-panel.warn{border-color:#f0d28b;background:#fff6e3;color:#74551d}.quality-panel.bad{border-color:#e6b8b4;background:#fff0ed;color:#8b302b}
+.quality-panel ul{margin:7px 0 0;padding-left:19px}.calibration-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px}
+.calibration-grid label{background:#fff;border:1px solid #e0e6e9;border-radius:9px;padding:8px}
+.calibration-grid input{margin-top:4px;padding:8px}.calibration-note{font-size:11px;line-height:1.4;color:#64717b;margin:8px 0 0}
+@media(max-width:420px){.route-playback-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}.calibration-grid{grid-template-columns:1fr}}
+
+/* HandWrite HD: improved visual hierarchy, touch targets and paper inspection */
+:root{color-scheme:light;--accent:#244b6b;--accent2:#397ca3;--paper-shadow:0 12px 32px #23374818}
+body{max-width:1080px;background:linear-gradient(180deg,#f2f6f8 0%,#f5f1e8 340px);padding:18px 16px 36px;font-size:15px;line-height:1.45}
+header{padding:10px 3px 16px}h1{font-size:clamp(24px,4vw,31px);letter-spacing:-.035em;color:#1d3548}h2{font-size:18px;letter-spacing:-.015em;color:#20384b}
+.sub{font-size:14px;max-width:700px}.card{border:1px solid #dce4e9;border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 5px 20px #2337480b}
+label{font-size:13px;font-weight:600;color:#405463}input,textarea,select{border-color:#cbd7df;border-radius:12px;padding:12px;font-size:15px;min-height:44px}textarea{min-height:128px;font-size:16px;line-height:1.6;letter-spacing:.005em}
+.btn{background:linear-gradient(135deg,#244b6b,#315f83);box-shadow:0 3px 9px #244b6b18}.btn.secondary{background:#eaf1f5;border:1px solid #d7e3ea;color:#24455e;box-shadow:none}.btn.ghost{background:#fff}
+.paper-wrap{background:linear-gradient(135deg,#e1e8ed,#edf1f4);padding:16px;touch-action:pan-x pan-y;border:1px solid #d5dfe5;border-radius:16px;scrollbar-color:#9eb2c1 #e9eef1;overscroll-behavior-x:contain}
+#paper{max-width:100%;height:auto;box-shadow:var(--paper-shadow);border-radius:2px;shape-rendering:geometricPrecision;overflow:visible}
+.paper-wrap.zoomed #paper{max-width:none}
+.paper-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 0;padding:9px 11px;border:1px solid #dce5eb;border-radius:12px;background:#f8fafb}
+.paper-toolbar-title{font-size:12px;font-weight:750;color:#41596a}.paper-zoom-controls{display:flex;align-items:center;gap:7px}.paper-zoom-controls output{min-width:78px;text-align:center;font-size:12px;font-weight:700;color:#36536a}
+.zoom-btn,.zoom-fit{min-width:38px;min-height:36px;padding:6px 10px;border:1px solid #cbd8e1;border-radius:9px;background:#fff;color:#28485f;font-weight:750}.zoom-fit{font-size:12px}
+.font-sample-wrap{margin:10px 0 11px;padding:10px 12px;border:1px solid #dce5eb;border-radius:12px;background:linear-gradient(140deg,#fff,#f4f8fa)}
+.font-sample-caption{display:block;font:700 10px system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#738492;margin-bottom:4px}
+.font-sample{font-family:cursive;font-size:clamp(23px,5vw,30px);line-height:1.25;color:#214a73;overflow-wrap:anywhere}
+.font-profile .recommended-grid{gap:8px 14px}.recommended-grid span{line-height:1.35}
+.route-playback{border-color:#d5e1e8;background:#f7fafc}.route-playback-buttons button{min-height:46px;transition:background .15s,border-color .15s}.route-playback-buttons button:active,.zoom-btn:active,.zoom-fit:active{transform:translateY(1px);background:#eaf2f7}
+.route-stat{font-variant-numeric:tabular-nums}.route-progress{height:9px;margin:10px 0 4px;border-radius:99px;overflow:hidden;background:#e2e9ee;border:1px solid #d6e0e7}.route-progress span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#377fa8,#4f9b80);transition:width .12s linear}.route-progress-label{font-size:11px;font-weight:700;color:#4b6475;margin:0 0 5px;font-variant-numeric:tabular-nums}.route-legend{padding:7px 10px;border:1px solid #e0e7eb;border-radius:10px;background:#fafcfd}
+.quality-panel{border-radius:14px}.check{background:#fff;border-radius:11px;padding:10px;line-height:1.4}.checks{gap:9px}
+.generation-progress{padding:11px 12px;border:1px solid #dbe4ea;border-radius:12px;background:#f7fafc;margin-top:11px}.generation-progress[hidden]{display:none!important}.generation-progress-track{height:8px;border-radius:99px;background:#e2eaf0;overflow:hidden}.generation-progress-track span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#3d88ad,#64a58a);transition:width .25s}.generation-progress p{margin:6px 0 0;font-size:11px;color:#5a6c78}
+.mobile-dock{display:none}.mobile-dock[hidden]{display:none!important}
+.bed-svg-wrap{background:linear-gradient(135deg,#e8eef2,#e1e8ed);border:1px solid #dbe3e8;padding:10px}
+#bedPreview{width:min(100%,600px);max-width:100%;filter:drop-shadow(0 3px 7px #20384b12)}
+.orientation-guide{border-radius:14px}.orientation-sheet{background-color:#fff}
+.option-toggle{transition:border-color .15s,background .15s}.option-toggle:has(input:checked){border-color:#8eb8a0;background:#f3f8f4}
+:focus-visible{outline:3px solid #77a9ca!important;outline-offset:2px}
+@media(min-width:760px){.card.controls{padding:22px}.preview .paper-wrap{padding:20px}.paper-gallery{max-width:760px}}
+@media(max-width:640px){body{padding:10px 10px 104px}.card{padding:14px;border-radius:16px;margin:10px 0}header{padding:6px 3px 10px}.grid{grid-template-columns:1fr}.paper-wrap{padding:9px}.paper-toolbar{align-items:flex-start}.paper-toolbar-title{padding-top:7px}.paper-zoom-controls{gap:5px}.zoom-btn{min-width:36px}.route-playback-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}.route-playback-buttons button{font-size:12px}.bed-card{padding:10px}.font-sample{font-size:25px}.mobile-dock{display:block;position:fixed;z-index:50;left:0;right:0;bottom:0;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#ffffffed;backdrop-filter:blur(14px);border-top:1px solid #d6e0e6;box-shadow:0 -6px 20px #1f3b5015}.mobile-dock>span{display:block;font-size:10px;line-height:1.2;color:#667783;margin:0 2px 6px}.mobile-dock>div{display:grid;grid-template-columns:.75fr 1.5fr;gap:8px}.dock-secondary,.dock-primary{min-height:44px;border-radius:11px;font-weight:750;border:1px solid #cbd8e1}.dock-secondary{background:#eef3f6;color:#29485f}.dock-primary{background:#244b6b;color:#fff;border-color:#244b6b}.mobile-dock button:disabled{opacity:.55}}
+@media(max-width:400px){.paper-toolbar{gap:6px}.paper-zoom-controls output{min-width:67px}.zoom-fit{padding-inline:7px}.route-playback-buttons{gap:6px}.route-playback-buttons button{padding:8px 4px}}
+
+
+.orientation-details,.pause-details,.checks-details{margin:9px 0;border:1px solid #d9e3e9;border-radius:12px;background:#f8fafb;overflow:hidden}
+.orientation-details>summary,.pause-details>summary,.checks-details>summary{padding:11px 13px;cursor:pointer;font-size:13px;font-weight:750;color:#294b64;list-style:none}
+.orientation-details>summary::-webkit-details-marker,.pause-details>summary::-webkit-details-marker,.checks-details>summary::-webkit-details-marker{display:none}
+.orientation-details>summary:after,.pause-details>summary:after,.checks-details>summary:after{content:'＋';float:right;color:#47738e;font-weight:800}
+.orientation-details[open]>summary:after,.pause-details[open]>summary:after,.checks-details[open]>summary:after{content:'−'}
+.orientation-details .orientation-guide{margin:0;border:0;border-radius:0;border-top:1px solid #e0e8ed}
+.pause-details .pause-guide{margin:0;padding:0 10px 10px}.checks-details .checks{padding:0 10px 10px}
+
+
+/* 3.1 ULTRA: clearer live status, route inspection and pause controls */
+.live-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0 2px}
+.live-stats>div{min-width:0;border:1px solid #dce5eb;border-radius:12px;padding:9px 10px;background:linear-gradient(145deg,#fff,#f5f8fa)}
+.live-stats b{display:block;font-size:18px;line-height:1.15;color:#234c69;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.live-stats span{display:block;margin-top:3px;font-size:10px;color:#6a7b86}
+#paper.route-ink-mode text[data-line]{opacity:.14;transition:opacity .2s}
+#penRouteLayer path[data-stroke],#bedRouteLayer path[data-stroke]{transition:opacity .14s,stroke .14s}
+#routeInkModeBtn[aria-pressed="true"]{background:#e5f2ec;border-color:#9ac6ad;color:#246345}
+.pause-setting{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:10px;align-items:center;padding:13px;border:1px solid #d8e4eb;border-radius:15px;background:linear-gradient(135deg,#f6fafc,#eef5f8);margin-top:12px}
+.pause-setting-copy b{display:block;color:#24475f;font-size:14px;margin-bottom:4px}.pause-setting-copy span{display:block;color:#647681;font-size:12px;line-height:1.4}
+.pause-setting label{font-size:12px}.pause-setting input{margin-top:4px;font-size:18px;font-weight:800;color:#244b6b;text-align:center}
+.pause-presets{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.pause-presets button{min-height:38px;border:1px solid #cedbe3;border-radius:9px;background:#fff;color:#34556b;font-weight:750}
+.pause-presets button[aria-pressed="true"]{background:#e5f1f7;border-color:#6c9bb6;color:#1f4e6b;box-shadow:inset 0 0 0 1px #6c9bb6}
+.pause-live{grid-column:1/-1;margin:0!important;font-size:12px;font-weight:750;color:#28613a}
+@media(max-width:520px){.live-stats{gap:6px}.live-stats>div{padding:8px 6px}.live-stats b{font-size:16px}.live-stats span{font-size:9px}.pause-setting{grid-template-columns:1fr 112px;padding:11px}.pause-setting-copy span{font-size:11px}.pause-presets{gap:5px}.pause-presets button{font-size:12px}}
+
+
+/* 3.2: text history + portable project backup */
+.text-tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:7px 0 2px}
+.text-tools button,.project-tools button{border:1px solid #cedbe3;background:#f7fafc;color:#2d4d64;border-radius:10px;min-height:39px;padding:8px 11px;font:650 12px system-ui,sans-serif;cursor:pointer}
+.text-tools button:disabled{opacity:.42;cursor:not-allowed}
+.text-count{margin-left:auto;font-size:11px;color:#71808a;font-variant-numeric:tabular-nums}
+.project-backup{margin-top:13px;padding:12px;border:1px solid #d7e2e8;border-radius:13px;background:linear-gradient(135deg,#f8fbfd,#f0f5f8)}
+.project-backup b{display:block;color:#2b4a60;font-size:13px;margin-bottom:4px}
+.project-backup p{margin:0;color:#667783;font-size:11px;line-height:1.4}
+.project-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.project-tools button.primary{background:#294f6d;color:#fff;border-color:#294f6d}
+.project-status{font-size:11px;color:#4f6b7e;margin:7px 0 0;min-height:1em}
+@media(max-width:520px){.text-tools button{flex:1}.text-count{width:100%;margin-left:0}.project-tools button{flex:1}}
+
+
+
+.z-setting{margin-top:13px;padding:13px;border:1px solid #d6e2e9;border-radius:14px;background:linear-gradient(145deg,#f8fbfd,#eef5f8)}
+.z-setting-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;color:#29485e;font-size:14px}
+.z-safety-badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:#e6f4e9;color:#28613a;font-size:10px;font-weight:800;letter-spacing:.03em}
+.z-setting>p{font-size:12px;line-height:1.45;color:#5b6e7b;margin:8px 0}
+.z-setting label{display:block;max-width:360px;margin-top:8px}
+.z-presets{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.z-presets button{border:1px solid #cbd8df;background:white;border-radius:9px;padding:8px 13px;min-height:38px;color:#29485e;font-weight:750;cursor:pointer}
+.z-presets button[aria-pressed="true"]{background:#294f6d;color:white;border-color:#294f6d}
+.z-levels{margin-top:9px;padding:10px;border-radius:10px;background:#fff;border:1px solid #d8e2e8;color:#31566d;font-size:12px;font-weight:700;line-height:1.5;font-variant-numeric:tabular-nums}
+.z-levels.invalid{background:#fff2ef;border-color:#e5b9b1;color:#923c32}
+@media(max-width:520px){.z-setting{padding:11px}.z-presets button{flex:1;min-width:62px}}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>✍️ Bambu HandWrite <span class="tiny">4.1 · REFINED HANDWRITING</span></h1>
+  <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
+  <p style="margin:10px 0 0"><span id="fontStatus" class="pill">Генератор готов · интернет не обязателен</span></p>
+</header>
+<section class="card controls">
+  <h2>1. Текст и почерк</h2>
+  <label>Текст домашней работы<textarea id="txt" spellcheck="false">Мама мыла раму.
+Hello, world!</textarea></label>
+  <label style="display:block;margin-top:10px">Название работы / имя G-code-файла
+    <input id="documentTitle" type="text" value="Моя работа" maxlength="80" autocomplete="off" spellcheck="false" placeholder="Например: Домашняя работа по физике">
+  </label>
+  <p class="tiny" style="margin:5px 1px 0">Можно вводить название по-русски. Приложение сразу покажет транслитерацию латиницей; в имени файла и G-code русских букв не будет. На сам лист название не наносится.<br><b>Латинское имя файла:</b> <output id="documentTitleLatin">Moya_rabota.gcode</output></p>
+  <div class="text-tools no-print" aria-label="История редактирования текста">
+    <button id="textUndo" type="button" disabled>↶ Отменить</button>
+    <button id="textRedo" type="button" disabled>↷ Повторить</button>
+    <button id="textClear" type="button">Очистить текст</button>
+    <span id="textCount" class="text-count">0 символов</span>
+  </div>
+  <div class="grid" style="margin-top:12px">
+    <label>Тип бумаги
+      <select id="paperType">
+        <option value="math-notebook" selected>Страница из тетради по математике — клетка 5 мм</option>
+        <option value="russian-notebook">Страница из тетради по русскому языку — линейка</option>
+        <option value="a4-plain">Обычный чистый лист A4 — без клеток и линеек</option>
+        <option value="custom-paper">Свой размер обычного листа</option>
+      </select>
+    </label>
+    <div class="paper-gallery wide" aria-label="Визуальный выбор типа бумаги">
+      <button class="paper-choice" type="button" data-paper-choice="a4-plain" aria-pressed="false"><div class="paper-thumb"><span>Текст</span></div><b>Чистый A4</b><small>210 × 297 мм · без линий</small></button>
+      <button class="paper-choice" type="button" data-paper-choice="math-notebook" aria-pressed="true"><div class="paper-thumb math"><span>Текст</span></div><b>Математика</b><small>165 × 203 мм · клетка 5 мм</small></button>
+      <button class="paper-choice" type="button" data-paper-choice="russian-notebook" aria-pressed="false"><div class="paper-thumb russian"><span>Текст</span></div><b>Русский язык</b><small>165 × 203 мм · линейка</small></button>
+    </div>
+    <p class="tiny wide">A4 — отдельный обычный лист. Для математики и русского языка используется формат школьной тетрадной страницы 165 × 203 мм. На странице в клетку первая строка начинается на 2 клетки (10 мм) ниже верхнего края.</p>
+    <div id="customPaperSize" class="grid wide" hidden style="margin-top:8px"><label>Ширина своего листа, мм<input id="customPaperW" type="number" min="40" max="420" step="1" value="165" inputmode="numeric"></label><label>Высота своего листа, мм<input id="customPaperH" type="number" min="40" max="420" step="1" value="203" inputmode="numeric"></label><p class="tiny wide">Укажи фактический размер бумаги в миллиметрах. Размеры должны соответствовать реальному листу; программа пересчитает размещение на пластине.</p></div>
+    <label id="orientationField">Ориентация чистого листа A4
+      <select id="paperOrientation">
+        <option value="portrait">Книжная — 210 × 297 мм</option>
+        <option value="landscape">Альбомная — 297 × 210 мм</option>
+      </select>
+    </label>
+    <label>Язык и почерк
+      <select id="scriptMode">
+        <option value="auto">Авто: русский и English каждый своим почерком</option>
+        <option value="ru">Только русский рукописный</option>
+        <option value="en">Только английский рукописный</option>
+        <option value="universal">Один почерк для обоих языков</option>
+        <option value="print">Упрощённый печатный · контурный, не single-line</option>
+      </select>
+    </label>
+    <label>Профиль почерка
+      <select id="handFont">
+        <option value="marck">Школьный прописной — Marck Script</option>
+        <option value="neucha" selected>Аккуратный повседневный — Neucha</option>
+        <option value="badscript">Естественный реалистичный — Bad Script</option>
+        <option value="pangolin">Мягкий рукописный — Pangolin</option>
+        <option value="lobster">Связный красивый — Lobster</option>
+        <option value="caveat">Быстрый — Caveat</option>
+        <option value="great">Каллиграфический — Great Vibes (латиница)</option>
+        <option value="recommended">Авто · подбирает почерк под язык</option>
+      </select>
+    </label>
+    <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
+      <div class="font-profile-head"><b id="fontProfileTitle">Школьный почерк — Marck Script</b><span class="font-profile-tag" id="fontProfileTag">ОСНОВНОЙ</span></div>
+      <p id="fontProfileDescription">Аккуратный школьный курсив. Рекомендуемый баланс разборчивости и скорости; это базовый вариант для обычных заданий.</p>
+      <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
+      <div class="recommended-grid" id="fontProfileMetrics">
+        <span>Высота букв: <b>4,8 мм</b></span>
+        <span>Шаг строк: <b>8,35 мм</b></span>
+        <span>Скорость письма: <b>1600 мм/мин</b></span>
+        <span>Характер: <b>ровный, школьный</b></span>
+      </div>
+      <p class="tiny">При выборе почерка подставляются его рекомендуемые высота и шаг строк. Их можно вручную менять в полях ниже. Neucha выбран по умолчанию: аккуратные буквы без дополнительного программного наклона.</p>
+    </div>
+    <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
+    <div class="layout-options wide" aria-label="Настройки абзацев и заполнения строк">
+      <label class="option-toggle"><input id="paragraphIndentToggle" type="checkbox" checked><span><b>Красная строка у русских абзацев</b><small>Включено — первая строка русского абзаца начинается с отступом 5 мм. Выключено — весь русский текст начинается от общего левого края. Английский текст не получает отступ.</small></span></label>
+      <label class="option-toggle"><input id="justifyToggle" type="checkbox" checked><span><b>Заполнять строки до правой границы</b><small id="justifyHelp">Распределять пробелы в промежуточных строках до безопасной правой границы. Последняя строка перед пустой строкой или концом текста остаётся обычной.</small></span></label>
+    </div>
+    <div class="grid wide" style="margin-top:10px">
+      <label id="pitchCellsField">Межстрочный интервал, клеток
+        <select id="pitchCells"><option value="1">1 клетка</option><option value="2" selected>2 клетки</option><option value="3">3 клетки</option><option value="4">4 клетки</option><option value="5">5 клеток</option><option value="6">6 клеток</option></select>
+      </label>
+    </div>
+    <p class="tiny wide">Межбуквенное расстояние определяется выбранным шрифтом: сохраняются его естественные интервалы, кернинг и соединения. Для страницы в клетку шаг строк задаётся целым числом клеток.</p>
+    <div class="grid wide" style="margin-top:10px">
+      <label>Высота букв, мм
+        <input id="lh" type="text" value="4.8" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="heightInputHelp">
+      </label>
+      <input id="pitch" type="hidden" value="8.2">
+    </div>
+    <p class="tiny wide" id="heightInputHelp">Высота и шаг можно вводить с запятой или точкой (например, 5,2). Значение больше не сбрасывается во время набора: проверка и ограничение выполняются после выхода из поля. Теперь высота означает именно высоту обычной строчной буквы (например, «х» или «x»); заглавные буквы будут естественно выше. Допустимо: 2–20 мм. Шаг строк: 2–30 мм.</p>
+    <input id="paragraphIndent" type="hidden" value="5">
+    <input id="pw" type="hidden" value="165"><input id="ph" type="hidden" value="203">
+    <input id="cell" type="hidden" value="5"><input id="left" type="hidden" value="5">
+    <input id="top" type="hidden" value="10"><input id="margin" type="hidden" value="20">
+    <input id="gapAfterMargin" type="hidden" value="1"><input id="rightSafe" type="hidden" value="0">
+    
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn" id="draw">Обновить предпросмотр</button>
+    <button class="btn secondary" id="reset">Сбросить значения</button>
+  </div>
+  <div class="row">
+    <button class="btn secondary" id="svgBtn">Скачать SVG</button>
+    <button class="btn secondary" id="pngBtn">Скачать PNG</button>
+    <button class="btn secondary" id="printBtn">Печать предпросмотра</button>
+  </div>
+  <div class="project-backup no-print">
+    <b>📦 Резервная копия проекта</b>
+    <p>Сохраняет текст, выбранный шрифт, формат страницы, время второй паузы и остальные настройки в одном JSON-файле. Копию можно перенести на другой телефон или восстановить после очистки браузера.</p>
+    <div class="project-tools">
+      <button class="primary" id="backupExport" type="button">Сохранить проект .json</button>
+      <button id="backupImportBtn" type="button">Восстановить проект</button>
+    </div>
+    <input id="backupImportFile" type="file" accept=".json,application/json" hidden>
+    <p id="backupStatus" class="project-status" aria-live="polite">Резервная копия не создаётся автоматически — сохраняй её перед переносом или очисткой данных.</p>
+  </div>
+  <p class="status" id="fontNote">Дополнительные шрифты подключаются необязательно. При отсутствии сети используется системный курсив; предпросмотр доступен сразу, а генератор после короткой проверки продолжает работу без сети.</p>
+  <p class="autosave" id="autosaveNote">Текст и настройки можно будет восстановить при следующем открытии в этом браузере.</p>
+</section>
+<section class="card preview" id="previewSection">
+  <div class="preview-head"><h2 style="margin:0">2. Как выглядит текст на листе</h2><span class="tiny mono" id="summary"></span></div>
+  <details class="orientation-details no-print"><summary>Как правильно положить лист на Bambu Lab A1</summary>
+  <div class="orientation-guide" role="note" aria-label="Правильная ориентация листа на принтере Bambu Lab A1">
+    <div class="orientation-head">Ориентация листа на Bambu Lab A1</div>
+    <div class="orientation-flow">
+      <div class="orientation-edge">ЗАДНЯЯ ЧАСТЬ ПРИНТЕРА · Y+</div>
+      <div class="orientation-arrow">↑ Верх листа направлен назад</div>
+      <div class="orientation-sheet"><strong>ВЕРХ ЛИСТА</strong><span>Текст читается</span><strong>НИЗ ЛИСТА</strong></div>
+      <div class="orientation-arrow">Нижний край — к тебе ↓</div>
+      <div class="orientation-edge">ПЕРЕДНЯЯ ЧАСТЬ ПРИНТЕРА</div>
+    </div>
+    <div class="orientation-axes"><span>X+ → вправо</span><span>Y+ ↑ к задней части</span></div>
+    <p class="orientation-explain">Смотри на лист со стороны передней части принтера. Клади его ровно: верх страницы — в глубину принтера, низ страницы — к переднему краю. Передний язычок/ручка пластины должен оставаться полностью свободным: бумага не должна на него заходить. Не поворачивай лист на 180° и не переворачивай его.</p>
+    <p class="note">Предпросмотр ниже всегда показывает страницу прямо, как её читает человек. Это схема правильной укладки, а не движение головки.</p>
+  </div></details>
+  <p class="paper-info" id="paperInfo">Чистый лист A4 · без клеток, линеек и полей.</p>
+  <div class="live-stats no-print" aria-label="Статистика страницы">
+    <div><b id="statChars">0</b><span>символов</span></div>
+    <div><b id="statWords">0</b><span>слов</span></div>
+    <div><b id="statLines">0</b><span>строк</span></div>
+    <div><b id="statSpace">—</b><span>место снизу</span></div>
+  </div>
+  <div class="paper-toolbar no-print" aria-label="Масштаб предпросмотра">
+    <span class="paper-toolbar-title">Масштаб листа</span>
+    <div class="paper-zoom-controls"><button id="zoomOut" class="zoom-btn" type="button" aria-label="Уменьшить масштаб">−</button><output id="zoomValue">По ширине</output><button id="zoomIn" class="zoom-btn" type="button" aria-label="Увеличить масштаб">＋</button><button id="zoomFit" class="zoom-fit" type="button">По ширине</button></div>
+  </div>
+  <div class="paper-wrap"><svg id="paper" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297" width="630" height="891" role="img" aria-label="Предпросмотр текста на листе"></svg></div>
+  <div class="preview-tools no-print"><button class="btn secondary" id="routeOverlayBtn" type="button" hidden>Показать траектории</button><button class="btn ghost" id="routeInkModeBtn" type="button" hidden disabled>Режим проверки пера</button><p id="routeOverlayStatus" class="status">После построения можно посмотреть реальные линии G-code, сравнить их с буквами и пройти весь маршрут по шагам.</p></div>
+  <div id="routePlayback" class="route-playback no-print" hidden>
+    <div class="route-playback-buttons">
+      <button id="routePlay" type="button">▶ Показать по порядку</button>
+      <button id="routePause" type="button">Ⅱ Пауза</button>
+      <button id="routeResume" type="button">▶ Продолжить</button>
+      <button id="routeAll" type="button">Показать всё</button>
+      <button id="routeStart" type="button">↺ Сначала</button>
+    </div>
+    <label style="margin-top:9px">Положение по штрихам <input id="routeSlider" type="range" min="0" max="0" step="1" value="0"></label>
+    <label>Скорость воспроизведения <input id="routeSpeed" type="range" min="80" max="1800" step="40" value="500"><span id="routeSpeedValue" class="tiny">2 штриха/сек</span></label>
+    <div id="routeProgress" class="route-progress" role="progressbar" aria-label="Прогресс прорисовки" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="routeProgressBar"></span></div>
+    <p id="routeProgressLabel" class="route-progress-label">Пройдено 0 из 0 штрихов</p>
+    <p id="routePlaybackStatus" class="route-stat" aria-live="polite">Траектории ещё не построены.</p>
+  </div>
+  <div class="route-legend no-print"><span><i class="dot gray"></i> ещё не пройдено</span><span><i class="dot orange"></i> текущий штрих</span><span><i class="dot blue"></i> пройдено</span><span><i class="dot red"></i> ошибка</span></div>
+  <div class="row no-print" style="margin-top:8px;gap:7px">
+    <span class="tiny">🟥 Красное поле показывается только на тетрадных листах</span>
+    <span class="tiny">Недоступная для письма зона отмечается штриховкой на листе и на схеме пластины</span>
+  </div>
+  <p class="status" id="layoutStatus" aria-live="polite"></p>
+  <div class="good" id="fitSuggestion" hidden aria-live="polite" style="margin-top:9px"><b id="fitSuggestionText"></b> <button type="button" id="applyFitSuggestion" class="secondary" style="margin:8px 0 0">Применить рекомендацию</button></div>
+  <div class="bed-card no-print">
+    <h3>3. Как лист расположен на пластине A1 (256 × 256 мм)</h3>
+    <p class="tiny">Схема сверху: верх листа направлен к задней части принтера. Белая область — бумага, серая — пластина, красная штриховка — свисающая часть, которую пластина не поддерживает.</p>
+    <details class="no-print" style="margin:9px 0"><summary style="cursor:pointer;font-size:13px;font-weight:700;color:#29465d">Настройки положения и защитной зоны пластины</summary>
+      <div class="calibration-grid">
+        <label>Отступ листа от заднего края, мм<input id="bedTopGap" type="number" min="0" max="20" step="0.5" value="0" inputmode="decimal"></label>
+        <label>Левая координата защитной зоны X, мм<input id="plateTabX" type="number" min="0" max="256" step="1" value="108" inputmode="decimal"></label>
+        <label>Ширина защитной зоны, мм<input id="plateTabWidth" type="number" min="1" max="100" step="1" value="40" inputmode="decimal"></label>
+        <label>Запас перед язычком, мм<input id="plateTabClearance" type="number" min="0" max="60" step="1" value="18" inputmode="decimal"></label>
+        <label>Глубина выступа за пластину, мм<input id="plateTabDepth" type="number" min="0" max="60" step="1" value="18" inputmode="decimal"></label>
+      </div>
+      <p class="calibration-note">Это настраиваемая консервативная зона безопасности, а не точный заводской размер Bambu. Измерь свою пластину и оставь дополнительный зазор; приложение не может проверить физическое положение бумаги.</p>
+    </details>
+    <div class="bed-svg-wrap"><svg id="bedPreview" viewBox="0 0 256 310" role="img" aria-label="Положение листа и точки маршрута на пластине принтера"></svg></div>
+    <div class="route-legend"><span><i class="dot corner"></i> положение сопла при второй остановке — снаружи левого края листа</span><span><i class="dot textstart"></i> отдельная точка начала текста</span><span><i class="dot red"></i> красная граница текста</span></div>
+    <div class="route-controls" aria-label="Этапы маршрута пера">
+      <button class="route-btn" id="stage1" type="button" aria-pressed="false">1 · Пауза 1<br>Подготовка</button>
+      <button class="route-btn" id="stage2" type="button" aria-pressed="true">2 · Остановка у угла<br>130 сек по умолч.</button>
+      <button class="route-btn" id="stage3" type="button" aria-pressed="false">3 · Начало письма</button>
+    </div>
+    <p id="routeStatus" class="route-status" aria-live="polite"></p>
+    <p id="bedStatus" class="bed-status" aria-live="polite"></p>
+    <details class="pause-details"><summary>Что делать во время двух остановок</summary><div class="pause-guide">
+      <div class="pause-item"><b>Пауза 1 — подготовка</b>Закрепи бумагу и проверь свободный ход. Перед поиском нуля (G28) сними с головки держатель ручки, если его безопасный проход при homing не проверен. После продолжения принтер выполнит homing.</div>
+      <div class="pause-item"><b>Остановка 2 — установка ручки</b>После homing сопло остановится на 3 мм снаружи левого края и на 3 мм ниже верхнего края листа, на безопасной высоте. Это точка парковки сопла, а не точка пера. Во время выдержки установи держатель и ручку и проверь зазор. По окончании времени работа продолжится сама — повторно нажимать «Продолжить» не нужно.</div>
+      <div class="pause-item"><b>После автоматической остановки</b>Ручка остаётся поднятой, головка перемещается от угла к рассчитанному началу первой строки. Опускается только перед письмом.</div>
+    </div></details>
+  </div>
+</section>
+<section class="card">
+  <h2>4. Автоматические проверки</h2>
+  <div id="qualityPanel" class="quality-panel" aria-live="polite">Диагностика центральных линий запускается после построения траекторий. Проверка границ листа выполняется уже на этапе предпросмотра.</div>
+  <details class="checks-details"><summary>Подробности проверок и размеров</summary><div class="checks" id="checks"></div></details>
+</section>
+<div class="warning"><b>Перед запуском.</b> Генератор строит центральные траектории из скелетизированного рукописного изображения текста. Это экспериментальный генератор, а не заводской профиль Bambu. Обычный шрифт превращается в центральную линию скелетизацией; это не специализированный single-line шрифт, поэтому сложные буквы могут требовать визуальной проверки. Высота сопла Z при письме задаётся в настройках (минимум 10 мм); подъёмы между штрихами и безопасное перемещение рассчитываются автоматически. Z — координата сопла после homing, а не фактический вылет пера из держателя. Крепление бумаги, вылет ручки, зазор и направление осей нужно проверить на тесте. Сначала сделай короткий пробный запуск без касания бумаги и будь рядом с принтером. Текст не выходит за физический край бумаги. Для A4 книжной ориентации нижняя часть листа свисает с пластины, поэтому на этом участке запись не выполняется: это ограничение рабочей области принтера, а не дополнительное поле страницы.</div>
+<section class="card no-print">
+  <h2>5. Создание G-code для SD-карты</h2>
+  <p class="tiny">Текст рисуется выбранным рукописным шрифтом, затем преобразуется в центральные линии. Это скелетизация шрифтового контура, а не полноценный single-line font, поэтому после построения обязательно проверь маршрут.</p>
+  <div class="pause-setting">
+    <div class="pause-setting-copy"><b>⏱ Вторая автоматическая остановка</b><span>Сопло остановится на 3 мм снаружи левого края и на 3 мм ниже верхнего края листа, с поднятой ручкой. Отсчёт закончится сам — повторно нажимать «Продолжить» не требуется.</span></div>
+    <label>Время, секунд<input id="pause2Seconds" type="number" min="1" max="600" step="1" value="130" inputmode="numeric"></label>
+    <div class="pause-presets" aria-label="Быстрый выбор времени паузы"><button type="button" data-pause-seconds="30">30 с</button><button type="button" data-pause-seconds="60">60 с</button><button type="button" data-pause-seconds="130" aria-pressed="true">130 с</button><button type="button" data-pause-seconds="180">180 с</button></div>
+    <p class="pause-live" id="pauseLive">Пауза у угла: 2 мин 10 сек.</p>
+  </div>
+  <div class="z-setting" aria-labelledby="zSettingTitle">
+    <div class="z-setting-head"><b id="zSettingTitle">📏 Высота сопла над пластиной при письме</b><span class="z-safety-badge">МИНИМУМ 10 мм</span></div>
+    <p>Это абсолютная координата Z сопла после homing, а не длина держателя ручки. Значение меньше 10 мм не принимается. Высоты перемещения рассчитываются автоматически относительно выбранной высоты письма.</p>
+    <label for="penWriteZ">Высота сопла при письме, мм
+      <input id="penWriteZ" type="number" min="10" max="150" step="0.5" value="30" inputmode="decimal" aria-describedby="zSettingHelp">
+    </label>
+    <div class="z-presets" aria-label="Быстрый выбор высоты Z">
+      <button type="button" data-z-value="20">20 мм</button><button type="button" data-z-value="30" aria-pressed="true">30 мм</button><button type="button" data-z-value="40">40 мм</button><button type="button" data-z-value="50">50 мм</button>
+    </div>
+    <div class="z-levels" id="zLevelReadout" aria-live="polite">Письмо: Z30 · подъём между штрихами: Z34 · безопасное перемещение: Z50</div>
+    <p class="tiny" id="zSettingHelp">Диапазон координаты сопла: 10–150 мм. Это НЕ гарантия реального зазора 10 мм между кончиком пера и бумагой: учитывай длину держателя и ручки. Подъём между штрихами — +4 мм; безопасный уровень — +20 мм. Измерь и проверь фактический зазор на коротком тесте.</p>
+  </div>
+  <div class="row" style="margin-top:10px"><button class="btn" id="gcodeBtn">Создать G-code</button><button class="btn secondary" id="gcodeHelpBtn">Инструкция перед запуском</button></div>
+  <a id="gcodeDownload" class="gcode-download" href="#" download="Bambu_запись.gcode" hidden>Скачать готовый G-code на SD-карту</a>
+  <div id="generationProgress" class="generation-progress" hidden><div class="generation-progress-track"><span id="generationProgressBar"></span></div><p id="generationProgressLabel">Подготовка…</p></div>
+  <p id="gcodeStatus" class="status" aria-live="polite">Сначала обнови предпросмотр и проверь лист на пластине.</p>
+  <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
+  <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: головка уже стоит над углом листа; время выдержки задано в настройке ниже (по умолчанию 130 секунд). За это время установи держатель ручки и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
+</section>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 4.3 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const DEFAULTS={pitchCells:2,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:5,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
+const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
+function getPenZSettings(){
+ const el=$('penWriteZ'),raw=String(el?.value??'').trim().replace(',','.');
+ const write=Number(raw);
+ if(raw===''||!Number.isFinite(write))throw Error('Укажи высоту сопла при письме от 10 до 150 мм.');
+ if(write<Z_LIMITS.min)throw Error('БЕЗОПАСНОСТЬ: высота сопла ниже 10 мм. Установи не менее 10 мм. G-code не создан.');
+ if(write>Z_LIMITS.max)throw Error('Высота сопла не должна превышать 150 мм.');
+ const round=n=>Number(n.toFixed(3));
+ return {write:round(write),travel:round(write+Z_LIMITS.travelOffset),safe:round(write+Z_LIMITS.safeOffset)};
+}
+function getPenZSettingsForPreview(){try{return getPenZSettings()}catch(e){const write=DEFAULTS.penWriteZ;return {write,travel:write+Z_LIMITS.travelOffset,safe:write+Z_LIMITS.safeOffset}}}
+function updatePenZUI(){
+ const readout=$('zLevelReadout'),el=$('penWriteZ');if(!readout||!el)return;
+ try{const z=getPenZSettings();readout.classList.remove('invalid');readout.textContent=`Письмо: Z${z.write.toFixed(1)} мм · подъём между штрихами: Z${z.travel.toFixed(1)} мм · безопасное перемещение: Z${z.safe.toFixed(1)} мм`;
+ }catch(e){readout.classList.add('invalid');readout.textContent=e.message}
+ document.querySelectorAll('[data-z-value]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.zValue)===Number(el.value))));
+}
+
+// Conservative front-centre keep-out for the build-plate finger tab/handle.
+// This is a safety envelope, not a measured CAD outline of every plate revision.
+const PLATE_TAB={x:108,w:40,y:256,depth:18,clearance:18};
+function getPlateTab(){return {x:clampValue('plateTabX',0,256),w:clampValue('plateTabWidth',1,100),y:256,depth:clampValue('plateTabDepth',0,60),clearance:clampValue('plateTabClearance',0,60)}}
+function scaleToLowercaseHeight(targetMm,lowercaseAscentPx){return lowercaseAscentPx>0?Math.max(.25,Math.min(4,targetMm/lowercaseAscentPx)):1}
+function findLargestFittingTenth(currentMm,fitsAt){let low=20,high=Math.floor((currentMm-.001)*10),best=null;while(low<=high){const mid=Math.floor((low+high)/2);if(fitsAt(mid/10)){best=mid;low=mid+1}else high=mid-1}return best===null?null:best/10}
+function getCornerPausePosition(pageX,pageMachineY){return {x:Math.max(3,pageX-3),y:Math.max(3,pageMachineY-3)}}
+const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
+function fontCss(font){return `"${font}", cursive`}
+function startOptionalFontStylesheet(){
+ if($('handwritingFontCss'))return;
+ const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='print';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pangolin&family=Lobster&display=swap';
+ link.addEventListener('load',()=>{link.media='all';fontStylesheetReady=true;window.dispatchEvent(new Event('handwritingfontsready'))},{once:true});
+ link.addEventListener('error',()=>window.dispatchEvent(new Event('handwritingfontserror')),{once:true});
+ document.head.appendChild(link);
+}
+let fontStylesheetPromise=null,fontStylesheetReady=false,fontCheckSequence=0;
+function waitForFontStylesheet(timeoutMs=2800){
+ const existingLink=$('handwritingFontCss');if(fontStylesheetReady||(existingLink?.sheet&&existingLink.media==='all')){fontStylesheetReady=true;return Promise.resolve(true)}
+ if(fontStylesheetPromise)return fontStylesheetPromise;
+ fontStylesheetPromise=new Promise(resolve=>{
+  const link=$('handwritingFontCss');let settled=false,timer;
+  const finish=ok=>{if(settled)return;settled=true;if(timer)clearTimeout(timer);fontStylesheetReady=ok;resolve(ok)};
+  if(!link){finish(false);return}
+  link.addEventListener('load',()=>finish(true),{once:true});
+  link.addEventListener('error',()=>finish(false),{once:true});
+  timer=setTimeout(()=>finish(false),timeoutMs);
+ });
+ return fontStylesheetPromise;
+}
+async function ensureFonts(fonts,size,timeoutMs=2200){
+ const unique=[...new Set(fonts)].filter(Boolean);if(!unique.length)return true;if(!document.fonts?.load)return false;
+ const cssReady=await waitForFontStylesheet();if(!cssReady)return false;
+ const loading=Promise.all(unique.map(f=>document.fonts.load(`${size}px "${f}"`).catch(()=>[]))).then(results=>results.every(list=>list.length>0)).catch(()=>false);
+ let timer;const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve(false),timeoutMs)});
+ const result=await Promise.race([loading,timeout]);if(timer)clearTimeout(timer);return result;
+}
+function fontsForModel(model){const fonts=new Set();for(const line of model.lines)if(!line.blank)for(const run of runsFor(line.text,model.mode,model.hand))fonts.add(run.font);return [...fonts]}
+function setFontStatus(online){
+ const status=$('fontStatus'),note=$('fontNote');
+ if(online){status.textContent='Рукописные шрифты доступны';status.className='pill';note.textContent='Дополнительные рукописные шрифты загружены. Если интернет пропадёт, приложение автоматически продолжит работу с системным курсивом.'}
+ else{status.textContent='Автономный режим · без ожидания интернета';status.className='pill offline';note.textContent='Рукописные шрифты из интернета недоступны. Предпросмотр и G-code работают через системный курсив; бесконечного ожидания подключения нет.'}
+}
+async function refreshFontAvailability(model=lastModel){
+ if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,1800);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build()}return online;
+}
+const FONT_PROFILES={
+ marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.8,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
+ neucha:{title:'Ровный повседневный — Neucha',tag:'ОСНОВНОЙ · БЕЗ ДОП. НАКЛОНА',description:'Спокойные, хорошо читаемые формы. Программный наклон отключён; этот профиль выбран по умолчанию для ровного письма.',lh:5,pitch:8.2,drawFeed:1650,rapidFeed:2000,widthScale:.98,slantDeg:0,letterSpacing:.04,wordSpacing:.58,routeTolerance:.08,character:'простой, разборчивый',connection:'слабые/отдельные соединения'},
+ badscript:{title:'Естественный реалистичный — Bad Script',tag:'ЖИВОЙ · НЕФОРМАЛЬНЫЙ',description:'Более свободный рисунок букв с заметным наклоном и чуть увеличенной шириной. Выглядит естественно, но отдельные знаки не всегда соединяются.',lh:4.8,pitch:8.4,drawFeed:1500,rapidFeed:2000,widthScale:1.02,slantDeg:0,letterSpacing:.02,wordSpacing:.50,routeTolerance:.09,character:'естественный, свободный',connection:'преимущественно отдельные буквы'},
+ caveat:{title:'Быстрый почерк — Caveat',tag:'БЫСТРЫЙ · СВОБОДНЫЙ',description:'Широкий, динамичный рисунок с выраженным наклоном. Более высокая скорость письма и чуть более мягкое упрощение мелких поворотов.',lh:4.6,pitch:8.0,drawFeed:2100,rapidFeed:2200,widthScale:1.10,slantDeg:0,letterSpacing:.05,wordSpacing:.42,routeTolerance:.10,character:'быстрый, динамичный',connection:'отдельные формы с вариациями'},
+ pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
+ lobster:{title:'Связный красивый — Lobster',tag:'СВЯЗНЫЙ · ВЫРАЗИТЕЛЬНЫЙ',description:'Более нарядный связный курсив с выразительными соединениями букв. Лучше всего подходит для коротких фраз и заголовков; перед длинным текстом обязательно проверь траектории.',lh:5.0,pitch:8.8,drawFeed:1250,rapidFeed:1900,widthScale:.98,slantDeg:0,letterSpacing:0,wordSpacing:.62,routeTolerance:.07,character:'плавный, выразительный',connection:'связные буквы'},
+ great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
+ recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.8,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
+};
+// Editable decimal fields must not be clamped while the user is midway through typing.
+// Accept both comma and dot decimal separators; retain the last valid value for preview
+// while the field is temporarily empty or contains an incomplete number.
+function readEditableDecimal(id,min,max,fallback){
+ const raw=String($(id)?.value??'').trim().replace(',', '.');
+ if(raw===''||raw==='-'||raw==='.'||raw==='-.')return Number.isFinite(fallback)?fallback:min;
+ const n=Number(raw);
+ if(!Number.isFinite(n))return Number.isFinite(fallback)?fallback:min;
+ return Math.max(min,Math.min(max,n));
+}
+function commitEditableDecimal(id,min,max,fallback,digits){
+ const el=$(id);if(!el)return;
+ const value=readEditableDecimal(id,min,max,fallback);
+ el.value=Number(value.toFixed(digits)).toString();
+}
+function refreshFontMetrics(){
+ const p=FONT_PROFILES[$('handFont')?.value]||FONT_PROFILES.neucha;
+ const fallbackLh=lastModel?.lh??p.lh,fallbackPitch=lastModel?.pitch??p.pitch;
+ const lh=readEditableDecimal('lh',2,20,fallbackLh),pitch=readEditableDecimal('pitch',2,30,fallbackPitch);
+ if($('fontProfileMetrics'))$('fontProfileMetrics').innerHTML=`<span>Высота / шаг строк: <b>${lh.toFixed(1).replace('.',',')} / ${pitch.toFixed(2).replace('.',',')} мм</b></span><span>Ширина / доп. наклон: <b>${Math.round(p.widthScale*100)}% / ${p.slantDeg}°</b></span><span>Межбуквенное / межсловное: <b>${CANVAS_SPACING.letter?p.letterSpacing.toFixed(2):'0.00'} / ${CANVAS_SPACING.word?p.wordSpacing.toFixed(2):'0.00'} мм</b></span><span>Скорость / детализация: <b>${p.drawFeed} мм/мин / ${p.routeTolerance.toFixed(2)} мм</b></span><span>Соединение: <b>${p.connection}</b></span>`;
+ const sample=$('fontSample');if(sample){const family=modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'neucha');sample.style.fontFamily=fontCss(family)+',cursive';sample.textContent='Красивый почерк — мама мыла раму. 123';}
+}
+function applyFontProfile(key){
+ const p=FONT_PROFILES[key]||FONT_PROFILES.neucha;
+ $('lh').value=p.lh;$('pitch').value=p.pitch;
+ if($('fontProfileTitle'))$('fontProfileTitle').textContent=p.title;
+ if($('fontProfileTag'))$('fontProfileTag').textContent=p.tag;
+ if($('fontProfileDescription'))$('fontProfileDescription').textContent=p.description;
+ refreshFontMetrics();
+ return p;
+}
+let lastModel=null,viewStage=2,paperZoom=1;
+function applyPaperZoom(){const paper=$('paper'),wrap=paper?.closest('.paper-wrap');if(!paper||!wrap)return;const vb=paper.getAttribute('viewBox')||'0 0 165 203',parts=vb.split(/\s+/).map(Number),w=parts[2]||165,h=parts[3]||203;paper.setAttribute('width',String(Math.round(w*5*paperZoom)));paper.setAttribute('height',String(Math.round(h*5*paperZoom)));wrap.classList.toggle('zoomed',paperZoom>1.01);$('zoomValue').textContent=paperZoom<=1.01?'По ширине':`${Math.round(paperZoom*100)}%`;}
+function clampValue(id,min,max){const el=$(id);let n=Number(el.value);if(!Number.isFinite(n))n=min;n=Math.max(min,Math.min(max,n));el.value=String(n);return n}
+function scriptOf(ch,last='latn'){if(/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(ch))return 'cyrl';if(/[A-Za-z\u00C0-\u024F]/u.test(ch))return 'latn';return last}
+function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(hand==='badscript')return FONT.badscript;if(hand==='neucha')return FONT.neucha;if(hand==='pangolin')return FONT.pangolin;if(hand==='lobster')return FONT.lobster;if(hand==='caveat')return FONT.caveat;if(hand==='marck')return FONT.marck;if(hand==='great')return sc==='cyrl'?FONT.neucha:FONT.great;if(hand==='recommended')return FONT.neucha;if(mode==='ru')return FONT.marck;if(mode==='en')return FONT.dancing;if(mode==='universal')return sc==='cyrl'?FONT.marck:FONT.dancing;return sc==='cyrl'?FONT.marck:FONT.dancing}
+function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
+const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
+const CANVAS_SPACING={letter:!!mctx&&'letterSpacing' in mctx,word:!!mctx&&'wordSpacing' in mctx};
+function measureText(t,font,size,hand='marck'){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;mctx.font=`${size}px ${fontCss(font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return mctx.measureText(t).width}
+function getLinePitchCells(){return Math.max(1,Math.min(6,Number($('pitchCells')?.value)||2));}
+function updateLineSpacingUI(){$('pitchCellsField').hidden=$('paperType')?.value!=='math-notebook';}
+function measureMixed(t,mode,hand,size){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;return runsFor(t,mode,hand).reduce((n,r)=>{mctx.font=`${size}px ${fontCss(r.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return n+mctx.measureText(r.text).width*(p.widthScale||1);},0);}
+function wrapLine(text,maxW,mode,hand,size){const words=text.split(/(\s+)/u);let out=[],line='';for(const word of words){if(!word)continue;const cand=line+word;if(line&&measureMixed(cand,mode,hand,size)>maxW){out.push(line.trimEnd());line=word.trimStart()}else line=cand}if(line.trim()||!out.length)out.push(line.trimEnd());const final=[];for(const ln of out){if(measureMixed(ln,mode,hand,size)<=maxW){final.push(ln);continue}let part='';for(const ch of ln){if(part&&measureMixed(part+ch,mode,hand,size)>maxW){final.push(part);part=ch}else part+=ch}if(part)final.push(part)}return final}
+function lineJustifySpacing(text,maxW,mode,hand,size){const spaces=(text.match(/ /g)||[]).length;if(spaces<1)return 0;const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha,natural=measureMixed(text,mode,hand,size),free=maxW-natural;if(free<.35)return 0;const extra=free/(spaces*(p.widthScale||1));return extra<=8.5?extra:0}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]))}
+function getTopMarginMm(type,cell){return type==='math-notebook'?Math.max(0,Number(cell)||5)*2:0}
+function setPreset(type,orientation,fromUser=true){
+ if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes(type))type='math-notebook';
+ const nb=type==='math-notebook'||type==='russian-notebook',custom=type==='custom-paper',land=orientation==='landscape';
+ $('paperType').value=type;
+ if(custom){$('pw').value=clampValue('customPaperW',40,420);$('ph').value=clampValue('customPaperH',40,420)}else{$('pw').value=nb?NOTEBOOK.w:(land?297:210);$('ph').value=nb?NOTEBOOK.h:(land?210:297)}
+ $('left').value=10;
+ $('margin').value=20;$('gapAfterMargin').value=1;$('rightSafe').value=0;
+ $('cell').value=type==='math-notebook'?5:8.35;
+ $('top').value=getTopMarginMm(type,Number($('cell').value));
+ $('orientationField').style.display=nb||custom?'none':'';$('customPaperSize').hidden=!custom;
+ build();
+}
+function bedPlacement(w,h){
+ const tab=getPlateTab(),pageX=(BED.w-w)/2,pageY=clampValue('bedTopGap',0,20);
+ const pageRight=pageX+w,pageBottom=pageY+h;
+ const tabKeepoutTop=BED.h-tab.clearance;
+ const tabOverlap=pageX<tab.x+tab.w && pageRight>tab.x && pageBottom>tabKeepoutTop && pageY<BED.h+tab.depth;
+ return {pageX,pageY,support:{left:Math.max(0,-pageX),right:Math.min(w,BED.w-pageX),bottom:Math.min(h,BED.h-pageY)},overLeft:pageX<0,overRight:pageRight>BED.w,overBottom:pageBottom>BED.h,tabOverlap,tab};
+}
+function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch){
+ const tab=pl.tab||getPlateTab(),x=pl.pageX,y=pl.pageY,cornerX=x,cornerY=y,tx=x+sx,ty=y+sy;
+ const viewX=Math.min(-12,x-12),viewR=Math.max(310,x+w+12),viewBottom=Math.max(300,y+h+14,BED.h+tab.depth+20),viewTop=-8,viewW=viewR-viewX,viewH=viewBottom-viewTop;
+ let s=`<defs><clipPath id="bedPaperClip"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#ffe8e5"/><line x1="0" y1="0" x2="0" y2="4" stroke="#d85b55"/></pattern><marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5z" fill="#2770bd"/></marker></defs>`;
+ s+=`<rect x="0" y="0" width="256" height="256" rx="2" fill="#cfd6dc" stroke="#53616c"/>`;
+ s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="#365a74"/>`;
+ s+=`<g clip-path="url(#bedPaperClip)">`;
+ if(type==='math-notebook'){
+  for(let gx=0;gx<=w+.01;gx+=cell){const major=Math.abs(gx/(cell*2)-Math.round(gx/(cell*2)))<.001;s+=`<line x1="${x+gx}" y1="${y}" x2="${x+gx}" y2="${y+h}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.45:.25}"/>`}
+  for(let gy=0;gy<=h+.01;gy+=cell){const major=Math.abs(gy/(cell*2)-Math.round(gy/(cell*2)))<.001;s+=`<line x1="${x}" y1="${y+gy}" x2="${x+w}" y2="${y+gy}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.45:.25}"/>`}
+ }
+ if(type==='russian-notebook')for(let gy=(sy%pitch);gy<=h+.01;gy+=pitch)s+=`<line x1="${x}" y1="${y+gy}" x2="${x+w}" y2="${y+gy}" stroke="#a9cde5" stroke-width=".35"/>`;
+ if(type!=='a4-plain')s+=`<line x1="${x+w-red}" y1="${y}" x2="${x+w-red}" y2="${y+h}" stroke="#c63c36" stroke-width=".8"/>`;
+ s+=`</g>`;
+ const printableBottom=Math.max(0,Math.min(h,253-y-3));
+ if(printableBottom<h){s+=`<rect x="${x}" y="${y+printableBottom}" width="${w}" height="${h-printableBottom}" fill="url(#hatch)"/>`;if(h-printableBottom>12)s+=`<text x="${x+5}" y="${y+printableBottom+8}" font-size="4" fill="#a33d37">ЭТА ЧАСТЬ НЕ ДОСТУПНА ДЛЯ ПИСЬМА</text>`}
+ if(x<0)s+=`<rect x="${x}" y="${y}" width="${-x}" height="${Math.max(0,Math.min(h,256-y))}" fill="url(#hatch)"/>`;
+ if(x+w>256)s+=`<rect x="256" y="${y}" width="${x+w-256}" height="${Math.max(0,Math.min(h,256-y))}" fill="url(#hatch)"/>`;
+ s+=`<path d="M${cornerX} ${cornerY}L${tx} ${ty}" stroke="#2770bd" stroke-width=".8" stroke-dasharray="2 1.5" marker-end="url(#arr)" fill="none"/>`;
+ const cc=cornerX>=0&&cornerX<=256&&cornerY>=0&&cornerY<=256?'#23824a':'#c63c36';
+ s+=`<circle cx="${cornerX}" cy="${cornerY}" r="3.2" fill="${stage===2?cc:'#fff'}" stroke="${cc}"/><path d="M${cornerX-4} ${cornerY}h8m-4 -4v8" stroke="${cc}"/>`;
+ s+=`<circle cx="${tx}" cy="${ty}" r="2.5" fill="${stage===3?'#2770bd':'#fff'}" stroke="#2770bd"/>`;
+ s+=`<text x="${Math.max(viewX+2,Math.min(viewR-36,cornerX+7))}" y="${Math.max(5,cornerY-5)}" font-size="4" fill="${cc}">УГОЛ · ПАУЗА 2</text><text x="${Math.min(viewR-30,tx+5)}" y="${ty+6}" font-size="3.8" fill="#205f9e">СТАРТ ТЕКСТА</text>`;
+ s+=`<rect x="0" y="0" width="256" height="256" fill="none" stroke="#42515d" stroke-width="1.2"/>`;
+ s+=`<rect x="${tab.x}" y="${BED.h}" width="${tab.w}" height="${tab.depth}" rx="2" fill="#aeb8c0" stroke="#53616c" stroke-width=".8"/>`;
+ s+=`<rect x="${tab.x}" y="${BED.h-tab.clearance}" width="${tab.w}" height="${tab.clearance+tab.depth}" fill="url(#hatch)" opacity=".9"/>`;
+ s+=`<text x="${Math.max(viewX+2,tab.x-8)}" y="${BED.h+tab.depth+7}" font-size="4" fill="#8e3934">ЯЗЫЧОК / РУЧКА ПЛАСТИНЫ · НЕ НАКРЫВАТЬ</text>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewTop} ${viewW} ${viewH}" width="${Math.min(680,viewW*1.55)}" height="${viewH*1.55}">${s}</svg>`
+}
+function getPause2Seconds(){
+ const el=$('pause2Seconds');const n=Number.parseInt(el?.value??'130',10);return Number.isFinite(n)?Math.max(1,Math.min(600,n)):130;
+}
+function formatDuration(seconds){const m=Math.floor(seconds/60),r=seconds%60;return m?`${m} мин${r?` ${r} сек`:''}`:`${r} сек`;}
+function updatePauseUI(){
+ const el=$('pause2Seconds');if(!el)return;const sec=getPause2Seconds();if(String(sec)!==el.value)el.value=String(sec);
+ $('pauseLive').textContent=`Пауза у угла: ${formatDuration(sec)}.`;
+ $('stage2').innerHTML=`2 · Остановка у угла<br>${formatDuration(sec)}`;
+ document.querySelectorAll('[data-pause-seconds]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.pauseSeconds)===sec)));
+ const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано снаружи левого края листа. Автоматическая остановка — ${formatDuration(sec)}.`:`Этап 3: после ${formatDuration(sec)} головка перемещается к первой букве с поднятой ручкой.`;}
+}
+function updateLiveStats(txt,lines,bottom,inkBottom,pageHeight){
+ const clean=String(txt||'').trim(),words=clean?clean.split(/\s+/u).length:0,visible=lines.filter(x=>!x.blank).length;
+ $('statChars').textContent=String(txt.length);$('statWords').textContent=String(words);$('statLines').textContent=String(visible);
+ const remaining=Math.max(0,bottom-(inkBottom||0));$('statSpace').textContent=inkBottom?`${remaining.toFixed(1).replace('.',',')} мм`:`${pageHeight.toFixed(0)} мм`;
+ $('statSpace').title=inkBottom?'Оценка свободного места до нижней рабочей границы':'Высота страницы';
+}
+function setRouteInkMode(enabled){
+ const paper=$('paper'),btn=$('routeInkModeBtn');if(!paper||!btn)return;
+ const on=!!enabled&&routePlayback.strokes.length>0;paper.classList.toggle('route-ink-mode',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'Показать почерк под линиями':'Сравнить линии с текстом';
+}
+function build(skipFitSuggestion=false){
+ const w=clampValue('pw',40,420),h=clampValue('ph',40,420),lh=readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh),pitchInput=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch),cell=clampValue('cell',2,15),red=clampValue('margin',2,100),configuredIndent=clampValue('paragraphIndent',0,20),indentEnabled=$('paragraphIndentToggle').checked,paraIndent=indentEnabled?configuredIndent:0,justifyEnabled=$('justifyToggle').checked;
+ const mode=$('scriptMode').value,hand=$('handFont').value,profile=FONT_PROFILES[hand]||FONT_PROFILES.neucha,txt=$('txt').value.replace(/\r/g,''),type=$('paperType').value,pl=bedPlacement(w,h),startX=clampValue('left',0,30),rightX=type==='a4-plain'?w-1.5:w-red-1.5,bottomY=Math.min(h,253-pl.pageY-3),topY=clampValue('top',0,30),fontSize=lh*1.28;
+ const pitch=type==='math-notebook'?getLinePitchCells()*cell:pitchInput;
+ $('orientationField').style.display=(type==='math-notebook'||type==='russian-notebook'||type==='custom-paper')?'none':'';updateLineSpacingUI();
+ $('justifyHelp').textContent=type==='a4-plain'?'Растягивать пробелы в подходящих промежуточных строках до безопасной правой границы листа. Последняя строка абзаца остаётся обычной.':'Распределять пробелы в промежуточных строках до безопасной правой границы. Последняя строка перед пустой строкой или концом текста остаётся обычной.';
+ const paragraphLines=txt.split('\n'),lines=[];let pn=0;for(let paraIndex=0;paraIndex<paragraphLines.length;paraIndex++){const para=paragraphLines[paraIndex];if(!para.trim()){lines.push({text:'',x:startX,paragraph:pn,blank:true,russian:false,extraWordSpace:0});pn++;continue}const isRussian=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(para),indent=isRussian?paraIndent:0,firstX=startX+indent,wrapped=wrapLine(para,Math.max(.1,rightX-firstX-1),mode,hand,fontSize),hasFollowingLine=!!(paragraphLines[paraIndex+1]&&paragraphLines[paraIndex+1].trim());wrapped.forEach((line,j)=>{const x=j===0?firstX:startX,maxLineW=Math.max(.1,rightX-x-1),isIntermediate=j<wrapped.length-1||hasFollowingLine,extraWordSpace=justifyEnabled&&isIntermediate?lineJustifySpacing(line,maxLineW,mode,hand,fontSize):0;lines.push({text:line,x,paragraph:pn,blank:false,russian:isRussian,extraWordSpace})});pn++}
+ const rawBaseline=topY+fontSize*1.25,baseline0=type==='math-notebook'?Math.ceil((rawBaseline-1e-6)/cell)*cell:rawBaseline;
+ let svg=`<rect x="0" y="0" width="${w}" height="${h}" fill="#fff"/>`;
+ if(type==='math-notebook'){
+  for(let x=0;x<=w+.01;x+=cell){const major=Math.abs(x/(cell*2)-Math.round(x/(cell*2)))<.001;svg+=`<line x1="${x}" y1="0" x2="${x}" y2="${h}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.25:.14}"/>`}
+  for(let y=0;y<=h+.01;y+=cell){const major=Math.abs(y/(cell*2)-Math.round(y/(cell*2)))<.001;svg+=`<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.25:.14}"/>`}
+ }
+ if(type==='russian-notebook')for(let y=baseline0;y<=h+.01;y+=pitch)svg+=`<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="#a9cde5" stroke-width=".2"/>`;
+ if(type!=='a4-plain'){svg+=`<rect x="${w-red}" y="0" width="${red}" height="${h}" fill="#fce9e8" opacity=".48"/><line x1="${rightX}" y1="0" x2="${rightX}" y2="${h}" stroke="#d65b54" stroke-width=".3" stroke-dasharray="1.4 1.2"/><line x1="${w-red}" y1="0" x2="${w-red}" y2="${h}" stroke="#d43f3f" stroke-width=".65"/><text x="${w-red+1.2}" y="5" font-size="2.6" fill="#b34a45">НЕ ПИСАТЬ</text>`}else{svg+=`<line x1="${rightX}" y1="0" x2="${rightX}" y2="${h}" stroke="#d65b54" stroke-width=".25" stroke-dasharray="1.4 1.2"/>`}
+ if(bottomY<h){svg+=`<rect x="0" y="${bottomY}" width="${w}" height="${h-bottomY}" fill="#fff0ed" opacity=".62"/><line x1="0" y1="${bottomY}" x2="${w}" y2="${bottomY}" stroke="#c65c52" stroke-width=".35" stroke-dasharray="2 1.5"/><text x="3" y="${Math.min(h-2,bottomY+4)}" font-size="3" fill="#a33d37">НИЖЕ ЭТОЙ ЛИНИИ ПЕРО НЕ ПИШЕТ</text>`}
+ lines.forEach((line,i)=>{
+  if(line.blank)return;
+  const y=baseline0+i*pitch,runs=runsFor(line.text,mode,hand);
+  let ascent=0,descent=0;
+  for(const run of runs){mctx.font=`${fontSize}px ${fontCss(run.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${profile.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${profile.wordSpacing}px`;const mt=mctx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
+  let lowerAscent=0;for(const run of runs){mctx.font=`${fontSize}px ${fontCss(run.font)}`;const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,mctx.measureText(probe).actualBoundingBoxAscent||0)}const sy=scaleToLowercaseHeight(lh,lowerAscent),width=profile.widthScale||1,tx=line.x*(1-width),ty=y*(1-sy);
+  const letter=CANVAS_SPACING.letter?profile.letterSpacing:0,word=CANVAS_SPACING.word?profile.wordSpacing:0;
+  svg+=`<text data-line="${i}" x="${line.x}" y="${y}" transform="matrix(${width},0,0,${sy},${tx},${ty})" letter-spacing="${letter}" word-spacing="${word}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">`;
+  {let pendingDx=0;for(const run of runs){for(const part of run.text.split(/(\\s+)/u)){if(!part)continue;if(/^\\s+$/u.test(part)){svg+=`<tspan font-family="${esc(run.font)},cursive">${esc(part)}</tspan>`;if(line.extraWordSpace)pendingDx+=(part.match(/ /g)||[]).length*line.extraWordSpace}else{const dx=pendingDx?` dx="${pendingDx.toFixed(3)}"`:'';svg+=`<tspan font-family="${esc(run.font)},cursive"${dx}>${esc(part)}</tspan>`;pendingDx=0}}}}
+  svg+='</text>';
+ });
+ svg+=`<rect x=".1" y=".1" width="${w-.2}" height="${h-.2}" fill="none" stroke="#9aa6ad" stroke-width=".2"/>`;
+ $('paper').setAttribute('viewBox',`0 0 ${w} ${h}`);$('paper').setAttribute('width',w*5);$('paper').setAttribute('height',h*5);$('paper').innerHTML=svg;applyPaperZoom();clearRoutePlaybackUI();
+ const firstLine=lines.findIndex(l=>!l.blank),startLine=firstLine<0?0:firstLine,startY=baseline0+startLine*pitch;const textStartX=lines[startLine]?.x??startX;
+ const bedMarkup=bedSVG(w,h,textStartX,startY,red,pl,viewStage,type,cell,pitch);const bedNode=new DOMParser().parseFromString(bedMarkup,'image/svg+xml').documentElement;const bed=$('bedPreview');if(!bed||bedNode.nodeName.toLowerCase()==='parsererror')throw Error('Не удалось обновить схему положения листа. Перезагрузи приложение.');for(const attr of ['viewBox','width','height']){const value=bedNode.getAttribute(attr);if(value)bed.setAttribute(attr,value)}bed.innerHTML=bedNode.innerHTML;
+ const cornerX=pl.pageX,cornerY=pl.pageY,cornerMachineY=253-cornerY;
+ const boxes=[...$('paper').querySelectorAll('text[data-line]')].map(el=>{try{return el.getBBox()}catch(e){return null}}).filter(Boolean);
+ const textBottom=boxes.length?Math.max(...boxes.map(b=>b.y+b.height)):0,textTop=boxes.length?Math.min(...boxes.map(b=>b.y)):0,textLeft=boxes.length?Math.min(...boxes.map(b=>b.x)):0,textRight=boxes.length?Math.max(...boxes.map(b=>b.x+b.width)):0;
+ const errors=[];
+ if(rightX<=startX+2)errors.push('Нет места между текстом и правой границей.');
+ if(cornerX<3||cornerX>253||cornerMachineY<3||cornerMachineY>253)errors.push('Верхний левый угол листа вне безопасной зоны пластины. Измени формат или положение.');
+ if(pl.tabOverlap)errors.push('Бумага попадает на передний язычок/ручку пластины или его защитную зону. Для записи используй лист, который заканчивается минимум за 18 мм до переднего края пластины.');
+ if(boxes.length&&textTop<-.25)errors.push(`Верхние буквы выходят за край листа на ${(-textTop).toFixed(1)} мм.`);
+ if(boxes.length&&textLeft<-.25)errors.push(`Левые буквы выходят за край листа на ${(-textLeft).toFixed(1)} мм.`);
+ if(boxes.length&&textRight>rightX+.25)errors.push(type==='a4-plain'?`Строка выходит за безопасную правую границу на ${(textRight-rightX).toFixed(1)} мм.`:`Строка пересекает безопасную линию перед красным полем на ${(textRight-rightX).toFixed(1)} мм.`);
+ if(boxes.length&&textRight>w)errors.push('Текст выходит за правый край листа.');
+ if(boxes.length&&textBottom>h+.25)errors.push(`Текст выходит за нижний край листа на ${(textBottom-h).toFixed(1)} мм. Уменьши шаг строк или размер букв.`);
+ if(boxes.length&&textBottom>bottomY+.25&&bottomY<h)errors.push(`Нижние буквы заходят в недоступную зону пластины на ${(textBottom-bottomY).toFixed(1)} мм. Уменьши высоту/шаг или количество строк.`);
+ const paperName=type==='a4-plain'?'Чистый лист A4 без разметки':type==='math-notebook'?'Тетрадный лист в клетку 5 мм с красным полем':type==='russian-notebook'?'Тетрадный лист в линейку с красным полем':'Пользовательский лист';
+ $('paperInfo').textContent=`${paperName} · ${w} × ${h} мм · начало текста ${startX.toFixed(1)} мм от левого края · красная строка у русских абзацев ${indentEnabled?'включена':'выключена'} · заполнение строк ${justifyEnabled?'включено':'выключено'} · траектория ограничена краями листа${(pl.overBottom||pl.overLeft||pl.overRight)?' и реальной рабочей областью пластины':''}.`;
+ document.querySelectorAll('[data-paper-choice]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.paperChoice===type)));
+ $('summary').textContent=`${w} × ${h} мм · ${lines.filter(l=>!l.blank).length} строк`;
+ $('layoutStatus').textContent=errors.length?errors.join(' '):`Текст начинается в ${startX.toFixed(1)} мм от левого края (${(startX/cell).toFixed(1)} клетки); красная строка у русских абзацев ${indentEnabled?`включена (${paraIndent.toFixed(1)} мм)`:'выключена'}, английские абзацы без отступа. Заполнение до правой границы ${justifyEnabled?'включено для подходящих промежуточных строк':'выключено'}. Верхний отступ — ${topY.toFixed(1)} мм${type==='math-notebook'?' (2 клетки)':''}; дополнительного нижнего отступа нет. Нижний предел — ${bottomY<h?'граница рабочей области пластины':'физический край листа'}.`;
+ $('layoutStatus').className='status '+(errors.length?'bad':'ok');
+ $('bedStatus').textContent=errors.length?errors.join(' '):`Угол листа: X ${cornerX.toFixed(1)} · Y ${cornerMachineY.toFixed(1)} мм. Головка подходит к нему с поднятой ручкой.`;$('bedStatus').className='bed-status '+(errors.length?'bad':'ok');
+ const pauseSecs=getPause2Seconds();$('routeStatus').textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано снаружи левого края листа. Автоматическая остановка — ${formatDuration(pauseSecs)}.`:`Этап 3: после ${formatDuration(pauseSecs)} головка перемещается к первой букве с поднятой ручкой.`;
+ ['stage1','stage2','stage3'].forEach((id,i)=>$(id).setAttribute('aria-pressed',String(viewStage===i+1)));
+ const checks=[['Размер бумаги',`${w} × ${h} мм`],['Вид листа',type==='a4-plain'?'чистый A4':type==='math-notebook'?'клетка 5 мм':type==='russian-notebook'?'линейка':'пользовательский'],['Отступ слева',`${startX.toFixed(1)} мм · ${(startX/cell).toFixed(1)} клетки`],['Красная строка',indentEnabled?`${paraIndent.toFixed(1)} мм у русских абзацев`:'выключена · без абзацного отступа'],['Заполнение строк',justifyEnabled?'до правой границы · промежуточные строки':'выключено · обычный край'],['Нижняя граница',bottomY<h?`предел пластины · ${bottomY.toFixed(1)} мм от верха`:'край самого листа'],['Поддержка пластины',pl.overBottom||pl.overLeft||pl.overRight?'есть неподдерживаемая часть':'лист помещается'],['Передний язычок пластины',pl.tabOverlap?'БУМАГА ПЕРЕКРЫВАЕТ ЗАПРЕТНУЮ ЗОНУ':'зона свободна · запас 18 мм'],['Остановка у угла',`${getPause2Seconds()} секунд · X ${cornerX.toFixed(1)} / Y ${cornerMachineY.toFixed(1)} мм`],['Правая граница',type==='a4-plain'?'край бумаги · резерв 1,5 мм':`${red} мм от края · резерв перед линией 1,5 мм`],['Почерк',profile.title],['Скорость письма',`${profile.drawFeed} мм/мин`],['Текст',`${txt.length} символов`]];
+ $('checks').innerHTML=checks.map(([a,b])=>`<div class="check"><b>${a}</b>${b}</div>`).join('');
+ updateLiveStats(txt,lines,bottomY,textBottom,h);
+ lastModel={w,h,lh,pitch,left:startX,top:topY,rightX,bottomY,red,pl,lines,baseline0,fontSize,mode,hand,profile,type,txt,errors,indentEnabled,paraIndent,justifyEnabled,cornerX,cornerY,routeTolerance:profile.routeTolerance||.12,textBounds:{left:textLeft,right:textRight,top:textTop,bottom:textBottom}};
+ if(!skipFitSuggestion){const clipsText=(m)=>m.errors.some(e=>/Строка выходит|пересекает безопасную|Текст выходит|Верхние буквы|Левые буквы|Нижние буквы/.test(e));const panel=$('fitSuggestion'),label=$('fitSuggestionText'),button=$('applyFitSuggestion');if(clipsText(lastModel)){const original=Number($('lh').value)||lh;const suggested=findLargestFittingTenth(original,value=>{$('lh').value=value.toFixed(1);return !clipsText(build(true))});$('lh').value=original;build(true);if(suggested!==null&&suggested<original){panel.hidden=false;label.textContent=`Текст не помещается при ${original.toFixed(1)} мм. Рекомендуем ${suggested.toFixed(1)} мм — это максимальный размер, при котором весь текст помещается с минимальным уменьшением.`;button.hidden=false;button.textContent=`Применить ${suggested.toFixed(1)} мм`;button.dataset.value=suggested.toFixed(1)}else{panel.hidden=false;label.textContent='Текст не помещается даже при минимальной высоте 2 мм. Одного уменьшения букв недостаточно — нужно сократить текст, изменить шаг строк или увеличить лист.';button.hidden=true}}else panel.hidden=true;}
+ return lastModel;
+}
+function setStage(n){viewStage=n;build()}
+function svgDownload(){const clone=$('paper').cloneNode(true);const route=clone.querySelector('#penRouteLayer');if(route)route.remove();const blob=new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml'});downloadBlob(blob,'Макет_страницы.svg')}
+async function pngDownload(){
+ const clone=$('paper').cloneNode(true);const route=clone.querySelector('#penRouteLayer');if(route)route.remove();
+ const vb=(clone.getAttribute('viewBox')||'0 0 165 203').split(/\s+/).map(Number),w=vb[2]||165,h=vb[3]||203,scale=8;
+ clone.setAttribute('width',String(Math.round(w*scale)));clone.setAttribute('height',String(Math.round(h*scale)));
+ const source=new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml'}),url=URL.createObjectURL(source);
+ try{const img=new Image();img.src=url;if(img.decode)await img.decode();else await new Promise((res,rej)=>{img.onload=res;img.onerror=rej});
+  const canvas=document.createElement('canvas');canvas.width=Math.round(w*scale);canvas.height=Math.round(h*scale);const ctx=canvas.getContext('2d');if(!ctx)throw Error('Не удалось создать изображение PNG.');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  const png=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Браузер не смог сохранить PNG.')),'image/png'));
+  downloadBlob(png,'Предпросмотр_Bambu_HandWrite.png');canvas.width=1;canvas.height=1;
+ }catch(e){$('layoutStatus').textContent='Не удалось сохранить PNG: '+(e?.message||e);$('layoutStatus').className='status bad'}finally{URL.revokeObjectURL(url)}
+}
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+async function skeletonizeAsync(binary,w,h,token){
+ // rasterText supplies a compact 1-byte-per-pixel binary mask to reduce mobile RAM use.
+ const a=binary;
+ const n=(x,y)=>a[y*w+x],yieldNow=()=>new Promise(resolve=>setTimeout(resolve,0));
+ let changed=true,loops=0,aborted=false;
+ while(changed&&loops<120){
+  changed=false;loops++;
+  for(let pass=0;pass<2;pass++){
+   const del=[];
+   for(let y=1;y<h-1;y++){
+    for(let x=1;x<w-1;x++){
+     const i=y*w+x;if(!a[i])continue;
+     const p=[n(x,y-1),n(x+1,y-1),n(x+1,y),n(x+1,y+1),n(x,y+1),n(x-1,y+1),n(x-1,y),n(x-1,y-1)];
+     const sum=p[0]+p[1]+p[2]+p[3]+p[4]+p[5]+p[6]+p[7];if(sum<2||sum>6)continue;
+     let trans=0;for(let k=0;k<8;k++)if(!p[k]&&p[(k+1)%8])trans++;if(trans!==1)continue;
+     const [p2,p3,p4,p5,p6,p7,p8,p9]=p;
+     if(pass===0){if(p2*p4*p6||p4*p6*p8)continue}else{if(p2*p4*p8||p2*p6*p8)continue}
+     del.push(i);
+    }
+    if(y%96===0){if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');await yieldNow()}
+   }
+   if(del.length){for(const i of del)a[i]=0;changed=true}
+  }
+  if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
+ }
+ return {bin:a,iterations:loops,converged:!changed};
+}
+function neighbors(bin,w,h,i){
+ const x=i%w,y=(i/w)|0,out=[];
+ for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+  if(!dx&&!dy)continue;const xx=x+dx,yy=y+dy;
+  if(xx<=0||xx>=w-1||yy<=0||yy>=h-1)continue;
+  const j=yy*w+xx;if(!bin[j])continue;
+  // Do not add a diagonal shortcut when an orthogonal pixel already connects the pair.
+  if(dx&&dy&&(bin[y*w+xx]||bin[yy*w+x]))continue;
+  out.push(j);
+ }
+ return out;
+}
+function traceSkeleton(bin,w,h){const total=w*h,seen=new Set(),paths=[];const edge=(a,b)=>a<b?a*total+b:b*total+a;const nodes=[];for(let i=0;i<total;i++)if(bin[i]){const d=neighbors(bin,w,h,i).length;if(d!==2)nodes.push(i)}function trace(start,next){let path=[start],prev=start,cur=next;seen.add(edge(prev,cur));let guard=0;while(guard++<total){path.push(cur);const ns=neighbors(bin,w,h,cur).filter(v=>v!==prev);if(ns.length!==1)break;const nx=ns[0],key=edge(cur,nx);if(seen.has(key)){if(nx===start)path.push(nx);break}seen.add(key);prev=cur;cur=nx;if(cur===start){path.push(cur);break}}if(path.length>1)paths.push(path)}for(const n of nodes)for(const q of neighbors(bin,w,h,n))if(!seen.has(edge(n,q)))trace(n,q);for(let i=0;i<total;i++)if(bin[i])for(const q of neighbors(bin,w,h,i))if(!seen.has(edge(i,q)))trace(i,q);return paths}
+function analyzeSkeleton(bin,w,h,paths,scale){
+ let branchNodes=0,endpoints=0,inkPixels=0;
+ for(let i=0;i<bin.length;i++)if(bin[i]){
+  inkPixels++;
+  const degree=neighbors(bin,w,h,i).length;
+  if(degree>2)branchNodes++;
+  else if(degree===1)endpoints++;
+ }
+ const lengths=paths.map(path=>{
+  let n=0;
+  for(let i=1;i<path.length;i++){
+   const ax=path[i-1]%w,ay=Math.floor(path[i-1]/w),bx=path[i]%w,by=Math.floor(path[i]/w);
+   n+=Math.hypot(bx-ax,by-ay);
+  }
+  return n/scale;
+ });
+ const shortCount=lengths.filter(v=>v<.35).length;
+ return {branchNodes,endpoints,inkPixels,shortCount,pathCount:paths.length,shortRatio:paths.length?shortCount/paths.length:0};
+}
+function simplify(points,tol=1.1){if(points.length<3)return points;const sq=v=>v*v,dist=(p,a,b)=>{let dx=b.x-a.x,dy=b.y-a.y;if(!dx&&!dy)return sq(p.x-a.x)+sq(p.y-a.y);let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));return sq(p.x-(a.x+t*dx))+sq(p.y-(a.y+t*dy))};function rec(a,b,out){let m=tol*tol,idx=-1;for(let i=a+1;i<b;i++){const d=dist(points[i],points[a],points[b]);if(d>m){m=d;idx=i}}if(idx>=0){rec(a,idx,out);out.push(points[idx]);rec(idx,b,out)}}const out=[points[0]];rec(0,points.length-1,out);out.push(points[points.length-1]);return out}
+async function rasterText(model,token){
+ const dm=Number(navigator.deviceMemory)||0;
+ // Render only the actual text bounds (plus a safety margin), not the empty page.
+ // This makes 22 px/mm practical without allocating a full-page RGBA canvas on phones.
+ const pixelBudget=dm>0&&dm<=2?3000000:dm>=8?11000000:dm>=6?9200000:dm>=4?7600000:6200000;
+ const maxSide=9216,maxPixels=12000000,maxScale=22;
+ const b=model.textBounds||{};
+ const hasBounds=[b.left,b.top,b.right,b.bottom].every(Number.isFinite)&&b.right>b.left&&b.bottom>b.top;
+ if(!hasBounds)throw Error('Не удалось определить область букв. Введи текст и обнови предпросмотр.');
+ const pad=Math.max(2.2,Math.min(4,model.lh*.65));
+ const leftMM=Math.max(0,b.left-pad),topMM=Math.max(0,b.top-pad),rightMM=Math.min(model.w,b.right+pad),bottomMM=Math.min(model.h,b.bottom+pad);
+ const roiW=Math.max(1,rightMM-leftMM),roiH=Math.max(1,bottomMM-topMM);
+ const rawScale=Math.min(maxScale,Math.sqrt(pixelBudget/(roiW*roiH)),maxSide/Math.max(roiW,roiH));
+ const scale=Math.max(2,Math.floor(rawScale*10)/10);
+ const originX=Math.max(0,Math.floor(leftMM*scale)),originY=Math.max(0,Math.floor(topMM*scale));
+ const endX=Math.min(Math.ceil(model.w*scale),Math.ceil(rightMM*scale)),endY=Math.min(Math.ceil(model.h*scale),Math.ceil(bottomMM*scale));
+ const w=Math.max(1,endX-originX),h=Math.max(1,endY-originY);
+ if(w*h>maxPixels||Math.max(w,h)>maxSide)throw Error('Область текста слишком велика для безопасной обработки. Разбей длинный текст на несколько частей.');
+ const c=document.createElement('canvas');c.width=w;c.height=h;
+ const cx=c.getContext('2d',{willReadFrequently:true});if(!cx)throw Error('Браузер не смог создать рабочий canvas.');
+ cx.clearRect(0,0,w,h);cx.fillStyle='#000';cx.textBaseline='alphabetic';cx.textAlign='left';
+ // All glyph positions stay in page millimetres; shift the cropped canvas window to the text ROI.
+ cx.translate(-originX,-originY);
+ const fontPx=model.fontSize*scale;
+ for(let i=0;i<model.lines.length;i++){
+  if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
+  const line=model.lines[i];if(line.blank)continue;
+  const baseline=(model.baseline0+i*model.pitch)*scale,runs=runsFor(line.text,model.mode,model.hand);
+  let ascent=0,descent=0;
+  for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;if(CANVAS_SPACING.letter)cx.letterSpacing=`${model.profile.letterSpacing*scale}px`;if(CANVAS_SPACING.word)cx.wordSpacing=`${model.profile.wordSpacing*scale}px`;const mt=cx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
+  let lowerAscent=0;for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,cx.measureText(probe).actualBoundingBoxAscent||0)}const target=model.lh*scale,sy=scaleToLowercaseHeight(target,lowerAscent);
+  const profile=model.profile,width=profile.widthScale||1;
+  if(CANVAS_SPACING.letter)cx.letterSpacing=`${profile.letterSpacing*scale}px`;if(CANVAS_SPACING.word)cx.wordSpacing=`${profile.wordSpacing*scale}px`;
+  cx.save();cx.translate(line.x*scale,baseline);cx.transform(width,0,0,sy,0,0);cx.translate(-line.x*scale,-baseline);
+  let x=line.x*scale;
+  for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;for(const part of run.text.split(/(\\s+)/u)){if(!part)continue;if(/^\\s+$/u.test(part)){const count=(part.match(/ /g)||[]).length;x+=cx.measureText(part).width+(line.extraWordSpace||0)*count*scale}else{cx.fillText(part,x,baseline);x+=cx.measureText(part).width}}}
+  if(i%8===0)await new Promise(resolve=>setTimeout(resolve,0));
+ }
+ if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
+ let imageData=cx.getImageData(0,0,w,h),pixels=imageData.data;let minX=w,minY=h,maxX=-1,maxY=-1;
+ for(let i=3,px=0;i<pixels.length;i+=4,px++)if(pixels[i]>105){const x=px%w,y=(px/w)|0;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y}
+ if(maxX<0)throw Error('Не найдено изображение букв. Проверь подключение шрифта или выбери другой профиль.');
+ const margin=Math.max(10,Math.ceil(scale*1.15)),x0=Math.max(0,minX-margin),y0=Math.max(0,minY-margin),x1=Math.min(w-1,maxX+margin),y1=Math.min(h-1,maxY+margin),cw=x1-x0+1,ch=y1-y0+1;
+ const binary=new Uint8Array(cw*ch);
+ for(let y=0;y<ch;y++){const src=((y+y0)*w+x0)*4,dst=y*cw;for(let x=0;x<cw;x++)binary[dst+x]=pixels[src+x*4+3]>105?1:0}
+ // Drop RGBA buffers before thinning; the ROI crop keeps the working set bounded on mobile.
+ pixels=null;imageData=null;c.width=1;c.height=1;
+ const thin=await skeletonizeAsync(binary,cw,ch,token);
+ return {bin:thin.bin,w:cw,h:ch,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
+}
+function labelComponents(bin,w,h){
+ const labels=new Int32Array(w*h),queue=new Int32Array(w*h),components=[];let id=0;
+ for(let seed=0;seed<bin.length;seed++){
+  if(!bin[seed]||labels[seed])continue;id++;let head=0,tail=0;queue[tail++]=seed;labels[seed]=id;
+  let minX=w,minY=h,maxX=0,maxY=0,sumX=0,sumY=0,count=0;
+  while(head<tail){const cur=queue[head++],x=cur%w,y=(cur/w)|0;count++;sumX+=x;sumY+=y;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+   for(const n of neighbors(bin,w,h,cur))if(!labels[n]){labels[n]=id;queue[tail++]=n}
+  }
+  components.push({id,minX,minY,maxX,maxY,cx:sumX/count,cy:sumY/count,count});
+ }
+ return {labels,components};
+}
+function orderPathsByComponent(paths,raster,model){
+ const {labels,components}=labelComponents(raster.bin,raster.w,raster.h),groups=new Map();
+ for(const p of paths){if(!p.length)continue;const id=labels[p[0]]||0;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(p)}
+ const componentById=new Map(components.map(c=>[c.id,c]));
+ const orderedComponents=[...groups.entries()].map(([id,ps])=>({id,paths:ps,box:componentById.get(id)})).filter(g=>g.box);
+ // Reading order: top-to-bottom by text row, then left-to-right within that row.
+ orderedComponents.sort((a,b)=>{
+  const ay=(a.box.cy+raster.offsetY)/raster.scale,by=(b.box.cy+raster.offsetY)/raster.scale;
+  const ar=Math.round((ay-model.baseline0+model.lh*.35)/model.pitch),br=Math.round((by-model.baseline0+model.lh*.35)/model.pitch);
+  return ar-br||a.box.minX-b.box.minX;
+ });
+ const result=[];
+ for(const group of orderedComponents){
+  let remaining=group.paths.slice(),cur=null;
+  // Finish every stroke belonging to this connected word/mark before moving to the next.
+  while(remaining.length){let best=0,reverse=false,bestD=Infinity;
+   remaining.forEach((p,i)=>{
+    const a={x:p[0]%raster.w,y:Math.floor(p[0]/raster.w)},z={x:p[p.length-1]%raster.w,y:Math.floor(p[p.length-1]/raster.w)};
+    const candidates=[[false,a],[true,z]];
+    for(const [rev,q] of candidates){const d=cur?(q.x-cur.x)**2+(q.y-cur.y)**2:q.x*q.x+q.y*q.y;if(d<bestD){bestD=d;best=i;reverse=rev}}
+   });
+   let p=remaining.splice(best,1)[0];if(reverse)p=p.slice().reverse();result.push(p);
+   const last=p[p.length-1];cur={x:last%raster.w,y:Math.floor(last/raster.w)};
+  }
+ }
+ return result;
+}
+
+function gcodeForPaths(paths,model,raster){
+ const scale=raster.scale,{pl}=model,pageX=pl.pageX,pageY=pl.pageY;
+ const toPage=p=>({x:(p.x+raster.offsetX)/scale,y:(p.y+raster.offsetY)/scale});
+ const toMachine=p=>{const q=toPage(p);return {x:Number((pageX+q.x).toFixed(3)),y:Number((253-(pageY+q.y)).toFixed(3))}};
+ const ordered=orderPathsByComponent(paths,raster,model).map(p=>simplify(p.map(i=>({x:i%raster.w,y:Math.floor(i/raster.w)})), model.routeTolerance||.12)).filter(p=>p.length>1);
+ const candidateStrokes=ordered.map(p=>p.map(toMachine)).filter(p=>p.length>1);
+ const strokes=[];
+ for(const path of candidateStrokes){const length=path.reduce((sum,q,i)=>i?sum+Math.hypot(q.x-path[i-1].x,q.y-path[i-1].y):0,0);if(length>=.16)strokes.push(path)}
+ for(const path of strokes)for(const q of path){
+  if(q.x<3||q.x>253||q.y<3||q.y>253)throw Error('Часть траектории находится вне рабочей зоны A1. Перемести лист или уменьши формат.');
+  const pg={x:q.x-pageX,y:253-q.y-pageY};
+  if(pg.x<.25||pg.y<.25||pg.x>model.rightX-.2)throw Error('Фактическая траектория касается края листа или красной границы. Перенеси часть текста на следующую строку.');
+  if(pg.y>model.bottomY-.25)throw Error('Фактическая траектория заходит в нижнюю недоступную зону. Уменьши количество строк или размер текста.');
+ }
+ const sorted=strokes; // Keep component reading order; do not globally jump between letters/words.
+ const fmt=n=>Number(n).toFixed(3),z=model.zSettings||getPenZSettingsForPreview();let out=[];
+ for(const p of strokes){const a=p[0];out.push(`G1 Z${fmt(z.travel)} F1200`,`G0 X${fmt(a.x)} Y${fmt(a.y)} F${model.profile.rapidFeed}`,`G1 Z${fmt(z.write)} F1200`);for(let i=1;i<p.length;i++){const q=p[i];out.push(`G1 X${fmt(q.x)} Y${fmt(q.y)} F${model.profile.drawFeed}`)}out.push(`G1 Z${fmt(z.travel)} F1200`)}
+ if(!out.length)throw Error('После обработки не осталось пригодных траекторий. Попробуй другой шрифт или увеличь высоту букв.');
+ return {commands:out,strokes};
+}
+let routePlayback={strokes:[],model:null,timer:null,cursor:0,visible:false};
+function updateRouteControls(){const has=routePlayback.strokes.length>0,playing=!!routePlayback.timer;for(const [id,disabled] of [['routePlay',!has],['routePause',!has||!playing],['routeResume',!has||playing],['routeAll',!has],['routeStart',!has],['routeSlider',!has]])$(id).disabled=disabled}
+function stopRoutePlayback(){if(routePlayback.timer){clearInterval(routePlayback.timer);routePlayback.timer=null}updateRouteControls()}
+function clearRoutePlaybackUI(){stopRoutePlayback();const old=$('paper').querySelector('#penRouteLayer');if(old)old.remove();const bedOld=$('bedPreview').querySelector('#bedRouteLayer');if(bedOld)bedOld.remove();routePlayback.strokes=[];routePlayback.model=null;routePlayback.cursor=0;routePlayback.visible=false;$('routeOverlayBtn').hidden=true;$('routeInkModeBtn').hidden=true;$('routeInkModeBtn').disabled=true;setRouteInkMode(false);$('routeOverlayBtn').textContent='Показать траектории';$('routeOverlayBtn').setAttribute('aria-pressed','false');$('routePlayback').hidden=true;$('routeOverlayStatus').textContent='После построения будут показаны те же центральные линии и точки, которые попадут в G-code.';$('routePlaybackStatus').textContent='Траектории ещё не построены.';$('routeProgressBar').style.width='0%';$('routeProgress').setAttribute('aria-valuenow','0');$('routeProgressLabel').textContent='Пройдено 0 из 0 штрихов';updateRouteControls()}
+function routePagePoint(q,m){return {x:q.x-m.pl.pageX,y:253-q.y-m.pl.pageY}}
+function setRouteCursor(cursor){
+ const n=routePlayback.strokes.length;routePlayback.cursor=Math.max(0,Math.min(n,Math.round(cursor)));
+ const layer=$('paper').querySelector('#penRouteLayer');if(layer){[...layer.querySelectorAll('path[data-stroke]')].forEach((el,i)=>{el.setAttribute('stroke',i<routePlayback.cursor?'#2776bd':i===routePlayback.cursor?'#ed922c':'#aeb6be');el.setAttribute('stroke-width',i===routePlayback.cursor?'.34':'.22');el.setAttribute('opacity',i<routePlayback.cursor?'.95':i===routePlayback.cursor?'1':'.8')});const marker=layer.querySelector('#routeCursorDot');if(marker&&n){const path=routePlayback.strokes[Math.min(routePlayback.cursor,n-1)],q=routePlayback.cursor<n?path[0]:routePlayback.strokes[n-1].at(-1),pt=routePagePoint(q,routePlayback.model);marker.setAttribute('cx',pt.x.toFixed(3));marker.setAttribute('cy',pt.y.toFixed(3));marker.setAttribute('opacity',routePlayback.visible?'1':'0')}}
+ const bedLayer=$('bedPreview').querySelector('#bedRouteLayer');if(bedLayer){[...bedLayer.querySelectorAll('path[data-stroke]')].forEach((el,i)=>{el.setAttribute('stroke',i<routePlayback.cursor?'#2776bd':i===routePlayback.cursor?'#ed922c':'#aeb6be');el.setAttribute('stroke-width',i===routePlayback.cursor?'.32':'.20');el.setAttribute('opacity',i<routePlayback.cursor?'.95':i===routePlayback.cursor?'1':'.8')});const marker=bedLayer.querySelector('#bedRouteCursorDot');if(marker&&n){const path=routePlayback.strokes[Math.min(routePlayback.cursor,n-1)],q=routePlayback.cursor<n?path[0]:routePlayback.strokes[n-1].at(-1);marker.setAttribute('cx',q.x.toFixed(3));marker.setAttribute('cy',(253-q.y).toFixed(3));marker.setAttribute('opacity',routePlayback.visible?'1':'0')}}
+ const slider=$('routeSlider');slider.max=String(n);slider.value=String(routePlayback.cursor);
+ const current=routePlayback.strokes[routePlayback.cursor],done=routePlayback.cursor,remaining=n-done,progress=n?done/n*100:0;$('routeProgressBar').style.width=progress.toFixed(2)+'%';$('routeProgress').setAttribute('aria-valuenow',String(Math.round(progress)));$('routeProgressLabel').textContent=`Пройдено ${done} из ${n} штрихов`
+
+ let lineText='—',lineNo='—';
+ if(current&&routePlayback.model){const mid=current.reduce((a,q)=>a+q.y,0)/current.length,pageY=253-mid-routePlayback.model.pl.pageY;let best=Infinity,idx=-1;for(let i=0;i<routePlayback.model.lines.length;i++){const row=routePlayback.model.lines[i];if(row.blank)continue;const y=routePlayback.model.baseline0+i*routePlayback.model.pitch,d=Math.abs(y-pageY);if(d<best){best=d;idx=i}}if(idx>=0){lineText=routePlayback.model.lines[idx].text;lineNo=String(idx+1)}}
+ $('routePlaybackStatus').textContent=n?(done===n?`Готово · пройдено ${done} из ${n} штрихов · осталось 0.`:`Текущий штрих ${done+1} из ${n} · пройдено ${done} · осталось ${remaining} · строка ${lineNo}: ${lineText||'—'} · буква не определяется надёжно.`):'Нет линий для показа.';
+}
+function showPenRoute(strokes,raster,model){
+ clearRoutePlaybackUI();
+ const ns='http://www.w3.org/2000/svg',g=document.createElementNS(ns,'g');g.setAttribute('id','penRouteLayer');g.setAttribute('fill','none');g.setAttribute('stroke-linecap','round');g.setAttribute('stroke-linejoin','round');
+ // These are the exact simplified machine-coordinate polylines serialized into G-code.
+ for(let i=0;i<strokes.length;i++){const p=strokes[i];if(p.length<2)continue;const d=p.map((q,j)=>{const v=routePagePoint(q,model);return `${j?'L':'M'} ${v.x.toFixed(3)} ${v.y.toFixed(3)}`}).join(' ');const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('data-stroke',String(i));el.setAttribute('stroke','#aeb6be');el.setAttribute('stroke-width','.22');g.appendChild(el)}
+ const cursorDot=document.createElementNS(ns,'circle');cursorDot.setAttribute('id','routeCursorDot');cursorDot.setAttribute('r','.72');cursorDot.setAttribute('fill','#ed922c');cursorDot.setAttribute('stroke','#fff');cursorDot.setAttribute('stroke-width','.22');cursorDot.setAttribute('opacity','1');g.appendChild(cursorDot);
+ $('paper').appendChild(g);
+ const bedLayer=document.createElementNS(ns,'g');bedLayer.setAttribute('id','bedRouteLayer');bedLayer.setAttribute('fill','none');bedLayer.setAttribute('stroke-linecap','round');bedLayer.setAttribute('stroke-linejoin','round');
+ for(let i=0;i<strokes.length;i++){const p=strokes[i];if(p.length<2)continue;const d=p.map((q,j)=>`${j?'L':'M'} ${q.x.toFixed(3)} ${(253-q.y).toFixed(3)}`).join(' ');const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('data-stroke',String(i));el.setAttribute('stroke','#aeb6be');el.setAttribute('stroke-width','.20');bedLayer.appendChild(el)}
+ const bedDot=document.createElementNS(ns,'circle');bedDot.setAttribute('id','bedRouteCursorDot');bedDot.setAttribute('r','.72');bedDot.setAttribute('fill','#ed922c');bedDot.setAttribute('stroke','#fff');bedDot.setAttribute('stroke-width','.22');bedLayer.appendChild(bedDot);$('bedPreview').appendChild(bedLayer);
+ routePlayback.strokes=strokes;routePlayback.model=model;routePlayback.cursor=0;routePlayback.visible=true;$('routeOverlayBtn').hidden=false;$('routeInkModeBtn').hidden=false;$('routeInkModeBtn').disabled=false;setRouteInkMode(false);$('routeOverlayBtn').textContent='Скрыть траектории';$('routeOverlayBtn').setAttribute('aria-pressed','true');$('routePlayback').hidden=false;updateRouteControls();
+ $('routeOverlayStatus').textContent=`Показаны ${strokes.length} фактических штрихов одновременно на листе и схеме пластины. Координаты совпадают с G-code; холостые перемещения выполняются с поднятой ручкой.`;
+ setRouteCursor(0);
+}
+function routeInterval(){return Number($('routeSpeed').value)||500}
+function startRoutePlayback(fromStart=false){const n=routePlayback.strokes.length;if(!n)return;stopRoutePlayback();if(fromStart)setRouteCursor(0);else if(routePlayback.cursor>=n)setRouteCursor(0);$('routeOverlayBtn').hidden=false;const layer=$('paper').querySelector('#penRouteLayer'),bedLayer=$('bedPreview').querySelector('#bedRouteLayer');if(layer)layer.style.display='';if(bedLayer)bedLayer.style.display='';routePlayback.visible=true;[layer?.querySelector('#routeCursorDot'),bedLayer?.querySelector('#bedRouteCursorDot')].filter(Boolean).forEach(m=>m.setAttribute('opacity','1'));$('routeOverlayBtn').textContent='Скрыть траектории';routePlayback.timer=setInterval(()=>{if(routePlayback.cursor>=n){stopRoutePlayback();return}setRouteCursor(routePlayback.cursor+1);if(routePlayback.cursor>=n)stopRoutePlayback()},routeInterval());updateRouteControls()}
+function toggleRouteVisibility(){const layer=$('paper').querySelector('#penRouteLayer'),bedLayer=$('bedPreview').querySelector('#bedRouteLayer');if(!layer)return;routePlayback.visible=!routePlayback.visible;[layer,bedLayer].filter(Boolean).forEach(g=>{g.style.display=routePlayback.visible?'':'none';const marker=g.querySelector('#routeCursorDot,#bedRouteCursorDot');if(marker)marker.setAttribute('opacity',routePlayback.visible?'1':'0')});$('routeOverlayBtn').textContent=routePlayback.visible?'Скрыть траектории':'Показать траектории';$('routeOverlayBtn').setAttribute('aria-pressed',String(routePlayback.visible))}
+
+function diagnoseRoutes(raster,paths,topology,result,model){
+ const lengths=result.strokes.map(p=>{let d=0;for(let i=1;i<p.length;i++)d+=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);return d});
+ const shortCount=lengths.filter(v=>v<.35).length,shortRatio=lengths.length?shortCount/lengths.length:0;
+ const moveCount=result.commands.filter(x=>/^G1 X/.test(x)).length;
+ const hashes=new Set();let duplicates=0;
+ for(const p of result.strokes){const coords=p.map(q=>`${Math.round(q.x*20)},${Math.round(q.y*20)}`),rev=coords.slice().reverse(),a=coords.join(';'),b=rev.join(';'),key=a<b?a:b;if(hashes.has(key))duplicates++;else hashes.add(key)}
+ const componentData=labelComponents(raster.bin,raster.w,raster.h),tinyComponents=componentData.components.filter(c=>c.count<=Math.max(2,Math.ceil(raster.scale*.035))).length;
+ const branchRatio=topology.inkPixels?topology.branchNodes/topology.inkPixels:0;
+ const warnings=[];let fatal=[];
+ if(!result.strokes.length)fatal.push('Нет реальных линий письма.');
+ if(duplicates)fatal.push(`Найдены повторяющиеся траектории: ${duplicates}.`);
+ if(result.strokes.length>12000)fatal.push('Слишком много отдельных штрихов для надёжной обработки.');
+ if(moveCount>120000)fatal.push('Слишком много команд движения для безопасного размера файла.');
+ if(!raster.converged)warnings.push('Скелетизация достигла лимита итераций; часть контуров может быть обработана не полностью.');
+ if(shortCount>8&&shortRatio>.22)warnings.push(`Много очень коротких фрагментов (${shortCount}); это могут быть точки/знаки или обрывки букв — требуется просмотр.`);
+ if(branchRatio>.12)warnings.push(`Повышенное число узлов разветвления (${topology.branchNodes}); возможны слипшиеся или пересечённые штрихи.`);
+ if(tinyComponents>8)warnings.push(`Много очень маленьких отдельных компонентов (${tinyComponents}); проверь точки, запятые и мелкие детали.`);
+ if(moveCount>30000)warnings.push(`Большой объём движений пера (${moveCount}); файл может обрабатываться медленно.`);
+ if(paths.length>5000)warnings.push('Очень много отдельных линий; проверь предпросмотр по порядку.');
+ return {fatal,warnings,shortCount,shortRatio,moveCount,duplicates,branchRatio,tinyComponents,componentCount:componentData.components.length,branchNodes:topology.branchNodes,endpoints:topology.endpoints,pathCount:result.strokes.length,scale:raster.scale,iterations:raster.iterations};
+}
+function renderQuality(d){
+ const panel=$('qualityPanel');if(!d){panel.className='quality-panel';panel.textContent='Диагностика центральных линий запускается после построения траекторий.';return}
+ if(d.fatal.length){panel.className='quality-panel bad';panel.innerHTML=`<b>Обнаружены серьёзные проблемы — G-code не создан.</b><ul>${d.fatal.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;return}
+ if(d.warnings.length){panel.className='quality-panel warn';panel.innerHTML=`<b>Есть подозрительные штрихи — обязательно проверь визуализацию.</b><ul>${d.warnings.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p>Автоматически отличить все точки/знаки от обрывков букв надёжно нельзя; подозрительные короткие фрагменты не удалялись.</p>`;return}
+ panel.className='quality-panel ok';panel.innerHTML=`<b>Геометрические проверки пройдены.</b><p>Реальные линии построены без выявленных дубликатов и выхода за безопасные границы. Это не доказывает, что каждая буква визуально идеальна: проверь порядок штрихов перед сохранением.</p>`;
+}
+let generatedGcodeUrl=null;
+function setGenerationProgress(percent,label){
+ const box=$('generationProgress'),bar=$('generationProgressBar'),txt=$('generationProgressLabel');
+ if(box)box.hidden=false;if(bar)bar.style.width=`${Math.max(0,Math.min(100,percent))}%`;if(txt)txt.textContent=label||'Обработка…';
+ if($('dockStatus'))$('dockStatus').textContent=label||'Идёт создание G-code…';
+}
+async function generateGcode(){
+ if(isGenerating)return;
+ const btn=$('gcodeBtn'),token=++generationToken;if(previewDebounce){clearTimeout(previewDebounce);previewDebounce=null}if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}isGenerating=true;btn.disabled=true;$('gcodeStatus').textContent='Подготавливаю страницу и рассчитываю траектории…';$('gcodeStatus').className='status';setGenerationProgress(3,'Проверяю лист и настройки…');$('gcodeDownload').hidden=true;$('gcodeDownload').removeAttribute('href');$('gcodeDetails').innerHTML='';renderQuality(null);
+ try{
+  const zSettings=getPenZSettings();
+  let m=build();m.zSettings=zSettings;if(!m.txt.trim())throw Error('Сначала введи текст.');
+  if(m.pl.tabOverlap)throw Error('Лист перекрывает настраиваемую защитную зону переднего язычка/ручки пластины A1. G-code не создан. Измерь свою пластину или измени формат/положение бумаги.');
+  setGenerationProgress(10,'Подготавливаю шрифты…');const fontReady=await ensureFonts(fontsForModel(m),m.fontSize,2200);if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');setFontStatus(fontReady);m=build();m.zSettings=zSettings;
+  if(m.errors.length)throw Error('Сначала исправь размещение листа: '+m.errors.join(' '));
+  if(m.rightX<=m.left+2)throw Error('Между началом текста и правой границей недостаточно места.');
+  const cx=m.pl.pageX,cy=253-m.pl.pageY;if(cx<3||cx>253||cy<3||cy>253)throw Error('Физический верхний левый угол листа вне безопасной области пластины.');
+  $('gcodeStatus').textContent='Рисую текст в повышенном разрешении и строю скелет…';setGenerationProgress(22,'Растеризую буквы с высоким разрешением…');
+  const raster=await rasterText(m,token);if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');setGenerationProgress(52,`Скелет готов: ${raster.scale.toFixed(1)} пикс./мм. Проверяю границы…`);const ink=raster.inkBounds;
+  if(ink.left<.25)throw Error(`Левые буквы вышли за край листа на ${(.25-ink.left).toFixed(1)} мм.`);
+  if(ink.top<.25)throw Error('Верхние буквы касаются края листа. Увеличь высоту начала или уменьши буквы.');
+  if(ink.right>m.rightX-.25)throw Error(`Правая часть строки подходит слишком близко к границе (${ink.right.toFixed(1)} мм). Уменьши высоту букв или перенеси часть слов на новую строку.`);
+  if(ink.bottom>m.bottomY-.25)throw Error(`Нижние буквы заходят в недоступную зону (${ink.bottom.toFixed(1)} мм от верха листа). Уменьши шаг строк или количество строк.`);
+  $('gcodeStatus').textContent='Извлекаю центральные линии и проверяю структуру…';setGenerationProgress(66,'Извлекаю реальные линии пера…');
+  const paths=traceSkeleton(raster.bin,raster.w,raster.h);if(!paths.length)throw Error('Не удалось получить центральные линии. Попробуй другой почерк или немного увеличь высоту букв.');
+  setGenerationProgress(78,'Собираю маршрут пера и проверяю штрихи…');const topology=analyzeSkeleton(raster.bin,raster.w,raster.h,paths,raster.scale),result=gcodeForPaths(paths,m,raster),diag=diagnoseRoutes(raster,paths,topology,result,m);
+  if(diag.fatal.length){renderQuality(diag);throw Error(diag.fatal.join(' '));}
+  if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');
+  const draw=result.commands,x=m.pl.pageX,y=253-m.pl.pageY,park=getCornerPausePosition(x,y),pauseSeconds=getPause2Seconds();
+  const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
+  const head=[`; Bambu Lab A1 — pen plotter G-code`,`; Generated by Bambu HandWrite 4.3`,`; Title: ${workTitle}`,`; Page: ${m.w} x ${m.h} mm; paper top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,`; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,`; Raster resolution: ${raster.scale.toFixed(1)} px/mm; route simplification: ${m.routeTolerance.toFixed(2)} mm`,`; Nozzle Z above build plate while writing: ${fmtZ(zSettings.write)} mm`,`; Pen-up travel Z: ${fmtZ(zSettings.travel)} mm (+${Z_LIMITS.travelOffset} mm); safe travel Z: ${fmtZ(zSettings.safe)} mm (+${Z_LIMITS.safeOffset} mm)`,`; Safety interlock: write Z must be between ${Z_LIMITS.min} and ${Z_LIMITS.max} mm.`,`; Z coordinates are absolute machine coordinates after homing; verify actual nozzle/pen-holder clearance physically.`,`; Pause 1 is manual (M400 U1). Remove the pen holder before homing if its homing clearance has not been verified. After Resume: G28 homes all axes.`,`; Pause 2: automatic ${pauseSeconds}s dwell with nozzle parked 3 mm outside the paper's left edge and 3 mm below its upper-left corner (M400 S${pauseSeconds}). Fit/adjust the pen holder during this dwell; no second Resume needed.`,`; WARNING: verify paper fixing and pen Z calibration with a short supervised test.`,`M73 P0 R1`,`M104 S0 ; nozzle heater off`,`M140 S0 ; bed heater off`,`M106 S0 ; fan off`,`M17 ; enable steppers`,`M84 S0 ; keep steppers energized`,`G21 ; metric units`,`G90 ; absolute positioning`,`M83 ; relative extrusion mode; no E moves`,`M400`,`M400 U1 ; PAUSE 1: secure paper; remove pen holder before homing if clearance is unverified; press Resume`,`G28 ; home all axes`,`G1 Z${fmtZ(zSettings.safe)} F1200 ; safe height above plate`,`M400`,`G0 X${park.x.toFixed(3)} Y${park.y.toFixed(3)} F2000 ; nozzle parks 3 mm outside the left edge and 3 mm below the paper's upper-left corner`,`M400`,`M400 S${pauseSeconds} ; SECOND STOP: nozzle is offset outside paper edge; automatic dwell; no Resume tap needed`,`; After the ${pauseSeconds}-second corner dwell: lower to pen-up travel Z, move to first text stroke, then write`,`G1 Z${fmtZ(zSettings.travel)} F1200`,...draw,`G1 Z${fmtZ(zSettings.safe)} F1200 ; final safe lift`,`G0 X128.000 Y246.000 F2000 ; park/present bed`,`M400 S1`,`M73 P100 R0`];
+  setGenerationProgress(92,'Формирую файл G-code…');const file=head.join('\n')+'\n',blob=new Blob([file],{type:'application/octet-stream'});
+  if(generatedGcodeUrl)URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=URL.createObjectURL(blob);
+  const link=$('gcodeDownload');link.href=generatedGcodeUrl;link.download=`${documentFileBase()}.gcode`;link.hidden=false;
+  showPenRoute(result.strokes,raster,m);renderQuality(diag);
+  $('layoutStatus').textContent=`Геометрия рассчитана: разрешение ${raster.scale.toFixed(1)} пикс./мм; упрощение ${m.routeTolerance.toFixed(2)} мм. Запас справа — ${(m.rightX-ink.right).toFixed(1)} мм; снизу — ${(m.bottomY-ink.bottom).toFixed(1)} мм. Визуальная идеальность букв автоматически не гарантируется.`;$('layoutStatus').className='status '+(diag.warnings.length?'bad':'ok');
+  $('bedStatus').textContent=`Геометрические границы проверены. Верхний левый угол: X ${cx.toFixed(1)} · Y ${cy.toFixed(1)} мм. Защитная зона язычка: пользовательская настройка.`;$('bedStatus').className='bed-status '+(diag.warnings.length?'bad':'ok');
+  const n=draw.filter(l=>l.startsWith('G1 X')).length;
+  $('gcodeStatus').textContent=`G-code сформирован: ${draw.length} команд, ${result.strokes.length} штрихов, ${n} команд движения пера.`;$('gcodeStatus').className='status '+(diag.warnings.length?'gcode-error':'gcode-ready');
+  $('gcodeDetails').innerHTML=[['Диагностика',diag.warnings.length?'есть предупреждения':'геометрические проверки пройдены'],['Разрешение растра',`${raster.scale.toFixed(1)} пикс./мм · до 22 пикс./мм`],['Область обработки',`${(raster.pixelCount/1000000).toFixed(2)} млн пикс. · только зона текста`],['Итерации скелетизации',`${raster.iterations}${raster.converged?' · завершена':' · лимит достигнут'}`],['Название работы',workTitle],['Штрихи пера',result.strokes.length],['Короткие фрагменты < 0,35 мм',`${diag.shortCount} (${(diag.shortRatio*100).toFixed(1)}%) · не удалялись автоматически`],['Узлы разветвления',diag.branchNodes],['Отдельные компоненты',diag.componentCount],['Мелкие компоненты',diag.tinyComponents],['Повторяющиеся траектории',diag.duplicates],['Команды движения пера',n],['Упрощение траекторий',`${m.routeTolerance.toFixed(2)} мм · предпросмотр совпадает с G-code`],['Физический угол листа',`X ${x.toFixed(2)} · Y ${y.toFixed(2)} мм`],['Z сопла над пластиной',`письмо ${zSettings.write} мм · между штрихами ${zSettings.travel} мм · безопасно ${zSettings.safe} мм`],['Паузы',`M400 U1 вручную → G28 → M400 S${pauseSeconds} автоматически`],['Защитная зона пластины',`${m.pl.tab.x}–${m.pl.tab.x+m.pl.tab.w} мм · запас ${m.pl.tab.clearance} мм`],['Профиль',m.profile.title],['Шрифт',fontReady?'дополнительный шрифт загружен':'системный курсив · автономный режим'],['Файл',`${(blob.size/1024).toFixed(0)} КБ · .gcode`]].map(([a,b])=>`<div class="check"><b>${esc(a)}</b>${esc(String(b))}</div>`).join('');
+ }catch(e){
+  const aborted=e?.name==='AbortError'||token!==generationToken;
+  if(!aborted){const message=(e&&e.message)?e.message:String(e||'неизвестная ошибка');$('gcodeStatus').textContent='G-code не создан: '+message;$('gcodeStatus').className='status gcode-error';$('dockStatus').textContent='Нужно исправить замечания';$('gcodeDetails').innerHTML=`<div class="check"><b>Причина</b>${esc(message)}</div><div class="check"><b>Следующий шаг</b>Исправь причину и повтори построение. Не используй предыдущий файл после изменения текста или настроек.</div>`;}
+  $('gcodeDownload').hidden=true;
+ }finally{isGenerating=false;btn.disabled=false;if($('mobileGenerate'))$('mobileGenerate').disabled=false;if($('generationProgress')){if($('generationProgressBar').style.width==='100%')setTimeout(()=>{if(!isGenerating)$('generationProgress').hidden=true},3200);else $('generationProgress').hidden=true}if($('dockStatus')&&$('gcodeDownload').hidden)$('dockStatus').textContent='Лист готов · можно исправить настройки'}
+}
+function safeDocumentTitle(){return String($('documentTitle')?.value??'Моя работа').normalize('NFKC').replace(/[\u0000-\u001f\u007f;]/g,' ').replace(/\s+/gu,' ').trim().slice(0,80)||'Моя работа'}
+function transliterateTitle(value){
+ const map={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'kh',ц:'ts',ч:'ch',ш:'sh',щ:'shch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+ return String(value).normalize('NFKC').split('').map(ch=>{const lower=ch.toLowerCase(),v=map[lower];return v===undefined?ch:v&&ch!==lower?v[0].toUpperCase()+v.slice(1):v}).join('').replace(/[^A-Za-z0-9]+/g,' ').replace(/\s+/g,' ').trim().slice(0,80)||'My_work';
+}
+function documentFileBase(){return transliterateTitle(safeDocumentTitle()).replace(/\s+/g,'_').replace(/_+/g,'_').replace(/^[_-]+|[_-]+$/g,'').slice(0,64)||'Bambu_HandWrite'}
+function updateDocumentTitlePreview(){const el=$('documentTitleLatin');if(el)el.textContent=documentFileBase()+'.gcode'}
+function invalidateGeneratedGcode(){generationToken++;const link=$('gcodeDownload');if(link){link.hidden=true;link.removeAttribute('href')}if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}clearRoutePlaybackUI();renderQuality(null)}
+
+// 3.2 text history: bounded snapshots with cursor restoration and keyboard shortcuts.
+const textHistory={items:[],index:-1,timer:null,restoring:false,max:60};
+function textSnapshot(){const el=$('txt');return {value:el.value,start:el.selectionStart??el.value.length,end:el.selectionEnd??el.value.length};}
+function updateTextHistoryUI(){
+ const undo=$('textUndo'),redo=$('textRedo'),count=$('textCount'),value=$('txt')?.value||'';
+ if(undo)undo.disabled=textHistory.index<=0;
+ if(redo)redo.disabled=textHistory.index<0||textHistory.index>=textHistory.items.length-1;
+ if(count){const words=value.trim()?value.trim().split(/\s+/u).length:0;count.textContent=`${value.length.toLocaleString('ru-RU')} символов · ${words} слов`}
+}
+function commitTextHistory(){
+ if(textHistory.restoring||!$('txt'))return;
+ const snap=textSnapshot(),prev=textHistory.items[textHistory.index];
+ if(prev&&prev.value===snap.value){updateTextHistoryUI();return}
+ textHistory.items=textHistory.items.slice(0,textHistory.index+1);textHistory.items.push(snap);
+ if(textHistory.items.length>textHistory.max)textHistory.items.shift();
+ textHistory.index=textHistory.items.length-1;updateTextHistoryUI();
+}
+function scheduleTextHistory(){if(textHistory.restoring)return;if(textHistory.timer)clearTimeout(textHistory.timer);textHistory.timer=setTimeout(()=>{textHistory.timer=null;commitTextHistory()},350);updateTextHistoryUI()}
+function initTextHistory(){if(textHistory.timer)clearTimeout(textHistory.timer);textHistory.items=[textSnapshot()];textHistory.index=0;updateTextHistoryUI()}
+function applyTextHistory(index){
+ if(index<0||index>=textHistory.items.length)return;
+ if(textHistory.timer){clearTimeout(textHistory.timer);textHistory.timer=null;commitTextHistory()}
+ // commit may append a fresh snapshot; clamp the requested history target again.
+ index=Math.max(0,Math.min(index,textHistory.items.length-1));const snap=textHistory.items[index];
+ textHistory.restoring=true;$('txt').value=snap.value;textHistory.index=index;
+ try{$('txt').setSelectionRange(snap.start,snap.end)}catch(e){}
+ textHistory.restoring=false;invalidateGeneratedGcode();refreshPreviewAndSave();updateTextHistoryUI();
+}
+function undoText(){if(textHistory.timer){clearTimeout(textHistory.timer);textHistory.timer=null;commitTextHistory()}if(textHistory.index>0)applyTextHistory(textHistory.index-1)}
+function redoText(){if(textHistory.timer){clearTimeout(textHistory.timer);textHistory.timer=null;commitTextHistory()}if(textHistory.index<textHistory.items.length-1)applyTextHistory(textHistory.index+1)}
+function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('Очистить весь текст? Это действие можно отменить кнопкой «Отменить».'))return;if(textHistory.timer){clearTimeout(textHistory.timer);textHistory.timer=null}commitTextHistory();$('txt').value='';try{$('txt').setSelectionRange(0,0)}catch(e){}commitTextHistory();invalidateGeneratedGcode();refreshPreviewAndSave();updateTextHistoryUI()}
+
+// Portable backup uses an explicit, versioned JSON format and validates values on import.
+function projectSnapshot(){
+ const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
+ settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;
+ return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'4.3',exportedAt:new Date().toISOString(),settings};
+}
+function exportProjectBackup(){
+ try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
+ catch(e){$('backupStatus').textContent='Не удалось создать копию: '+(e?.message||e)}
+}
+function importProjectBackup(file){
+ if(!file)return;
+ if(file.size>2*1024*1024){$('backupStatus').textContent='Файл слишком большой (максимум 2 МБ).';return}
+ const reader=new FileReader();reader.onerror=()=>{$('backupStatus').textContent='Не удалось прочитать файл.'};
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(String(reader.result||''));if(data?.format!=='BambuHandWriteProject'||data?.formatVersion!==1||!data.settings||typeof data.settings!=='object')throw Error('Это не резервная копия Bambu HandWrite или её версия не поддерживается.');
+   const v=data.settings;if(typeof v.txt==='string'&&v.txt.length>50000)throw Error('В резервной копии слишком длинный текст (лимит 50 000 символов).');
+   const allowed=Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']);
+   for(const k of allowed){if(v[k]===undefined||!$(k))continue;const el=$(k);
+    if(el.tagName==='SELECT'){if([...el.options].some(o=>o.value===String(v[k])))el.value=String(v[k]);continue}
+    if(el.type==='number'||el.type==='hidden'){
+     const n=Number(v[k]);if(!Number.isFinite(n))continue;let lo=el.min!==''?Number(el.min):-100000,hi=el.max!==''?Number(el.max):100000;
+     if(k==='pause2Seconds'){lo=1;hi=600}el.value=String(Math.max(lo,Math.min(hi,n)));continue;
+    }
+    if(k==='txt'||k==='documentTitle')el.value=String(v[k]);
+   }
+   if(typeof v.paragraphIndentEnabled==='boolean')$('paragraphIndentToggle').checked=v.paragraphIndentEnabled;
+   else if(v.paragraphIndent!==undefined)$('paragraphIndentToggle').checked=Number(v.paragraphIndent)>0;
+   if(typeof v.justifyLines==='boolean')$('justifyToggle').checked=v.justifyLines;if(v.pitchCells)$('pitchCells').value=v.pitchCells;   document.querySelectorAll('[data-paper-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.paperChoice===$('paperType').value)));$('customPaperSize').hidden=$('paperType').value!=='custom-paper';
+   invalidateGeneratedGcode();updatePauseUI();updatePenZUI();const fp=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.marck;$('fontProfileTitle').textContent=fp.title;$('fontProfileTag').textContent=fp.tag;$('fontProfileDescription').textContent=fp.description;refreshFontMetrics();build();save();initTextHistory();refreshFontAvailability(lastModel);
+   $('backupStatus').textContent=`Проект восстановлен из копии ${data.exportedAt?new Date(data.exportedAt).toLocaleDateString('ru-RU'):''}. Проверь лист и заново создай G-code.`;
+  }catch(e){$('backupStatus').textContent='Копия не загружена: '+(e?.message||e)}
+ };
+ reader.readAsText(file);
+}
+
+function restore(){
+ try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(sourceKey!=='bhw35'&&v.handFont==='marck')$('handFont').value='neucha';if(v.handFont==='neucha'&&Number(v.lh)===4.7)$('lh').value='5';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=sourceKey==='bhw35'?!!v.justifyLines:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';return true}}
+ catch(e){}return false
+}
+function save(){const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']).forEach(k=>{if($(k))v[k]=$(k).value});
+ // Do not persist a temporarily empty/incomplete decimal field while the user edits it.
+ v.lh=readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh);
+ v.pitch=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch);
+ try{v.penWriteZ=getPenZSettings().write}catch(e){v.penWriteZ=DEFAULTS.penWriteZ}
+ v.paragraphIndentEnabled=$('paragraphIndentToggle').checked;v.justifyLines=$('justifyToggle').checked;v.pitchCells=$('pitchCells').value;try{localStorage.setItem('bhw35',JSON.stringify(v));$('autosaveNote').textContent='Настройки автоматически сохранены в этом браузере. Резервная копия проекта доступна в JSON.'}catch(e){$('autosaveNote').textContent='Браузер запретил сохранение настроек; экспортируй нужные значения отдельно.'}}
+let previewDebounce=null,generationToken=0,isGenerating=false;
+function refreshPreviewAndSave(){if(previewDebounce)clearTimeout(previewDebounce);previewDebounce=setTimeout(()=>{try{build();save()}catch(e){$('layoutStatus').textContent='Не удалось обновить предпросмотр: '+(e?.message||e);$('layoutStatus').className='status bad'}},180)}
+$('applyFitSuggestion').addEventListener('click',()=>{const value=Number($('applyFitSuggestion').dataset.value);if(!Number.isFinite(value)||value<2||value>20)return;invalidateGeneratedGcode();$('lh').value=value.toFixed(1);refreshPreviewAndSave()});
+$('draw').addEventListener('click',()=>{invalidateGeneratedGcode();try{build();save()}catch(e){$('layoutStatus').textContent='Ошибка предпросмотра: '+(e?.message||e);$('layoutStatus').className='status bad'}});
+$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('scriptMode').value='auto';$('handFont').value='neucha';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('neucha');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
+$('paperType').addEventListener('change',e=>{invalidateGeneratedGcode();setPreset(e.target.value,$('paperOrientation').value,true);save()});
+['customPaperW','customPaperH'].forEach((id)=>$(id).addEventListener('input',()=>{if($('paperType').value!=='custom-paper')return;const key=id==='customPaperW'?'pw':'ph';$(key).value=String(clampValue(id,40,420));invalidateGeneratedGcode();refreshPreviewAndSave()}));$('paperOrientation').addEventListener('change',()=>{invalidateGeneratedGcode();setPreset($('paperType').value,$('paperOrientation').value,false);save()});
+document.querySelectorAll('[data-paper-choice]').forEach(btn=>btn.addEventListener('click',()=>{$('paperType').value=btn.dataset.paperChoice;invalidateGeneratedGcode();setPreset(btn.dataset.paperChoice,$('paperOrientation').value,false);save()}));
+$('svgBtn').addEventListener('click',svgDownload);$('pngBtn').addEventListener('click',pngDownload);$('printBtn').addEventListener('click',()=>window.print());$('gcodeBtn').addEventListener('click',generateGcode);
+$('textUndo').addEventListener('click',undoText);$('textRedo').addEventListener('click',redoText);$('textClear').addEventListener('click',clearTextWithHistory);
+$('txt').addEventListener('input',scheduleTextHistory);
+$('documentTitle').addEventListener('input',()=>{updateDocumentTitlePreview();invalidateGeneratedGcode();save()});
+$('txt').addEventListener('keydown',e=>{const mod=e.ctrlKey||e.metaKey;if(!mod)return;const k=e.key.toLowerCase();if(k==='z'&&!e.shiftKey){e.preventDefault();undoText()}else if(k==='y'||(k==='z'&&e.shiftKey)){e.preventDefault();redoText()}});
+$('backupExport').addEventListener('click',exportProjectBackup);$('backupImportBtn').addEventListener('click',()=>$('backupImportFile').click());$('backupImportFile').addEventListener('change',e=>{importProjectBackup(e.target.files?.[0]);e.target.value=''});
+$('routeOverlayBtn').addEventListener('click',()=>{toggleRouteVisibility();if($('routeOverlayBtn').getAttribute('aria-pressed')==='false')setRouteInkMode(false)});
+$('routeInkModeBtn').addEventListener('click',()=>{const next=!$('paper').classList.contains('route-ink-mode');setRouteInkMode(next);if(next&& !routePlayback.visible){toggleRouteVisibility();}});
+$('pause2Seconds').addEventListener('input',()=>{invalidateGeneratedGcode();if($('pause2Seconds').value.trim()===''){$('pauseLive').textContent='Введи время от 1 до 600 секунд.';save();return}updatePauseUI();save();build()});
+$('pause2Seconds').addEventListener('change',()=>{const n=getPause2Seconds();$('pause2Seconds').value=String(n);updatePauseUI();save();build()});
+document.querySelectorAll('[data-pause-seconds]').forEach(btn=>btn.addEventListener('click',()=>{invalidateGeneratedGcode();$('pause2Seconds').value=btn.dataset.pauseSeconds;updatePauseUI();save();build()}));
+$('penWriteZ').addEventListener('input',()=>{invalidateGeneratedGcode();updatePenZUI();try{const z=getPenZSettings();const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']).forEach(k=>{if($(k))v[k]=$(k).value});v.penWriteZ=z.write;v.lh=readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh);v.pitch=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch);v.paragraphIndentEnabled=$('paragraphIndentToggle').checked;v.justifyLines=$('justifyToggle').checked;localStorage.setItem('bhw35',JSON.stringify(v));$('autosaveNote').textContent='Высота Z сохранена в этом браузере.'}catch(e){$('autosaveNote').textContent='Высота Z не сохранена: '+e.message}});
+$('penWriteZ').addEventListener('change',()=>{updatePenZUI();try{const z=getPenZSettings();$('penWriteZ').value=String(z.write);save()}catch(e){$('zLevelReadout').classList.add('invalid');$('zLevelReadout').textContent=e.message}});
+document.querySelectorAll('[data-z-value]').forEach(btn=>btn.addEventListener('click',()=>{invalidateGeneratedGcode();$('penWriteZ').value=btn.dataset.zValue;updatePenZUI();save()}));
+$('routePlay').addEventListener('click',()=>startRoutePlayback(true));$('routePause').addEventListener('click',stopRoutePlayback);$('routeResume').addEventListener('click',()=>startRoutePlayback(false));$('routeAll').addEventListener('click',()=>{stopRoutePlayback();const layer=$('paper').querySelector('#penRouteLayer'),bedLayer=$('bedPreview').querySelector('#bedRouteLayer');if(layer){[layer,bedLayer].filter(Boolean).forEach(g=>g.style.display='');routePlayback.visible=true;$('routeOverlayBtn').textContent='Скрыть траектории';$('routeOverlayBtn').setAttribute('aria-pressed','true')}setRouteCursor(routePlayback.strokes.length)});
+$('routeStart').addEventListener('click',()=>{stopRoutePlayback();setRouteCursor(0)});$('routeSlider').addEventListener('input',()=>{stopRoutePlayback();setRouteCursor(Number($('routeSlider').value))});$('routeSpeed').addEventListener('input',()=>{$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;save();if(routePlayback.timer)startRoutePlayback(false)});
+$('gcodeHelpBtn').addEventListener('click',()=>{$('gcodeInstruction').hidden=!$('gcodeInstruction').hidden});['stage1','stage2','stage3'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
+$('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paperZoom+.2)*10)/10);applyPaperZoom()});$('zoomOut').addEventListener('click',()=>{paperZoom=Math.max(1,Math.round((paperZoom-.2)*10)/10);applyPaperZoom()});$('zoomFit').addEventListener('click',()=>{paperZoom=1;applyPaperZoom()});
+$('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
+$('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
+['lh','pitch'].forEach(id=>$(id).addEventListener('change',()=>{const isHeight=id==='lh';commitEditableDecimal(id,isHeight?2:2,isHeight?20:30,isHeight?(lastModel?.lh??DEFAULTS.lh):(lastModel?.pitch??DEFAULTS.pitch),isHeight?1:2);invalidateGeneratedGcode();refreshFontMetrics();try{build();save()}catch(e){$('layoutStatus').textContent='Проверь высоту букв и шаг строк: '+(e?.message||e);$('layoutStatus').className='status bad'}}));
+['txt','scriptMode','lh','pitch','bedTopGap','plateTabX','plateTabWidth','plateTabClearance','plateTabDepth','paragraphIndent'].forEach(id=>$(id).addEventListener('input',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()}));
+['paragraphIndentToggle','justifyToggle','pitchCells'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();build();save()}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRoutePlayback()});window.addEventListener('pagehide',()=>{stopRoutePlayback();if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}});
+
+const hadSavedSettings=restore();updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.marck;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
+</script></body></html>
