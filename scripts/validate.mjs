@@ -29,7 +29,7 @@ if (html) {
   for (const marker of ['Bambu HandWrite 4.6', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing version 4.4 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 4.5 badge and both line-spacing modes are present');
+  if (!errors.length) ok('Version 4.6 badge and both line-spacing modes are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
