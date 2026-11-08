@@ -26,7 +26,7 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 4.5', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
+  for (const marker of ['Bambu HandWrite 4.6', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing version 4.4 line-spacing feature: ${marker}`);
   }
   if (!errors.length) ok('Version 4.5 badge and both line-spacing modes are present');
@@ -68,9 +68,13 @@ if (html) {
   if (missingReferences.length) fail(`Static DOM references without a matching id: ${missingReferences.join(', ')}`);
   else ok('Static DOM id lookups have matching elements');
 
-  for (const required of ['function getPenZSettings()', 'const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20}', 'M400 U1', 'M400 S${pauseSeconds}', 'G28 ; home all axes', 'G21 ; metric units', 'G90 ; absolute positioning']) {
+  for (const required of ['function validateGeneratedGcode(file,pauseSeconds,park,zSettings)', 'validateGeneratedGcode(file,pauseSeconds,park,zSettings);', 'function getPenZSettings()', 'const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20}', 'M400 U1', 'M400 S${pauseSeconds}', 'G28 ; home all axes', 'G21 ; metric units', 'G90 ; absolute positioning']) {
     if (!html.includes(required)) fail(`Missing expected safety/G-code marker: ${required}`);
   }
+  if (html.includes('M73 P0 R1') || html.includes('M73 P100 R0')) fail('Legacy M73 progress markers must be absent from raw G-code output.');
+  else ok('Legacy M73 progress markers are absent');
+  if (!html.includes('должна быть ровно одна вторая автоматическая пауза') || !html.includes('не-ASCII символы')) fail('Generated G-code preflight must validate pause sequence and ASCII-only output.');
+  else ok('G-code preflight checks ASCII output and the two-pause sequence');
   if (!errors.length) ok('Z limits, pause commands, homing and motion mode markers are present');
 
   if (!html.includes('не гарантия реального зазора') && !html.includes('не гарантия зазора')) {
