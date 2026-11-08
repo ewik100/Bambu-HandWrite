@@ -344,7 +344,7 @@ Hello, world!</textarea></label>
       <p class="calibration-note">Это настраиваемая консервативная зона безопасности, а не точный заводской размер Bambu. Измерь свою пластину и оставь дополнительный зазор; приложение не может проверить физическое положение бумаги.</p>
     </details>
     <div class="bed-svg-wrap"><svg id="bedPreview" viewBox="0 0 256 310" role="img" aria-label="Положение листа и точки маршрута на пластине принтера"></svg></div>
-    <div class="route-legend"><span><i class="dot corner"></i> физический верхний левый угол листа — автоматическая остановка у угла</span><span><i class="dot textstart"></i> отдельная точка начала текста</span><span><i class="dot red"></i> красная граница текста</span></div>
+    <div class="route-legend"><span><i class="dot corner"></i> положение сопла при второй остановке — снаружи левого края листа</span><span><i class="dot textstart"></i> отдельная точка начала текста</span><span><i class="dot red"></i> красная граница текста</span></div>
     <div class="route-controls" aria-label="Этапы маршрута пера">
       <button class="route-btn" id="stage1" type="button" aria-pressed="false">1 · Пауза 1<br>Подготовка</button>
       <button class="route-btn" id="stage2" type="button" aria-pressed="true">2 · Остановка у угла<br>130 сек по умолч.</button>
@@ -465,7 +465,7 @@ async function refreshFontAvailability(model=lastModel){
 }
 const FONT_PROFILES={
  marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.8,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
- neucha:{title:'Ровный повседневный — Neucha',tag:'ОСНОВНОЙ · БЕЗ ДОП. НАКЛОНА',description:'Спокойные, хорошо читаемые формы. Программный наклон отключён; этот профиль выбран по умолчанию для ровного письма.',lh:4.7,pitch:8.2,drawFeed:1650,rapidFeed:2000,widthScale:.98,slantDeg:0,letterSpacing:.04,wordSpacing:.58,routeTolerance:.08,character:'простой, разборчивый',connection:'слабые/отдельные соединения'},
+ neucha:{title:'Ровный повседневный — Neucha',tag:'ОСНОВНОЙ · БЕЗ ДОП. НАКЛОНА',description:'Спокойные, хорошо читаемые формы. Программный наклон отключён; этот профиль выбран по умолчанию для ровного письма.',lh:5,pitch:8.2,drawFeed:1650,rapidFeed:2000,widthScale:.98,slantDeg:0,letterSpacing:.04,wordSpacing:.58,routeTolerance:.08,character:'простой, разборчивый',connection:'слабые/отдельные соединения'},
  badscript:{title:'Естественный реалистичный — Bad Script',tag:'ЖИВОЙ · НЕФОРМАЛЬНЫЙ',description:'Более свободный рисунок букв с заметным наклоном и чуть увеличенной шириной. Выглядит естественно, но отдельные знаки не всегда соединяются.',lh:4.8,pitch:8.4,drawFeed:1500,rapidFeed:2000,widthScale:1.02,slantDeg:0,letterSpacing:.02,wordSpacing:.50,routeTolerance:.09,character:'естественный, свободный',connection:'преимущественно отдельные буквы'},
  caveat:{title:'Быстрый почерк — Caveat',tag:'БЫСТРЫЙ · СВОБОДНЫЙ',description:'Широкий, динамичный рисунок с выраженным наклоном. Более высокая скорость письма и чуть более мягкое упрощение мелких поворотов.',lh:4.6,pitch:8.0,drawFeed:2100,rapidFeed:2200,widthScale:1.10,slantDeg:0,letterSpacing:.05,wordSpacing:.42,routeTolerance:.10,character:'быстрый, динамичный',connection:'отдельные формы с вариациями'},
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
@@ -573,7 +573,7 @@ function updatePauseUI(){
  $('pauseLive').textContent=`Пауза у угла: ${formatDuration(sec)}.`;
  $('stage2').innerHTML=`2 · Остановка у угла<br>${formatDuration(sec)}`;
  document.querySelectorAll('[data-pause-seconds]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.pauseSeconds)===sec)));
- const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: головка над верхним левым углом листа. Автоматическая остановка — ${formatDuration(sec)}.`:`Этап 3: после ${formatDuration(sec)} головка перемещается к первой букве с поднятой ручкой.`;}
+ const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано снаружи левого края листа. Автоматическая остановка — ${formatDuration(sec)}.`:`Этап 3: после ${formatDuration(sec)} головка перемещается к первой букве с поднятой ручкой.`;}
 }
 function updateLiveStats(txt,lines,bottom,inkBottom,pageHeight){
  const clean=String(txt||'').trim(),words=clean?clean.split(/\s+/u).length:0,visible=lines.filter(x=>!x.blank).length;
