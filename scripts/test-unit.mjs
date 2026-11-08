@@ -18,6 +18,8 @@ function throws(fn, pattern, message) {
 }
 
 const limitsMatch = html.match(/const Z_LIMITS=\{[^}]+\};/);
+const pitchCellsMatch = html.match(/function getLinePitchCells\(\)\{[^}]+\}/);
+const pitchMmMatch = html.match(/function getLinePitchMm\(cell\)\{[^}]+\}/);
 const zFunctionMatch = html.match(/function getPenZSettings\(\)\{[\s\S]*?\n\}/);
 const pauseFunctionMatch = html.match(/function getPause2Seconds\(\)\{[\s\S]*?\n\}/);
 const topMarginMatch = html.match(/function getTopMarginMm\(type,cell\)\{[^}]+\}/);
@@ -25,22 +27,38 @@ const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetM
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !routeFunctionMatch) {
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
 let zInput = '30';
 let pauseInput = '130';
+let pitchCellsInput = '2';
+let pitchUnitInput = 'cells';
+let pitchMmInput = '15';
 const context = {
-  $: (id) => ({ value: id === 'penWriteZ' ? zInput : pauseInput }),
+  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : pauseInput }),
   Number, String, Error, Math,
   orderPathsByComponent: (paths) => paths,
   simplify: (points) => points,
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
+assert(context.getLinePitchMm(5) === 15, 'Two empty cells produce a 15 mm baseline step on 5 mm grid');
+pitchCellsInput = '1';
+assert(context.getLinePitchMm(5) === 10, 'One empty cell produces a 10 mm baseline step, not zero gap');
+pitchCellsInput = '6';
+assert(context.getLinePitchMm(5) === 35, 'Six empty cells produce a 35 mm baseline step');
+pitchUnitInput = 'mm';
+pitchMmInput = '12,5';
+assert(context.getLinePitchMm(5) === 12.5, 'Millimetre mode accepts decimal comma and exact baseline step');
+pitchMmInput = '3';
+assert(context.getLinePitchMm(5) === 5, 'Millimetre mode enforces 5 mm minimum');
+pitchMmInput = '75';
+assert(context.getLinePitchMm(5) === 60, 'Millimetre mode enforces 60 mm maximum');
+pitchUnitInput = 'cells'; pitchCellsInput = '2';
 assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook starts two 5 mm cells below the top edge');
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');

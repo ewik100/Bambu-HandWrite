@@ -26,6 +26,11 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
+  for (const marker of ['Bambu HandWrite 4.4', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'return (getLinePitchCells()+1)*cell']) {
+    if (!html.includes(marker)) fail(`Missing version 4.4 line-spacing feature: ${marker}`);
+  }
+  if (!errors.length) ok('Version 4.4 badge and both line-spacing modes are present');
+
   const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
   if (scripts.length !== 1) fail(`Expected one inline application script; found ${scripts.length}.`);
   else {
