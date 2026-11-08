@@ -1,4 +1,4 @@
-# Bambu HandWrite 4.5
+# Bambu HandWrite 4.6
 
 **Bambu HandWrite** — небольшое браузерное приложение, которое превращает набранный текст в рукописный макет и строит для него G-code: команды перемещения головки 3D-принтера.
 
@@ -8,7 +8,7 @@
 
 **Самый простой способ:** откройте [отдельную версию 4.5](releases/Bambu-HandWrite-4.5.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.5](releases/Bambu-HandWrite-4.5.html).
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.6](releases/Bambu-HandWrite-4.5.html).
 
 ## Что умеет программа
 
@@ -64,9 +64,9 @@
 
 ## Паузы в G-code
 
-Файл использует команды Bambu-совместимого семейства `M400 U1` для ручного продолжения и `M400 S...` для выдержки в секундах. Описание этих вариантов встречается в материалах сообщества Bambu, но это не заменяет проверку на конкретной модели и версии прошивки. Смотрите [источники и ограничения](docs/COMPATIBILITY.md).
+Файл использует команды `M400 U1` для ручного продолжения и `M400 S...` для выдержки в секундах. Перед скачиванием G-code проходит встроенную проверку: ASCII без BOM, правильный порядок обеих пауз, парковка сопла на заданной безопасной высоте и штатное завершение. Маркеры прогресса `M73` исключены из сырого файла. Описание этих вариантов встречается в материалах сообщества Bambu, но это не заменяет проверку на конкретной модели и версии прошивки. Смотрите [источники и ограничения](docs/COMPATIBILITY.md).
 
-Первая остановка — перед `G28` (homing). Вторая — автоматическое ожидание с соплом на 3 мм снаружи левого края и на 3 мм ниже верхнего края бумаги, по умолчанию 130 секунд. Во время второй выдержки можно завершить установку держателя, затем программа продолжит работу сама. Не нажимайте Resume второй раз.
+Первая остановка — перед `G28` (homing). Вторая — автоматическая выдержка с соплом на 3 мм снаружи левого края и на 3 мм ниже верхнего края бумаги. Сопло остаётся на безопасной высоте Z, рассчитанной из настройки пера (`Z пера + 20 мм`); длительность по умолчанию 130 секунд. После выдержки сопло опускается до высоты холостого хода и движется к первой букве. Во время второй выдержки можно завершить установку держателя, затем программа продолжит работу сама. Не нажимайте Resume второй раз.
 
 ## Конфиденциальность
 
@@ -107,4 +107,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 4.5 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 4.6 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
