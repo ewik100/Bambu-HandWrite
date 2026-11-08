@@ -934,7 +934,7 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  const homeIndex=lines.findIndex(line=>line.startsWith('G28 ; home all axes'));
  const safeLine='G1 Z'+Number(zSettings.safe).toFixed(3)+' F1200 ; safe height above plate';
  const safeIndex=lines.indexOf(safeLine);
- const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle parks 3 mm outside the left edge and 3 mm below the paper\'s upper-left corner';
+ const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle parks directly over the upper-left paper corner';
  const parkIndex=lines.indexOf(parkLine);
  const travelIndex=lines.findIndex((line,i)=>i>pause2Index&&line==='G1 Z'+Number(zSettings.travel).toFixed(3)+' F1200');
  if(!(manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<pause2Index&&pause2Index<travelIndex))fail('нарушен порядок: ручная пауза → homing → безопасная высота → парковка сопла у края листа → вторая выдержка → движение к тексту.');
