@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<title>Bambu HandWrite 4.8 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 4.8.1 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#20252b;background:#f5f1e8;--ink:#183c70;--muted:#65707b;--line:#dce4e9;--accent:#263b54}*{box-sizing:border-box}body{margin:0;padding:14px;max-width:980px;margin-inline:auto}header{padding:8px 2px 12px}h1{font-size:25px;margin:0 0 5px}h2{font-size:17px;margin:0 0 12px}.sub{margin:0;color:var(--muted);font-size:14px;line-height:1.45}.card{background:#fff;border:1px solid #e2ddd3;border-radius:17px;padding:15px;margin:11px 0;box-shadow:0 2px 12px #00000008}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.wide{grid-column:1/-1}label{display:block;font-size:13px;color:#4d5660}input,textarea,select{width:100%;padding:11px;border:1px solid #cfd5db;border-radius:10px;font:inherit;margin-top:5px;background:white;color:#20252b}textarea{min-height:116px;resize:vertical;line-height:1.4}input:focus,textarea:focus,select:focus{outline:2px solid #96b5d2;outline-offset:1px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.btn{border:0;border-radius:11px;padding:12px 15px;font-weight:650;background:var(--accent);color:white;min-height:44px;cursor:pointer}.btn.secondary{background:#e8edf2;color:#263b54}.btn.ghost{background:#f8f8f7;color:#263b54;border:1px solid #d8dee3}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.status{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.4}.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;border-radius:999px;background:#eef4ef;color:#2f6544}.pill.loading{background:#fff3dc;color:#76551c}.pill.offline{background:#fff0ed;color:#884132}.pill:before{content:"";height:7px;width:7px;border-radius:50%;background:currentColor}.preview-head{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}.paper-wrap{overflow:auto;background:#e8e4dc;padding:12px;border-radius:13px;margin-top:12px}#paper{display:block;background:white;max-width:100%;height:auto;box-shadow:0 2px 12px #0002;margin:auto}.status.ok{color:#28613a;font-weight:650}.status.bad{color:#a12c25;font-weight:700}.warning{background:#fff4dc;border:1px solid #f0d28b;border-radius:12px;padding:12px;color:#694c13;font-size:13px;line-height:1.45}.good{background:#edf5ef;border:1px solid #cde1d1;border-radius:12px;padding:12px;color:#315e3b;font-size:13px;line-height:1.45}.tiny{font-size:11px;color:var(--muted)}.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check{border:1px solid #e1e5e8;border-radius:10px;padding:9px;font-size:12px}.check b{display:block;font-size:13px;margin-bottom:3px}.mono{font-variant-numeric:tabular-nums}.orientation-guide{margin-top:12px;padding:12px;border:1px solid #d5e2eb;border-radius:12px;background:#f4f8fb;color:#29445c;font-size:13px;line-height:1.45}.orientation-head{font-weight:700;margin-bottom:8px}.orientation-flow{display:grid;grid-template-columns:1fr;justify-items:center;gap:5px;text-align:center}.orientation-edge{font-size:11px;font-weight:700;letter-spacing:.02em;color:#53697b}.orientation-arrow{font-size:13px;font-weight:700;color:#315e86}.orientation-sheet{width:min(190px,70%);min-height:118px;border:2px solid #95a8b6;border-radius:5px;background:repeating-linear-gradient(0deg,transparent 0 15px,#d8e8f1 15px 16px),repeating-linear-gradient(90deg,transparent 0 15px,#d8e8f1 15px 16px),#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:9px 5px;box-shadow:0 2px 5px #00000010}.orientation-sheet strong{font-size:10px;color:#53697b}.orientation-sheet span{font-family:cursive;color:#244e79;font-size:19px}.orientation-axes{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:650}.orientation-explain{margin:8px 0 0;color:#465b6d}.orientation-guide .note{font-size:11px;color:#647584;margin:6px 0 0}
@@ -257,11 +257,11 @@ Hello, world!</textarea></label>
     <p class="tiny wide">В режиме «Клетки» задаётся шаг между базовыми линиями в целых клетках: 1 клетка = 5 мм, 2 клетки = 10 мм при размере клетки 5 мм. Каждая базовая линия остаётся привязанной к линии сетки. В режиме «Миллиметры» можно задать точный шаг от 5 до 60 мм без округления к сетке. Межбуквенное расстояние определяется выбранным шрифтом: сохраняются его естественные интервалы, кернинг и соединения.</p>
     <div class="grid wide" style="margin-top:10px">
       <label>Высота букв, мм
-        <input id="lh" type="text" value="4.8" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="heightInputHelp">
+        <input id="lh" type="text" value="4.7" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="heightInputHelp">
       </label>
       <input id="pitch" type="hidden" value="8.2">
     </div>
-    <p class="tiny wide" id="heightInputHelp">Высота и шаг можно вводить с запятой или точкой (например, 5,2). Значение больше не сбрасывается во время набора: проверка и ограничение выполняются после выхода из поля. Теперь высота означает именно высоту обычной строчной буквы (например, «х» или «x»); заглавные буквы будут естественно выше. Допустимо: 2–20 мм. Шаг строк: 2–30 мм.</p>
+    <p class="tiny wide" id="heightInputHelp">Высоту и шаг можно вводить с запятой или точкой (например, 4,7). Высота означает размер обычной строчной буквы (например, «х» или «x»); заглавные буквы автоматически ограничиваются примерно 8% сверху от высоты строчной. Значение проверяется после выхода из поля. Допустимо: 2–20 мм. Шаг строк: 2–30 мм.</p>
     <input id="paragraphIndent" type="hidden" value="5">
     <input id="pw" type="hidden" value="165"><input id="ph" type="hidden" value="203">
     <input id="cell" type="hidden" value="5"><input id="left" type="hidden" value="5">
@@ -402,14 +402,14 @@ Hello, world!</textarea></label>
   <div id="generationProgress" class="generation-progress" hidden><div class="generation-progress-track"><span id="generationProgressBar"></span></div><p id="generationProgressLabel">Подготовка…</p></div>
   <p id="gcodeStatus" class="status" aria-live="polite">Сначала обнови предпросмотр и проверь лист на пластине.</p>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
-  <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм снаружи левого края и на 3 мм ниже верхнего края листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
+  <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется непосредственно над верхним левым углом листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 4.8 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 4.8.1 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.8,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
@@ -434,6 +434,23 @@ function updatePenZUI(){
 const PLATE_TAB={x:108,w:40,y:256,depth:18,clearance:18};
 function getPlateTab(){return {x:clampValue('plateTabX',0,256),w:clampValue('plateTabWidth',1,100),y:256,depth:clampValue('plateTabDepth',0,60),clearance:clampValue('plateTabClearance',0,60)}}
 function scaleToLowercaseHeight(targetMm,lowercaseAscentPx){return lowercaseAscentPx>0?Math.max(.25,Math.min(4,targetMm/lowercaseAscentPx)):1}
+function splitCaseSegments(text){
+ const segments=[];
+ for(const ch of Array.from(String(text))){
+  const upper=/\p{Lu}/u.test(ch),last=segments[segments.length-1];
+  if(last&&last.upper===upper)last.text+=ch;else segments.push({text:ch,upper});
+ }
+ return segments;
+}
+function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent){
+ if(!(lowercaseAscent>0))return 1;
+ let uppercaseAscent=0;
+ for(const run of runs){
+  context.font=`${fontPx}px ${fontCss(run.font)}`;
+  for(const ch of Array.from(run.text))if(/\p{Lu}/u.test(ch))uppercaseAscent=Math.max(uppercaseAscent,context.measureText(ch).actualBoundingBoxAscent||0);
+ }
+ return uppercaseAscent>0?Math.min(1,(lowercaseAscent*1.08)/uppercaseAscent):1;
+}
 function findLargestFittingTenth(currentMm,fitsAt){let low=20,high=Math.floor((currentMm-.001)*10),best=null;while(low<=high){const mid=Math.floor((low+high)/2);if(fitsAt(mid/10)){best=mid;low=mid+1}else high=mid-1}return best===null?null:best/10}
 function getCornerPausePosition(pageX,pageMachineY){return {x:Math.max(3,pageX),y:Math.max(3,pageMachineY)}}
 const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
@@ -476,14 +493,14 @@ async function refreshFontAvailability(model=lastModel){
  if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,1800);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build()}return online;
 }
 const FONT_PROFILES={
- marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.8,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
- neucha:{title:'Ровный повседневный — Neucha',tag:'ОСНОВНОЙ · БЕЗ ДОП. НАКЛОНА',description:'Спокойные, хорошо читаемые формы. Программный наклон отключён; этот профиль выбран по умолчанию для ровного письма.',lh:4.8,pitch:8.2,drawFeed:1650,rapidFeed:2000,widthScale:.98,slantDeg:0,letterSpacing:.04,wordSpacing:.58,routeTolerance:.08,character:'простой, разборчивый',connection:'слабые/отдельные соединения'},
- badscript:{title:'Естественный реалистичный — Bad Script',tag:'ЖИВОЙ · НЕФОРМАЛЬНЫЙ',description:'Более свободный рисунок букв с заметным наклоном и чуть увеличенной шириной. Выглядит естественно, но отдельные знаки не всегда соединяются.',lh:4.8,pitch:8.4,drawFeed:1500,rapidFeed:2000,widthScale:1.02,slantDeg:0,letterSpacing:.02,wordSpacing:.50,routeTolerance:.09,character:'естественный, свободный',connection:'преимущественно отдельные буквы'},
+ marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
+ neucha:{title:'Ровный повседневный — Neucha',tag:'ОСНОВНОЙ · БЕЗ ДОП. НАКЛОНА',description:'Спокойные, хорошо читаемые формы. Программный наклон отключён; этот профиль выбран по умолчанию для ровного письма.',lh:4.7,pitch:8.2,drawFeed:1650,rapidFeed:2000,widthScale:.98,slantDeg:0,letterSpacing:.04,wordSpacing:.58,routeTolerance:.08,character:'простой, разборчивый',connection:'слабые/отдельные соединения'},
+ badscript:{title:'Естественный реалистичный — Bad Script',tag:'ЖИВОЙ · НЕФОРМАЛЬНЫЙ',description:'Более свободный рисунок букв с заметным наклоном и чуть увеличенной шириной. Выглядит естественно, но отдельные знаки не всегда соединяются.',lh:4.7,pitch:8.4,drawFeed:1500,rapidFeed:2000,widthScale:1.02,slantDeg:0,letterSpacing:.02,wordSpacing:.50,routeTolerance:.09,character:'естественный, свободный',connection:'преимущественно отдельные буквы'},
  caveat:{title:'Быстрый почерк — Caveat',tag:'БЫСТРЫЙ · СВОБОДНЫЙ',description:'Широкий, динамичный рисунок с выраженным наклоном. Более высокая скорость письма и чуть более мягкое упрощение мелких поворотов.',lh:4.6,pitch:8.0,drawFeed:2100,rapidFeed:2200,widthScale:1.10,slantDeg:0,letterSpacing:.05,wordSpacing:.42,routeTolerance:.10,character:'быстрый, динамичный',connection:'отдельные формы с вариациями'},
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
  lobster:{title:'Связный красивый — Lobster',tag:'СВЯЗНЫЙ · ВЫРАЗИТЕЛЬНЫЙ',description:'Более нарядный связный курсив с выразительными соединениями букв. Лучше всего подходит для коротких фраз и заголовков; перед длинным текстом обязательно проверь траектории.',lh:5.0,pitch:8.8,drawFeed:1250,rapidFeed:1900,widthScale:.98,slantDeg:0,letterSpacing:0,wordSpacing:.62,routeTolerance:.07,character:'плавный, выразительный',connection:'связные буквы'},
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
- recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.8,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
+ recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
 // Editable decimal fields must not be clamped while the user is midway through typing.
 // Accept both comma and dot decimal separators; retain the last valid value for preview
@@ -602,8 +619,9 @@ function setRouteInkMode(enabled){
  const paper=$('paper'),btn=$('routeInkModeBtn');if(!paper||!btn)return;
  const on=!!enabled&&routePlayback.strokes.length>0;paper.classList.toggle('route-ink-mode',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'Показать почерк под линиями':'Сравнить линии с текстом';
 }
-function build(skipFitSuggestion=false){
- const w=clampValue('pw',40,420),h=clampValue('ph',40,420),lh=readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh),pitchInput=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch),cell=clampValue('cell',2,15),red=clampValue('margin',2,100),configuredIndent=clampValue('paragraphIndent',0,20),indentEnabled=$('paragraphIndentToggle').checked,paraIndent=indentEnabled?configuredIndent:0,justifyEnabled=$('justifyToggle').checked;
+function build(skipFitSuggestion=false,heightOverride=null){
+  const rawHeight=heightOverride===null?readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh):Number(heightOverride),lh=Number.isFinite(rawHeight)?Math.max(2,Math.min(20,rawHeight)):DEFAULTS.lh;
+ const w=clampValue('pw',40,420),h=clampValue('ph',40,420),pitchInput=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch),cell=clampValue('cell',2,15),red=clampValue('margin',2,100),configuredIndent=clampValue('paragraphIndent',0,20),indentEnabled=$('paragraphIndentToggle').checked,paraIndent=indentEnabled?configuredIndent:0,justifyEnabled=$('justifyToggle').checked;
  const mode=$('scriptMode').value,hand=$('handFont').value,profile=FONT_PROFILES[hand]||FONT_PROFILES.neucha,txt=$('txt').value.replace(/\r/g,''),type=$('paperType').value,pl=bedPlacement(w,h),startX=clampValue('left',0,30),rightX=type==='a4-plain'?w-1.5:w-red-1.5,bottomY=Math.min(h,253-pl.pageY-3),topY=clampValue('top',0,30),fontSize=lh*1.28;
  const pitch=type==='math-notebook'?getLinePitchMm(cell):pitchInput;
  $('orientationField').style.display=(type==='math-notebook'||type==='russian-notebook'||type==='custom-paper')?'none':'';updateLineSpacingUI();
@@ -623,10 +641,29 @@ function build(skipFitSuggestion=false){
   const y=baseline0+i*pitch,runs=runsFor(line.text,mode,hand);
   let ascent=0,descent=0;
   for(const run of runs){mctx.font=`${fontSize}px ${fontCss(run.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${profile.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${profile.wordSpacing}px`;const mt=mctx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
-  let lowerAscent=0;for(const run of runs){mctx.font=`${fontSize}px ${fontCss(run.font)}`;const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,mctx.measureText(probe).actualBoundingBoxAscent||0)}const sy=scaleToLowercaseHeight(lh,lowerAscent),width=profile.widthScale||1,tx=line.x*(1-width),ty=y*(1-sy);
+   let lowerAscent=0;for(const run of runs){mctx.font=`${fontSize}px ${fontCss(run.font)}`;const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,mctx.measureText(probe).actualBoundingBoxAscent||0)}const sy=scaleToLowercaseHeight(lh,lowerAscent),capScale=uppercaseVerticalScale(mctx,runs,fontSize,lowerAscent),width=profile.widthScale||1,tx=line.x*(1-width),ty=y*(1-sy);
   const letter=CANVAS_SPACING.letter?profile.letterSpacing:0,word=CANVAS_SPACING.word?profile.wordSpacing:0;
   svg+=`<text data-line="${i}" x="${line.x}" y="${y}" transform="matrix(${width},0,0,${sy},${tx},${ty})" letter-spacing="${letter}" word-spacing="${word}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">`;
-  {let pendingDx=0;for(const run of runs){for(const part of run.text.split(/(\\s+)/u)){if(!part)continue;if(/^\\s+$/u.test(part)){svg+=`<tspan font-family="${esc(run.font)},cursive">${esc(part)}</tspan>`;if(line.extraWordSpace)pendingDx+=(part.match(/ /g)||[]).length*line.extraWordSpace}else{const dx=pendingDx?` dx="${pendingDx.toFixed(3)}"`:'';svg+=`<tspan font-family="${esc(run.font)},cursive"${dx}>${esc(part)}</tspan>`;pendingDx=0}}}}
+  {
+   let pendingDx=0;
+   for(const run of runs){
+    for(const part of run.text.split(/(\s+)/u)){
+     if(!part)continue;
+     if(/^\s+$/u.test(part)){
+      svg+=`<tspan font-family="${esc(run.font)},cursive">${esc(part)}</tspan>`;
+      if(line.extraWordSpace)pendingDx+=(part.match(/ /g)||[]).length*line.extraWordSpace;
+     }else{
+      const dx=pendingDx?` dx="${pendingDx.toFixed(3)}"`:'';
+      for(const [segmentIndex,segment] of splitCaseSegments(part).entries()){
+       const segmentDx=segmentIndex===0?dx:'';
+       const capTransform=segment.upper&&capScale<.9999?` transform="translate(0 ${(y*(1-capScale)).toFixed(4)}) scale(1 ${capScale.toFixed(5)})"`:'';
+       svg+=`<tspan font-family="${esc(run.font)},cursive"${segmentDx}${capTransform}>${esc(segment.text)}</tspan>`;
+      }
+      pendingDx=0;
+     }
+    }
+   }
+  }
   svg+='</text>';
  });
  svg+=`<rect x=".1" y=".1" width="${w-.2}" height="${h-.2}" fill="none" stroke="#9aa6ad" stroke-width=".2"/>`;
@@ -653,13 +690,13 @@ function build(skipFitSuggestion=false){
  $('layoutStatus').textContent=errors.length?errors.join(' '):`Текст начинается в ${startX.toFixed(1)} мм от левого края (${(startX/cell).toFixed(1)} клетки); красная строка у русских абзацев ${indentEnabled?`включена (${paraIndent.toFixed(1)} мм)`:'выключена'}, английские абзацы без отступа. Заполнение до правой границы ${justifyEnabled?'включено для подходящих промежуточных строк':'выключено'}. Верхний отступ — ${topY.toFixed(1)} мм${type==='math-notebook'?' (2 клетки)':''}; дополнительного нижнего отступа нет. Нижний предел — ${bottomY<h?'граница рабочей области пластины':'физический край листа'}.`;
  $('layoutStatus').className='status '+(errors.length?'bad':'ok');
  $('bedStatus').textContent=errors.length?errors.join(' '):`Угол листа: X ${cornerX.toFixed(1)} · Y ${cornerMachineY.toFixed(1)} мм. Головка подходит к нему с поднятой ручкой.`;$('bedStatus').className='bed-status '+(errors.length?'bad':'ok');
- const pauseSecs=getPause2Seconds();$('routeStatus').textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано снаружи левого края листа. Автоматическая остановка — ${formatDuration(pauseSecs)}.`:`Этап 3: после ${formatDuration(pauseSecs)} головка перемещается к первой букве с поднятой ручкой.`;
+ const pauseSecs=getPause2Seconds();$('routeStatus').textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано непосредственно над верхним левым углом листа. Автоматическая остановка — ${formatDuration(pauseSecs)}.`:`Этап 3: после ${formatDuration(pauseSecs)} головка перемещается к первой букве с поднятой ручкой.`;
  ['stage1','stage2','stage3'].forEach((id,i)=>$(id).setAttribute('aria-pressed',String(viewStage===i+1)));
  const checks=[['Размер бумаги',`${w} × ${h} мм`],['Вид листа',type==='a4-plain'?'чистый A4':type==='math-notebook'?'клетка 5 мм':type==='russian-notebook'?'линейка':'пользовательский'],['Отступ слева',`${startX.toFixed(1)} мм · ${(startX/cell).toFixed(1)} клетки`],['Красная строка',indentEnabled?`${paraIndent.toFixed(1)} мм у русских абзацев`:'выключена · без абзацного отступа'],['Заполнение строк',justifyEnabled?'до правой границы · промежуточные строки':'выключено · обычный край'],['Нижняя граница',bottomY<h?`предел пластины · ${bottomY.toFixed(1)} мм от верха`:'край самого листа'],['Поддержка пластины',pl.overBottom||pl.overLeft||pl.overRight?'есть неподдерживаемая часть':'лист помещается'],['Передний язычок пластины',pl.tabOverlap?'БУМАГА ПЕРЕКРЫВАЕТ ЗАПРЕТНУЮ ЗОНУ':'зона свободна · запас 18 мм'],['Остановка у угла',`${getPause2Seconds()} секунд · X ${cornerX.toFixed(1)} / Y ${cornerMachineY.toFixed(1)} мм`],['Правая граница',type==='a4-plain'?'край бумаги · резерв 1,5 мм':`${red} мм от края · резерв перед линией 1,5 мм`],['Почерк',profile.title],['Скорость письма',`${profile.drawFeed} мм/мин`],['Текст',`${txt.length} символов`]];
  $('checks').innerHTML=checks.map(([a,b])=>`<div class="check"><b>${a}</b>${b}</div>`).join('');
  updateLiveStats(txt,lines,bottomY,textBottom,h);
  lastModel={w,h,lh,pitch,left:startX,top:topY,rightX,bottomY,red,pl,lines,baseline0,fontSize,mode,hand,profile,type,txt,errors,indentEnabled,paraIndent,justifyEnabled,cornerX,cornerY,routeTolerance:profile.routeTolerance||.12,textBounds:{left:textLeft,right:textRight,top:textTop,bottom:textBottom}};
- if(!skipFitSuggestion){const clipsText=(m)=>m.errors.some(e=>/Строка выходит|пересекает безопасную|Текст выходит|Верхние буквы|Левые буквы|Нижние буквы/.test(e));const panel=$('fitSuggestion'),label=$('fitSuggestionText'),button=$('applyFitSuggestion');if(clipsText(lastModel)){const original=Number($('lh').value)||lh;const suggested=findLargestFittingTenth(original,value=>{$('lh').value=value.toFixed(1);return !clipsText(build(true))});$('lh').value=original;build(true);if(suggested!==null&&suggested<original){panel.hidden=false;label.textContent=`Текст не помещается при ${original.toFixed(1)} мм. Рекомендуем ${suggested.toFixed(1)} мм — это максимальный размер, при котором весь текст помещается с минимальным уменьшением.`;button.hidden=false;button.textContent=`Применить ${suggested.toFixed(1)} мм`;button.dataset.value=suggested.toFixed(1)}else{panel.hidden=false;label.textContent='Текст не помещается даже при минимальной высоте 2 мм. Одного уменьшения букв недостаточно — нужно сократить текст, изменить шаг строк или увеличить лист.';button.hidden=true}}else panel.hidden=true;}
+ if(!skipFitSuggestion){const clipsText=(m)=>m.errors.some(e=>/Строка выходит|пересекает безопасную|Текст выходит|Верхние буквы|Левые буквы|Нижние буквы/.test(e));const panel=$('fitSuggestion'),label=$('fitSuggestionText'),button=$('applyFitSuggestion');if(clipsText(lastModel)){const original=readEditableDecimal('lh',2,20,lh);const suggested=findLargestFittingTenth(original,value=>!clipsText(build(true,value)));build(true);if(suggested!==null&&suggested<original){panel.hidden=false;label.textContent=`Текст не помещается при ${original.toFixed(1)} мм. Рекомендуем ${suggested.toFixed(1)} мм — это максимальный размер, при котором весь текст помещается с минимальным уменьшением.`;button.hidden=false;button.textContent=`Применить ${suggested.toFixed(1)} мм`;button.dataset.value=suggested.toFixed(1)}else{panel.hidden=false;label.textContent='Текст не помещается даже при минимальной высоте 2 мм. Одного уменьшения букв недостаточно — нужно сократить текст, изменить шаг строк или увеличить лист.';button.hidden=true}}else panel.hidden=true;}
  return lastModel;
 }
 function setStage(n){viewStage=n;build()}
@@ -778,12 +815,34 @@ async function rasterText(model,token){
   const baseline=(model.baseline0+i*model.pitch)*scale,runs=runsFor(line.text,model.mode,model.hand);
   let ascent=0,descent=0;
   for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;if(CANVAS_SPACING.letter)cx.letterSpacing=`${model.profile.letterSpacing*scale}px`;if(CANVAS_SPACING.word)cx.wordSpacing=`${model.profile.wordSpacing*scale}px`;const mt=cx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
-  let lowerAscent=0;for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,cx.measureText(probe).actualBoundingBoxAscent||0)}const target=model.lh*scale,sy=scaleToLowercaseHeight(target,lowerAscent);
+   let lowerAscent=0;for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,cx.measureText(probe).actualBoundingBoxAscent||0)}const target=model.lh*scale,sy=scaleToLowercaseHeight(target,lowerAscent),capScale=uppercaseVerticalScale(cx,runs,fontPx,lowerAscent);
   const profile=model.profile,width=profile.widthScale||1;
   if(CANVAS_SPACING.letter)cx.letterSpacing=`${profile.letterSpacing*scale}px`;if(CANVAS_SPACING.word)cx.wordSpacing=`${profile.wordSpacing*scale}px`;
   withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{
    let x=line.x*scale;
-   for(const run of runs){cx.font=`${fontPx}px ${fontCss(run.font)}`;for(const part of run.text.split(/(\\s+)/u)){if(!part)continue;if(/^\\s+$/u.test(part)){const count=(part.match(/ /g)||[]).length;x+=cx.measureText(part).width+(line.extraWordSpace||0)*count*scale}else{cx.fillText(part,x,baseline);x+=cx.measureText(part).width}}}
+    for(const run of runs){
+     cx.font=`${fontPx}px ${fontCss(run.font)}`;
+     for(const part of run.text.split(/(\s+)/u)){
+      if(!part)continue;
+      if(/^\s+$/u.test(part)){
+       const count=(part.match(/ /g)||[]).length;
+       x+=cx.measureText(part).width+(line.extraWordSpace||0)*count*scale;
+      }else{
+       let segmentX=x;
+       for(const segment of splitCaseSegments(part)){
+        if(segment.upper&&capScale<.9999){
+         cx.save();
+         cx.translate(segmentX,baseline*(1-capScale));
+         cx.scale(1,capScale);
+         cx.fillText(segment.text,0,baseline);
+         cx.restore();
+        }else cx.fillText(segment.text,segmentX,baseline);
+        segmentX+=cx.measureText(segment.text).width;
+       }
+       x+=cx.measureText(part).width;
+      }
+     }
+    }
   });
   if(i%8===0)await new Promise(resolve=>setTimeout(resolve,0));
  }
@@ -1035,7 +1094,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;
- return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'4.5',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'4.8.1',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
@@ -1069,7 +1128,7 @@ function importProjectBackup(file){
 }
 
 function restore(){
- try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(sourceKey!=='bhw35'&&v.handFont==='marck')$('handFont').value='neucha';if(v.handFont==='neucha'&&Number(v.lh)===4.7)$('lh').value='5';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=sourceKey==='bhw35'?!!v.justifyLines:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';return true}}
+ try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(sourceKey!=='bhw35'&&v.handFont==='marck')$('handFont').value='neucha';if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=sourceKey==='bhw35'?!!v.justifyLines:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';return true}}
  catch(e){}return false
 }
 function save(){const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']).forEach(k=>{if($(k))v[k]=$(k).value});
@@ -1077,7 +1136,7 @@ function save(){const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','han
  v.lh=readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh);
  v.pitch=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch);
  try{v.penWriteZ=getPenZSettings().write}catch(e){v.penWriteZ=DEFAULTS.penWriteZ}
- v.paragraphIndentEnabled=$('paragraphIndentToggle').checked;v.justifyLines=$('justifyToggle').checked;v.pitchCells=$('pitchCells').value;try{localStorage.setItem('bhw35',JSON.stringify(v));$('autosaveNote').textContent='Настройки автоматически сохранены в этом браузере. Резервная копия проекта доступна в JSON.'}catch(e){$('autosaveNote').textContent='Браузер запретил сохранение настроек; экспортируй нужные значения отдельно.'}}
+ v.paragraphIndentEnabled=$('paragraphIndentToggle').checked;v.justifyLines=$('justifyToggle').checked;v.pitchCells=$('pitchCells').value;v.heightScaleV2=1;try{localStorage.setItem('bhw35',JSON.stringify(v));$('autosaveNote').textContent='Настройки автоматически сохранены в этом браузере. Резервная копия проекта доступна в JSON.'}catch(e){$('autosaveNote').textContent='Браузер запретил сохранение настроек; экспортируй нужные значения отдельно.'}}
 let previewDebounce=null,generationToken=0,isGenerating=false;
 function refreshPreviewAndSave(){if(previewDebounce)clearTimeout(previewDebounce);previewDebounce=setTimeout(()=>{try{build();save()}catch(e){$('layoutStatus').textContent='Не удалось обновить предпросмотр: '+(e?.message||e);$('layoutStatus').className='status bad'}},180)}
 $('applyFitSuggestion').addEventListener('click',()=>{const value=Number($('applyFitSuggestion').dataset.value);if(!Number.isFinite(value)||value<2||value>20)return;invalidateGeneratedGcode();$('lh').value=value.toFixed(1);refreshPreviewAndSave()});
