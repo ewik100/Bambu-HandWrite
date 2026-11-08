@@ -1,0 +1,31 @@
+name: Feature request
+description: Предложить новую функцию или улучшение
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую проблему нужно решить?
+      description: Опишите ситуацию простыми словами.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Как должна работать функция?
+      description: Пример использования или ожидаемый результат.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: К чему относится предложение?
+      options:
+        - Интерфейс и удобство
+        - Почерк и текст
+        - Предпросмотр и траектории
+        - G-code и безопасность
+        - Поддержка принтеров
+        - Другое
+    validations:
+      required: true

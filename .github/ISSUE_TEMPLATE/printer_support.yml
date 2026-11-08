@@ -1,0 +1,60 @@
+name: Request support for another Bambu Lab printer
+description: Запросить отдельный профиль для другой модели Bambu Lab
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Запрос не означает, что модель уже поддерживается. Совместимость можно объявить только после адаптации и физической проверки. Не прикладывайте личные данные.
+  - type: input
+    id: model
+    attributes:
+      label: Точная модель принтера
+      placeholder: Например, Bambu Lab A1 mini
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Версия прошивки
+      placeholder: Укажите номер версии или «не знаю»
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Версия Bambu HandWrite
+      placeholder: Например, 3.4
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Как закрепляется держатель ручки?
+      description: Опишите конструкцию, выступ относительно сопла и есть ли пружинный ход.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Что нужно адаптировать или проверить?
+      description: Размеры, координаты, homing, парковка, паузы или другая функция.
+    validations:
+      required: true
+  - type: dropdown
+    id: tested
+    attributes:
+      label: Проверяли ли вы на принтере?
+      options:
+        - Нет, только запрос
+        - Проверялся только предпросмотр
+        - Проверялось перемещение без ручки и без контакта с бумагой
+        - Был короткий контролируемый тест с ручкой
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Результат и дополнительные сведения
+      description: Если тест проводился, укажите точные условия и что произошло. Не запускайте опасные файлы ради заполнения формы.
+    validations:
+      required: false

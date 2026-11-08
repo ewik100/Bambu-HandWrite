@@ -1,0 +1,62 @@
+name: Bug report
+description: Сообщить об ошибке в приложении или генерации G-code
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Не публикуйте пароли, токены, личные адреса или полный личный текст из документа. Не запускайте опасный G-code ради проверки ошибки.
+  - type: input
+    id: app-version
+    attributes:
+      label: Версия приложения
+      placeholder: Например, 3.4
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Браузер и устройство
+      placeholder: Например, Chrome на Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Как повторить ошибку?
+      description: Напишите действия по порядку.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Что должно было произойти?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Что произошло на самом деле?
+    validations:
+      required: true
+  - type: dropdown
+    id: printer
+    attributes:
+      label: Принтер (если проблема связана с G-code)
+      options:
+        - Bambu Lab A1
+        - Bambu Lab A1 mini
+        - Bambu Lab P1P
+        - Bambu Lab P1S
+        - Bambu Lab X1 Carbon
+        - Другая модель
+        - Не относится к принтеру
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Дополнительная информация
+      description: Версия прошивки, предупреждения приложения, обезличенный фрагмент G-code (если безопасно).
+    validations:
+      required: false
