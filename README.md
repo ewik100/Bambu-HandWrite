@@ -1,4 +1,4 @@
-# Bambu HandWrite 4.4
+# Bambu HandWrite 4.5
 
 **Bambu HandWrite** — небольшое браузерное приложение, которое превращает набранный текст в рукописный макет и строит для него G-code: команды перемещения головки 3D-принтера.
 
@@ -6,9 +6,9 @@
 
 ## Запустить программу
 
-**Самый простой способ:** откройте [отдельную версию 4.4](releases/Bambu-HandWrite-4.4.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
+**Самый простой способ:** откройте [отдельную версию 4.5](releases/Bambu-HandWrite-4.5.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.4](releases/Bambu-HandWrite-4.4.html).
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 4.5](releases/Bambu-HandWrite-4.5.html).
 
 ## Что умеет программа
 
@@ -17,7 +17,7 @@
 - Задавать название работы на русском или английском: приложение сразу транслитерирует его в латиницу для имени `.gcode` и комментария G-code; в этих полях не остаётся кириллицы.
 - Предлагать несколько профилей рукописного оформления; по умолчанию выбран ровный Neucha.
 - Сохранять естественное межбуквенное расстояние выбранного шрифта: приложение не раздвигает буквы по клеткам и не задаёт искусственный интервал, поэтому сохраняются кернинг, соединения и форма знаков.
-- Для тетрадной страницы выбирать межстрочный интервал: 1–6 пустых клеток между строками или точный шаг между базовыми линиями 5–60 мм. В клеточном режиме каждая базовая линия совмещается с нижней линией клетки; миллиметровый режим использует заданное расстояние без округления к сетке.
+- Для тетрадной страницы выбирать шаг между базовыми линиями: 1–6 клеток или точное значение 5–60 мм. В режиме клеток шаг равен выбранному числу клеток (1 клетка = 5 мм) и каждая базовая линия привязывается к сетке; миллиметровый режим использует заданное расстояние без округления.
 - Не обрезать широкие символы по границам клеток: клетка задаёт вертикальную привязку и шаг строк, а не позицию каждой отдельной буквы.
 - Не добавлять искусственный наклон к буквам ни в предпросмотре, ни в растре для G-code.
 - Растягивать промежуточные строки до правого края; работает и для строк, введённых через Enter, если следующая строка не пустая.
@@ -107,4 +107,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 4.4 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 4.5 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.

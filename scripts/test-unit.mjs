@@ -46,11 +46,15 @@ const context = {
 vm.createContext(context);
 vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
-assert(context.getLinePitchMm(5) === 15, 'Two empty cells produce a 15 mm baseline step on 5 mm grid');
+assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
-assert(context.getLinePitchMm(5) === 10, 'One empty cell produces a 10 mm baseline step, not zero gap');
+assert(context.getLinePitchMm(5) === 5, 'One cell produces exactly one 5 mm grid step');
 pitchCellsInput = '6';
-assert(context.getLinePitchMm(5) === 35, 'Six empty cells produce a 35 mm baseline step');
+assert(context.getLinePitchMm(5) === 30, 'Six cells produce a 30 mm baseline step');
+pitchCellsInput = '1';
+assert(context.getLinePitchMm(4.5) === 4.5, 'One cell follows a 4.5 mm notebook grid exactly');
+pitchCellsInput = '2';
+assert(context.getLinePitchMm(4.5) === 9, 'Two cells follow a 4.5 mm notebook grid exactly');
 pitchUnitInput = 'mm';
 pitchMmInput = '12,5';
 assert(context.getLinePitchMm(5) === 12.5, 'Millimetre mode accepts decimal comma and exact baseline step');
