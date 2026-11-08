@@ -27,7 +27,7 @@ if (html) {
   else ok('Russian document language is set');
 
   for (const marker of ['Bambu HandWrite 4.6', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
-    if (!html.includes(marker)) fail(`Missing version 4.4 line-spacing feature: ${marker}`);
+    if (!html.includes(marker)) fail(`Missing required 4.6 line-spacing feature: ${marker}`);
   }
   if (!errors.length) ok('Version 4.6 badge and both line-spacing modes are present');
 
