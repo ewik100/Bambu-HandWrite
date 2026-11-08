@@ -84,9 +84,9 @@ assert(context.findLargestFittingTenth(5, value => value <= 2) === 2, 'Auto-fit 
 assert(context.findLargestFittingTenth(2, () => false) === null, 'Auto-fit does not recommend a value below the minimum');
 const validGcode=['; Bambu Lab A1 pen plotter G-code','M400','M400 U1 ; manual pause','G28 ; home all axes','G1 Z50.000 F1200 ; safe height above plate','G0 X45.500 Y253.000 F2000 ; nozzle parks directly over the upper-left paper corner','M400','M400 S130 ; SECOND STOP','G1 Z34.000 F1200','G1 X10.000 Y20.000 F1500','M400'].join('\n')+'\n';
 assert(context.validateGeneratedGcode(validGcode,130,{x:45.5,y:253},{safe:50,travel:34})===true,'G-code preflight accepts valid ASCII output with manual pause and nozzle parked at the upper-left paper corner at safe Z for the timed second pause');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:42.5,y:250},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M73 P100'),130,{x:42.5,y:250},{safe:50,travel:34}),/ручная пауза/,'G-code preflight rejects a missing manual pause');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,{x:42.5,y:250},{safe:50,travel:34}),/нарушен порядок/,'G-code preflight rejects a second pause at an unexpected Z level');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:45.5,y:253},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M73 P100'),130,{x:45.5,y:253},{safe:50,travel:34}),/ручная пауза/,'G-code preflight rejects a missing manual pause');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,{x:45.5,y:253},{safe:50,travel:34}),/нарушен порядок/,'G-code preflight rejects a second pause at an unexpected Z level');
 
 let z = context.getPenZSettings();
 assert(z.write === 30 && z.travel === 34 && z.safe === 50, 'Default Z=30 produces write/travel/safe levels 30/34/50');
