@@ -21,7 +21,7 @@ const limitsMatch = html.match(/const Z_LIMITS=\{[^}]+\};/);
 const zFunctionMatch = html.match(/function getPenZSettings\(\)\{[\s\S]*?\n\}/);
 const pauseFunctionMatch = html.match(/function getPause2Seconds\(\)\{[\s\S]*?\n\}/);
 const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
-const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{[^}]+\}/);
+const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
 if (!limitsMatch || !zFunctionMatch || !pauseFunctionMatch || !lowercaseScaleMatch || !cornerPauseMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
