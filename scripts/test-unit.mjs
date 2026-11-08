@@ -56,7 +56,7 @@ assert(context.getLinePitchMm(5) === 30, 'Six cells produce a 30 mm baseline ste
 pitchCellsInput = '1';
 assert(context.getLinePitchMm(4.5) === 4.5, 'One cell follows a 4.5 mm notebook grid exactly');
 pitchCellsInput = '2';
-assert(context.getLinePitchMm(4.8) === 9, 'Two cells follow a 4.5 mm notebook grid exactly');
+assert(context.getLinePitchMm(4.5) === 9, 'Two cells follow a 4.5 mm notebook grid exactly');
 pitchUnitInput = 'mm';
 pitchMmInput = '12,5';
 assert(context.getLinePitchMm(5) === 12.5, 'Millimetre mode accepts decimal comma and exact baseline step');
