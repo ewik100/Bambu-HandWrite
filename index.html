@@ -248,7 +248,7 @@ Hello, world!</textarea></label>
         <select id="letterSpacingMode"><option value="cells">По клеткам тетради</option><option value="custom">Пользовательский, мм</option></select>
       </label>
       <label id="letterCellsField">Расстояние между началами букв, клеток
-        <select id="letterSpacingCells"><option value="1">1 клетка</option><option value="2" selected>2 клетки</option><option value="3">3 клетки</option><option value="4">4 клетки</option></select>
+        <select id="letterSpacingCells"><option value="1" selected>1 клетка</option><option value="2">2 клетки</option><option value="3">3 клетки</option><option value="4">4 клетки</option></select>
       </label>
       <label id="letterCustomField" hidden>Дополнительный интервал, мм
         <input id="letterSpacingCustom" type="number" min="0" max="10" step="0.1" value="0.5">
@@ -411,7 +411,7 @@ Hello, world!</textarea></label>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={letterSpacingMode:'cells',letterSpacingCells:2,letterSpacingCustom:0.5,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:5,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={letterSpacingMode:'cells',letterSpacingCells:1,letterSpacingCustom:0.5,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:5,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
