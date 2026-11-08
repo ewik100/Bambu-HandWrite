@@ -20,11 +20,12 @@ function throws(fn, pattern, message) {
 const limitsMatch = html.match(/const Z_LIMITS=\{[^}]+\};/);
 const zFunctionMatch = html.match(/function getPenZSettings\(\)\{[\s\S]*?\n\}/);
 const pauseFunctionMatch = html.match(/function getPause2Seconds\(\)\{[\s\S]*?\n\}/);
+const topMarginMatch = html.match(/function getTopMarginMm\(type,cell\)\{[^}]+\}/);
 const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !zFunctionMatch || !pauseFunctionMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !routeFunctionMatch) {
+if (!limitsMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -38,8 +39,11 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
+assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook starts two 5 mm cells below the top edge');
+assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
+assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
 assert(context.scaleToLowercaseHeight(5, 2.5) === 2, 'A 5 mm lowercase target scales the measured x-height to 5 mm');
 assert(context.scaleToLowercaseHeight(5, 0) === 1, 'Missing font metrics fall back to neutral vertical scaling');
 const pausePoint = context.getCornerPausePosition(45.5, 253);
