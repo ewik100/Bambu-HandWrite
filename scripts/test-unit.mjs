@@ -20,8 +20,10 @@ function throws(fn, pattern, message) {
 const limitsMatch = html.match(/const Z_LIMITS=\{[^}]+\};/);
 const zFunctionMatch = html.match(/function getPenZSettings\(\)\{[\s\S]*?\n\}/);
 const pauseFunctionMatch = html.match(/function getPause2Seconds\(\)\{[\s\S]*?\n\}/);
+const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
+const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{[^}]+\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !zFunctionMatch || !pauseFunctionMatch || !routeFunctionMatch) {
+if (!limitsMatch || !zFunctionMatch || !pauseFunctionMatch || !lowercaseScaleMatch || !cornerPauseMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -35,7 +37,13 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${routeFunctionMatch[0]}`, context);
+
+assert(context.scaleToLowercaseHeight(5, 2.5) === 2, 'A 5 mm lowercase target scales the measured x-height to 5 mm');
+assert(context.scaleToLowercaseHeight(5, 0) === 1, 'Missing font metrics fall back to neutral vertical scaling');
+const pausePoint = context.getCornerPausePosition(45.5, 253);
+assert(pausePoint.x === 42.5 && pausePoint.y === 250, 'Second pause parks the nozzle outside the paper corner');
+assert(context.getCornerPausePosition(2, 2).x === 3 && context.getCornerPausePosition(2, 2).y === 3, 'Second-pause nozzle parking stays inside the minimum machine boundary');
 
 let z = context.getPenZSettings();
 assert(z.write === 30 && z.travel === 34 && z.safe === 50, 'Default Z=30 produces write/travel/safe levels 30/34/50');
