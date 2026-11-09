@@ -26,10 +26,10 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.0.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
+  for (const marker of ['Bambu HandWrite 5.0.1', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.0.0, A1 profile metadata, letter-size fixes and both line-spacing modes are present');
+  if (!errors.length) ok('Version 5.0.1, letter-size fixes and both line-spacing modes are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
@@ -75,10 +75,15 @@ if (html) {
   else ok('Legacy M73 progress markers are absent');
   if (!html.includes('должна быть ровно одна вторая автоматическая пауза') || !html.includes('не-ASCII символы')) fail('Generated G-code preflight must validate pause sequence and ASCII-only output.');
   else ok('G-code preflight checks ASCII output and the two-pause sequence');
-  for (const required of ['; printer_model = Bambu Lab A1','; printer_settings_id = Bambu Lab A1 0.4 nozzle','; printable_area = 0x0,256x0,256x256,0x256','; printable_height = 256','; printer_structure = i3']) {
-    if (!html.includes(required)) fail(`Missing required A1 G-code profile metadata: ${required}`);
-  }
-  if (!errors.length) ok('A1 G-code profile metadata is embedded and preflight-validated');
+  const headStart = html.indexOf('const head=[');
+  const headEnd = html.indexOf('];', headStart);
+  const generatedHead = headStart >= 0 && headEnd > headStart ? html.slice(headStart, headEnd) : '';
+  if (!generatedHead.includes('raw G-code for Bambu Lab A1')) fail('The generator must identify its output as raw A1 G-code.');
+  if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P'].some(marker => generatedHead.includes(marker))) {
+    fail('Generated raw G-code must not include Bambu Studio container markers, heater/fan shutdowns, or M400 P waits.');
+  } else ok('Generated output uses plain raw G-code without container markers or unverified startup commands');
+  if (!html.includes('M400 P отключена') || !html.includes('M400 S')) fail('A1-specific pause validation must reject M400 P and retain M400 S.');
+  else ok('A1-specific pause validation accepts M400 S and rejects M400 P');
   if (!errors.length) ok('Z limits, pause commands, homing and motion mode markers are present');
 
   if (!html.includes('не гарантия реального зазора') && !html.includes('не гарантия зазора')) {
@@ -93,7 +98,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.0.1.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',
