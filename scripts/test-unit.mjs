@@ -25,12 +25,13 @@ const pauseFunctionMatch = html.match(/function getPause2Seconds\(\)\{[\s\S]*?\n
 const topMarginMatch = html.match(/function getTopMarginMm\(type,cell\)\{[^}]+\}/);
 const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
+const pagePlacementMatch = html.match(/function getPagePlacementParkPosition\(pageX,pageMachineY,pageWidth,pageHeight,tab\)\{[\\s\\S]*?\\n\\}/);
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const justifyCorrectionMatch = html.match(/function getJustifyCorrectionScale\(lines,boxes,rightX,widthScale,currentScale=1\)\{[\s\S]*?\n\}/);
 const lineTransformMatch = html.match(/function withCanvasLineTransform\(cx,x,y,width,heightScale,draw\)\{[\s\S]*?\n\}/);
-const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,zSettings\)\{[\s\S]*?\n\}/);
+const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -47,7 +48,7 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
@@ -78,8 +79,11 @@ throws(()=>context.withCanvasLineTransform(mockCanvas,100,400,1,1.2,()=>{throw E
 assert(mockCanvas.depth===0&&mockCanvas.saves===3&&mockCanvas.restores===3,'Canvas state is restored even when a line draw throws');
 assert(context.scaleToLowercaseHeight(5, 0) === 1, 'Missing font metrics fall back to neutral vertical scaling');
 const pausePoint = context.getCornerPausePosition(45.5, 253);
-assert(pausePoint.x === 42.5 && pausePoint.y === 250, 'Second pause parks 3 mm left and 3 mm below the paper top-left corner');
+assert(pausePoint.x === 45.5 && pausePoint.y === 253, 'Second pause is directly above the upper-left page corner');
 assert(context.getCornerPausePosition(2, 2).x === 3 && context.getCornerPausePosition(2, 2).y === 3, 'Second-pause nozzle parking stays inside the minimum machine boundary');
+const sidePark = context.getPagePlacementParkPosition(45.5, 253, 165, 203, {x:0,w:100,depth:15,clearance:0});
+assert(sidePark.x === 128 && sidePark.y === 42, 'F15-sized page gets a side parking point outside the page for sheet placement');
+assert(sidePark.x < 45.5 || sidePark.x > 210.5 || sidePark.y < 50 || sidePark.y > 253, '50-second placement parking point is outside the paper rectangle');
 assert(context.findLargestFittingTenth(5, value => value <= 4.9) === 4.9, 'Auto-fit recommends 4.9 mm instead of reducing a 5 mm setting more than needed');
 assert(context.findLargestFittingTenth(5, value => value <= 2) === 2, 'Auto-fit can find the minimum allowed height');
 assert(context.findLargestFittingTenth(2, () => false) === null, 'Auto-fit does not recommend a value below the minimum');
@@ -88,36 +92,56 @@ assert(context.getJustifyCorrectionScale(justifyLines,[{x:10,width:100}],100,1,1
 assert(context.getJustifyCorrectionScale(justifyLines,[{x:10,width:80}],100,1,1)===1,'SVG calibration leaves a line unchanged when it already fits');
 assert(context.getJustifyCorrectionScale([{text:'singleword',extraWordSpace:4}],[{x:10,width:100}],100,1,1)===1,'SVG calibration ignores lines without spaces');
 const validGcode=[
-  "; Bambu HandWrite 5.2.0 - raw G-code for Bambu Lab A1",
+  "; Bambu HandWrite 5.3.0 - raw G-code for Bambu Lab A1",
   "; Title: test",
-  "M73 P0 R1",
   "G21 ; metric units",
   "G90 ; absolute positioning",
+  "M83 ; relative extrusion mode; no E moves",
+  "M400",
   "M400 U1 ; manual pause",
   "G28 ; home all axes",
   "G1 Z50.000 F1200 ; safe height above plate",
   "M400",
-  "G0 X42.500 Y250.000 F2000 ; nozzle parks 3 mm left and 3 mm below the paper top-left corner",
+  "G0 X45.500 Y253.000 F2000 ; nozzle pauses directly above the paper top-left corner",
   "M400",
   "M400 S130 ; SECOND STOP",
+  "G1 Z34.000 F1200 ; pen up before drawing the page outline",
+  "G0 X45.500 Y253.000 F1900 ; outline start on protective A4",
+  "G1 Z30.000 F1200 ; draw outline on protective A4",
+  "G1 X210.500 Y253.000 F1250 ; outline top edge",
+  "G1 X210.500 Y50.000 F1250 ; outline right edge",
+  "G1 X45.500 Y50.000 F1250 ; outline bottom edge",
+  "G1 X45.500 Y253.000 F1250 ; close outline",
+  "G1 Z50.000 F1200 ; lift before sheet placement",
+  "G0 X128.000 Y42.000 F2000 ; move clear of page for placement",
+  "M400",
+  "M400 S50 ; 50-second placement window",
+  "G1 Z34.000 F1200 ; pen-up travel after placement",
   "G1 Z34.000 F1200",
-  "G1 X10.000 Y20.000 F1500",
+  "G0 X55.000 Y240.000 F1800",
+  "G1 Z30.000 F1200",
+  "G1 X60.000 Y240.000 F1500",
+  "G1 Z34.000 F1200",
   "G1 Z50.000 F1200 ; final safe lift",
   "G0 X128.000 Y246.000 F2000 ; park/present bed",
-  "M73 P100 R0",
   "M400",
   "; END"
 ].join('\n')+'\n';
-assert(context.validateGeneratedGcode(validGcode,130,{x:42.5,y:250},{safe:50,travel:34})===true,'G-code preflight accepts plain raw ASCII output with both pauses and safe corner parking');
-const commentedCompletion=validGcode.replace('M73 P100 R0\n','M73 P100 R0 ; completion marker\n');
-assert(context.validateGeneratedGcode(commentedCompletion,130,{x:42.5,y:250},{safe:50,travel:34})===true,'G-code preflight accepts an inline comment on the final M73 command');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 P30000\nM400 S130'),130,{x:42.5,y:250},{safe:50,travel:34}),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G21 ; metric units','M104 S0\nG21 ; metric units'),130,{x:42.5,y:250},{safe:50,travel:34}),/нагревателями/,'G-code preflight rejects startup heater/fan shutdown commands');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:42.5,y:250},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M73 P100'),130,{x:42.5,y:250},{safe:50,travel:34}),/ручная пауза/,'G-code preflight rejects a missing manual pause');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P100 R0','M73 P99 R0'),130,{x:42.5,y:250},{safe:50,travel:34}),/завершающий M73/,'G-code preflight rejects a missing completion marker');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,{x:42.5,y:250},{safe:50,travel:34}),/нарушен порядок/,'G-code preflight rejects a second pause at an unexpected Z level');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('; Title: test','; HEADER_BLOCK_START\n; Title: test'),130,{x:42.5,y:250},{safe:50,travel:34}),/контейнерные блоки/,'G-code preflight rejects Bambu Studio container markers');
+const testPage={x:45.5,y:253,w:165,h:203};
+const testPause={x:45.5,y:253};
+const testSidePark={x:128,y:42};
+const testZ={safe:50,travel:34,write:30};
+assert(context.validateGeneratedGcode(validGcode,130,testPause,testSidePark,testPage,testZ)===true,'G-code preflight accepts restored startup, second pause, protective-A4 outline and 50-second placement wait');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S129 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/вторая автоматическая остановка/,'G-code preflight rejects a missing or altered second pause');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S50 ; 50-second placement window','M400 S49 ; 49-second placement window'),130,testPause,testSidePark,testPage,testZ),/50-секундное окно/,'G-code preflight requires the fixed 50-second placement window');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X210.500 Y253.000 F1250 ; outline top edge','G1 X209.500 Y253.000 F1250 ; outline top edge'),130,testPause,testSidePark,testPage,testZ),/контур на защитном A4/,'G-code preflight checks the exact page outline');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M400 U0'),130,testPause,testSidePark,testPage,testZ),/ручная пауза/,'G-code preflight rejects a missing manual pause');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S50 ; 50-second placement window','M400 P30000 ; 50-second placement window'),130,testPause,testSidePark,testPage,testZ),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S130 — SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M83 ; relative extrusion mode; no E moves','M73 P0 R1'),130,testPause,testSidePark,testPage,testZ),/M73/,'G-code preflight rejects progress markers');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,testPause,testSidePark,testPage,testZ),/нарушен восстановленный порядок/,'G-code preflight rejects an unexpected second-pause height');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('; Title: test','; HEADER_BLOCK_START\n; Title: test'),130,testPause,testSidePark,testPage,testZ),/контейнерные блоки/,'G-code preflight rejects Bambu Studio container markers');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G0 X128.000 Y246.000 F2000 ; park/present bed\nM400\n; END','G0 X128.000 Y246.000 F2000 ; park/present bed\n; END'),130,testPause,testSidePark,testPage,testZ),/финальной последовательности|нарушена восстановленная последовательность завершения/,'G-code preflight rejects a damaged completion sequence');
 let z = context.getPenZSettings();
 assert(z.write === 30 && z.travel === 34 && z.safe === 50, 'Default Z=30 produces write/travel/safe levels 30/34/50');
 zInput = '10';
