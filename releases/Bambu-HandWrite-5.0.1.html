@@ -991,7 +991,7 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  const timed=lines.map((line,i)=>line.startsWith('M400 S'+pauseSeconds+' ')?i:-1).filter(i=>i>=0);
  if(manual.length!==1)fail('должна быть ровно одна первая ручная пауза M400 U1.');
  if(timed.length!==1)fail('должна быть ровно одна вторая автоматическая пауза M400 S'+pauseSeconds+'.');
- if(lines.some(line=>/^M400 P(?:\\d|\\s|$)/.test(line)))fail('M400 P отключена: на проверенном A1 эта команда завершила короткий тест сразу.');
+ if(lines.some(line=>/^M400 P(?:\d|\s|$)/.test(line)))fail('M400 P отключена: на проверенном A1 эта команда завершила короткий тест сразу.');
  if(lines.some(line=>/^M73\b/.test(line)))fail('команды M73 отключены, чтобы не передавать принтеру маркеры прогресса/завершения.');
  if(lines.some(line=>/^M(?:104|140|106)\b/.test(line)))fail('в начале pen-plotter файла не должно быть команд управления нагревателями или вентилятором.');
  const allowed=new Set(['G0','G1','G21','G28','G90','M83','M400']);
