@@ -53,7 +53,7 @@ pitchCellsInput = '1';
 assert(context.getLinePitchMm(5) === 5, 'One cell produces exactly one 5 mm grid step');
 pitchCellsInput = '6';
 assert(context.getLinePitchMm(5) === 30, 'Six cells produce a 30 mm baseline step');
-assert(context.fitJustifiedLineRatio(2, 4, 1, 146, 145) === 1, 'Justified line spacing is unchanged when the actual SVG text already fits');
+assert(context.fitJustifiedLineRatio(2, 4, 1, 145, 145) === 1, 'Justified line spacing is unchanged when the actual SVG text already fits');
 const fitRatio = context.fitJustifiedLineRatio(2, 4, 1, 148, 145);
 assert(Math.abs(fitRatio - 0.625) < 1e-9, 'SVG overflow is removed by reducing only the added spaces, not the glyphs');
 assert(context.fitJustifiedLineRatio(2, 4, 1, 154, 145) === 0, 'Justification correction never hides overflow caused by the natural text width');
