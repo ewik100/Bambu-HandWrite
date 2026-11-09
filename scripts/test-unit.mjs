@@ -27,6 +27,7 @@ const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetM
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const justifyCorrectionMatch = html.match(/function getJustifyCorrectionScale\(lines,boxes,rightX,widthScale,currentScale=1\)\{[\s\S]*?\n\}/);
+const lineTransformMatch = html.match(/function withCanvasLineTransform\(cx,x,y,width,heightScale,draw\)\{[\s\S]*?\n\}/);
 const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,zSettings\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
 if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
