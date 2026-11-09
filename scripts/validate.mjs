@@ -26,10 +26,10 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.4.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
+  for (const marker of ['Bambu HandWrite 5.4.2', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.4.0, letter-size fixes and both line-spacing modes are present');
+  if (!errors.length) ok('Version 5.4.2, letter-size fixes and both line-spacing modes are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
@@ -88,7 +88,7 @@ if (html) {
   }
   if (!html.includes('M73 P0 R1') || !html.includes('M73 P100 R0')) fail('The raw G-code must retain both original Bambu progress markers.');
   else ok('Raw G-code retains the original M73 start and completion markers');
-  if (!html.includes('должно быть ровно одно 50-секундное окно') || !html.includes('не-ASCII символы') || !html.includes('контур на защитном A4')) {
+  if (!html.includes('должно быть ровно одно 50-секундное окно') || !html.includes('не-ASCII символы') || !html.includes('контур на защитном A4') || !html.includes('первым движением должен быть подъём пера') || !html.includes('после 50-секундного окна нет рисующих движений текста')) {
     fail('Generated G-code preflight must validate the contour, two timed waits and ASCII-only output.');
   } else ok('G-code preflight checks the protective-paper outline, both timed waits and ASCII output');
   const headStart = html.indexOf('const head=[');
@@ -114,7 +114,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.0.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',
