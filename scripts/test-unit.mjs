@@ -78,7 +78,7 @@ throws(()=>context.withCanvasLineTransform(mockCanvas,100,400,1,1.2,()=>{throw E
 assert(mockCanvas.depth===0&&mockCanvas.saves===3&&mockCanvas.restores===3,'Canvas state is restored even when a line draw throws');
 assert(context.scaleToLowercaseHeight(5, 0) === 1, 'Missing font metrics fall back to neutral vertical scaling');
 const pausePoint = context.getCornerPausePosition(45.5, 253);
-assert(pausePoint.x === 45.5 && pausePoint.y === 253, 'Second pause parks the nozzle directly over the upper-left paper corner');
+assert(pausePoint.x === 42.5 && pausePoint.y === 250, 'Second pause parks 3 mm left and 3 mm below the paper top-left corner');
 assert(context.getCornerPausePosition(2, 2).x === 3 && context.getCornerPausePosition(2, 2).y === 3, 'Second-pause nozzle parking stays inside the minimum machine boundary');
 assert(context.findLargestFittingTenth(5, value => value <= 4.9) === 4.9, 'Auto-fit recommends 4.9 mm instead of reducing a 5 mm setting more than needed');
 assert(context.findLargestFittingTenth(5, value => value <= 2) === 2, 'Auto-fit can find the minimum allowed height');
@@ -97,7 +97,7 @@ const validGcode=[
   "G28 ; home all axes",
   "G1 Z50.000 F1200 ; safe height above plate",
   "M400",
-  "G0 X45.500 Y253.000 F2000 ; nozzle parks directly over the upper-left paper corner",
+  "G0 X42.500 Y250.000 F2000 ; nozzle parks 3 mm left and 3 mm below the paper top-left corner",
   "M400",
   "M400 S130 ; SECOND STOP",
   "G1 Z34.000 F1200",
@@ -108,7 +108,7 @@ const validGcode=[
   "M400",
   "; END"
 ].join('\n')+'\n';
-assert(context.validateGeneratedGcode(validGcode,130,{x:45.5,y:253},{safe:50,travel:34})===true,'G-code preflight accepts plain raw ASCII output with both pauses and safe corner parking');
+assert(context.validateGeneratedGcode(validGcode,130,{x:42.5,y:250},{safe:50,travel:34})===true,'G-code preflight accepts plain raw ASCII output with both pauses and safe corner parking');
 const commentedCompletion=validGcode.replace('M73 P100 R0\n','M73 P100 R0 ; completion marker\n');
 assert(context.validateGeneratedGcode(commentedCompletion,130,{x:45.5,y:253},{safe:50,travel:34})===true,'G-code preflight accepts an inline comment on the final M73 command');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 P30000\nM400 S130'),130,{x:45.5,y:253},{safe:50,travel:34}),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
