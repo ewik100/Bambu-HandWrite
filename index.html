@@ -1051,7 +1051,9 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  const travelIndex=lines.findIndex((line,i)=>i>pause2Index&&line==='G1 Z'+Number(zSettings.travel).toFixed(3)+' F1200');
  if(!(manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<pause2Index&&pause2Index<travelIndex))fail('нарушен порядок: ручная пауза → homing → безопасная высота → парковка сопла у края листа → вторая выдержка → движение к тексту.');
  for(let i=safeIndex+1;i<pause2Index;i++){if(/^G[01] Z/.test(lines[i]))fail('высота Z меняется во время второй остановки; сопло должно оставаться на заданной безопасной высоте.');}
- if(lines[lines.length-3]!=='M73 P100 R0'||lines[lines.length-2]!=='M400'||lines[lines.length-1]!=='; END')fail('файл должен завершаться M73 P100 R0 → M400 → ; END.');
+ const finalProgressCommand=(lines[lines.length-3]||'').split(';',1)[0].trim();
+ const finalSyncCommand=(lines[lines.length-2]||'').split(';',1)[0].trim();
+ if(finalProgressCommand!=='M73 P100 R0'||finalSyncCommand!=='M400'||lines[lines.length-1]!=='; END')fail('файл должен завершаться M73 P100 R0 → M400 → ; END.');
  if(!lines.some(line=>/^G1 X/.test(line)))fail('в файле нет команд рисования.');
  return true;
 }
