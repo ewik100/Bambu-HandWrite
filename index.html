@@ -380,7 +380,7 @@ Hello, world!</textarea></label>
   <h2>5. Создание G-code для SD-карты</h2>
   <p class="tiny">Текст рисуется выбранным рукописным шрифтом, затем преобразуется в центральные линии. Это скелетизация шрифтового контура, а не полноценный single-line font, поэтому после построения обязательно проверь маршрут.</p>
   <div class="pause-setting">
-    <div class="pause-setting-copy"><b>⏱ Вторая автоматическая остановка</b><span>Сопло остановится на 3 мм снаружи левого края и на 3 мм ниже верхнего края листа, с поднятой ручкой. Отсчёт закончится сам — повторно нажимать «Продолжить» не требуется.</span></div>
+    <div class="pause-setting-copy"><b>⏱ Вторая автоматическая выдержка</b><span>После первой паузы сопло поднимется на безопасную высоту и остановится у верхнего левого края листа: на 3 мм левее и на 3 мм ниже угла. Принтер не покажет отдельное окно «Продолжить»: он просто подождёт заданное время и сам продолжит письмо.</span></div>
     <label>Время, секунд<input id="pause2Seconds" type="number" min="1" max="600" step="1" value="130" inputmode="numeric"></label>
     <div class="pause-presets" aria-label="Быстрый выбор времени паузы"><button type="button" data-pause-seconds="30">30 с</button><button type="button" data-pause-seconds="60">60 с</button><button type="button" data-pause-seconds="130" aria-pressed="true">130 с</button><button type="button" data-pause-seconds="180">180 с</button></div>
     <p class="pause-live" id="pauseLive">Пауза у угла: 2 мин 10 сек.</p>
