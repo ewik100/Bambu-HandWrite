@@ -26,10 +26,10 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.2.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
+  for (const marker of ['Bambu HandWrite 5.3.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.2.0, letter-size fixes and both line-spacing modes are present');
+  if (!errors.length) ok('Version 5.3.0, letter-size fixes and both line-spacing modes are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
@@ -68,22 +68,37 @@ if (html) {
   if (missingReferences.length) fail(`Static DOM references without a matching id: ${missingReferences.join(', ')}`);
   else ok('Static DOM id lookups have matching elements');
 
-  for (const required of ['function validateGeneratedGcode(file,pauseSeconds,park,zSettings)', 'validateGeneratedGcode(file,pauseSeconds,park,zSettings);', 'function getPenZSettings()', 'const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20}', 'M400 U1', 'M400 S${pauseSeconds}', 'M73 P0 R1', 'M73 P100 R0', 'G28 ; home all axes', 'G21 ; metric units', 'G90 ; absolute positioning']) {
+  for (const required of [
+    'function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings)',
+    'validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings);',
+    'function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,tab)',
+    'function getPenZSettings()',
+    'const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20}',
+    'M83 ; relative extrusion mode; no E moves',
+    'M400 U1',
+    'M400 S50 ; 50-second placement window',
+    'outline start on protective A4',
+    'SECOND STOP: nozzle is directly above the upper-left paper corner',
+    'G28 ; home all axes',
+    'G21 ; metric units',
+    'G90 ; absolute positioning'
+  ]) {
     if (!html.includes(required)) fail(`Missing expected safety/G-code marker: ${required}`);
   }
-  if (!html.includes('M73 P0 R1') || !html.includes('M73 P100 R0')) fail('Bambu progress markers must initialize at start and complete only at the end.');
-  else ok('Bambu progress markers are present at the start and end');
-  if (!html.includes('должна быть ровно одна вторая автоматическая пауза') || !html.includes('не-ASCII символы')) fail('Generated G-code preflight must validate pause sequence and ASCII-only output.');
-  else ok('G-code preflight checks ASCII output and the two-pause sequence');
+  if (html.includes('M73 P0 R1') || html.includes('M73 P100 R0')) fail('M73 progress markers must remain absent from the raw pen-plotter G-code.');
+  else ok('Raw G-code has no M73 progress markers');
+  if (!html.includes('должно быть ровно одно 50-секундное окно') || !html.includes('не-ASCII символы') || !html.includes('контур на защитном A4')) {
+    fail('Generated G-code preflight must validate the contour, two timed waits and ASCII-only output.');
+  } else ok('G-code preflight checks the protective-paper outline, both timed waits and ASCII output');
   const headStart = html.indexOf('const head=[');
   const headEnd = html.indexOf('];', headStart);
   const generatedHead = headStart >= 0 && headEnd > headStart ? html.slice(headStart, headEnd) : '';
   if (!generatedHead.includes('raw G-code for Bambu Lab A1')) fail('The generator must identify its output as raw A1 G-code.');
-  if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P','M83 ; relative extrusion mode'].some(marker => generatedHead.includes(marker))) {
+  if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P'].some(marker => generatedHead.includes(marker))) {
     fail('Generated raw G-code must not include Bambu Studio container markers, heater/fan shutdowns, or M400 P waits.');
   } else ok('Generated output uses plain raw G-code without container markers or unverified startup commands');
-  if (!html.includes('M400 P отключена') || !html.includes('M400 S') || !html.includes('getJustifyCorrectionScale') || !html.includes('blob.arrayBuffer()') || !html.includes('M73 P0 R1') || !html.includes('M73 P100 R0')) fail('A1-specific pause validation must reject M400 P and retain M400 S.');
-  else ok('A1-specific pause validation accepts M400 S and rejects M400 P');
+  if (!html.includes('M400 P отключена') || !html.includes('M400 S50 ; 50-second placement window') || !html.includes('getJustifyCorrectionScale') || !html.includes('blob.arrayBuffer()') || !html.includes('M83 ; relative extrusion mode; no E moves')) fail('A1-specific validation must reject M400 P, restore M83 and require the 50-second placement wait.');
+  else ok('A1-specific validation restores M83, retains M400 S and rejects M400 P');
   if (!errors.length) ok('Z limits, pause commands, homing and motion mode markers are present');
 
   if (!html.includes('не гарантия реального зазора') && !html.includes('не гарантия зазора')) {
@@ -98,7 +113,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',
