@@ -1014,9 +1014,11 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  if(manual.length!==1)fail('должна быть ровно одна первая ручная пауза M400 U1.');
  if(timed.length!==1)fail('должна быть ровно одна вторая автоматическая пауза M400 S'+pauseSeconds+'.');
  if(lines.some(line=>/^M400 P(?:\d|\s|$)/.test(line)))fail('M400 P отключена: на проверенном A1 эта команда завершила короткий тест сразу.');
- if(lines.some(line=>/^M73\b/.test(line)))fail('команды M73 отключены, чтобы не передавать принтеру маркеры прогресса/завершения.');
+ const progressStart=lines.map((line,i)=>/^M73 P0 R1(?:\s|$)/.test(line)?i:-1).filter(i=>i>=0);
+ const progressEnd=lines.map((line,i)=>/^M73 P100 R0(?:\s|$)/.test(line)?i:-1).filter(i=>i>=0);
+ if(progressStart.length!==1||progressEnd.length!==1||progressStart[0]>=progressEnd[0])fail('нужны ровно один начальный M73 P0 R1 и один завершающий M73 P100 R0.');
  if(lines.some(line=>/^M(?:104|140|106)\b/.test(line)))fail('в начале pen-plotter файла не должно быть команд управления нагревателями или вентилятором.');
- const allowed=new Set(['G0','G1','G21','G28','G90','M400']);
+ const allowed=new Set(['G0','G1','G21','G28','G90','M73','M400']);
  for(const line of lines){
   const trimmed=line.trim();
   if(!trimmed||trimmed.startsWith(';'))continue;
@@ -1024,7 +1026,7 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
   if(!allowed.has(command))fail('обнаружена непроверенная команда '+command+'.');
  }
  const executable=lines.map((line,index)=>({line,index,text:line.split(';',1)[0].trim()})).filter(x=>x.text);
- if(executable[0]?.text!=='G21'||executable[1]?.text!=='G90'||!executable[2]?.text.startsWith('M400 U1'))fail('неверное начало файла: ожидаются G21 → G90 → ручная пауза M400 U1.');
+ if(executable[0]?.text!=='M73 P0 R1'||executable[1]?.text!=='G21'||executable[2]?.text!=='G90'||!executable[3]?.text.startsWith('M400 U1'))fail('неверное начало файла: ожидаются M73 P0 R1 → G21 → G90 → ручная пауза M400 U1.');
  const endIndex=lines.lastIndexOf('; END');
  if(endIndex<0||lines.slice(endIndex+1).some(line=>line.trim()))fail('после маркера ; END не должно быть никаких данных.');
  let xyMoves=0,zMoves=0,drawMoves=0;
@@ -1049,7 +1051,7 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  const travelIndex=lines.findIndex((line,i)=>i>pause2Index&&line==='G1 Z'+Number(zSettings.travel).toFixed(3)+' F1200');
  if(!(manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<pause2Index&&pause2Index<travelIndex))fail('нарушен порядок: ручная пауза → homing → безопасная высота → парковка сопла у края листа → вторая выдержка → движение к тексту.');
  for(let i=safeIndex+1;i<pause2Index;i++){if(/^G[01] Z/.test(lines[i]))fail('высота Z меняется во время второй остановки; сопло должно оставаться на заданной безопасной высоте.');}
- if(lines[lines.length-2]!=='M400'||lines[lines.length-1]!=='; END')fail('файл должен завершаться командой M400 и маркером ; END.');
+ if(lines[lines.length-3]!=='M73 P100 R0'||lines[lines.length-2]!=='M400'||lines[lines.length-1]!=='; END')fail('файл должен завершаться M73 P100 R0 → M400 → ; END.');
  if(!lines.some(line=>/^G1 X/.test(line)))fail('в файле нет команд рисования.');
  return true;
 }
@@ -1097,6 +1099,7 @@ async function generateGcode(){
   `; Pause 1 is manual (M400 U1). Remove pen holder before homing if clearance is unverified. After Resume: G28 homes all axes.`,
   `; Pause 2: automatic ${pauseSeconds}s dwell with nozzle parked directly over the upper-left paper corner at safe Z ${fmtZ(zSettings.safe)} mm (M400 S${pauseSeconds}); no second Resume needed.`,
   `; WARNING: verify paper fixing and pen Z calibration with a short supervised test.`,
+  `M73 P0 R1 ; initialize Bambu print progress`,
   `G21 ; metric units`,
   `G90 ; absolute positioning`,
   `M400 U1 ; PAUSE 1: secure paper; remove pen holder before homing if clearance is unverified; press Resume`,
@@ -1111,6 +1114,7 @@ async function generateGcode(){
   ...draw,
   `G1 Z${fmtZ(zSettings.safe)} F1200 ; final safe lift`,
   `G0 X128.000 Y246.000 F2000 ; park/present bed`,
+  `M73 P100 R0 ; mark completed only after all drawing moves`,
   `M400`,
   `; END`,
 ];
