@@ -95,9 +95,9 @@ if (html) {
   const headEnd = html.indexOf('];', headStart);
   const generatedHead = headStart >= 0 && headEnd > headStart ? html.slice(headStart, headEnd) : '';
   if (!generatedHead.includes('raw G-code for Bambu Lab A1')) fail('The generator must identify its output as raw A1 G-code.');
-  if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P'].some(marker => generatedHead.includes(marker))) {
-    fail('Generated raw G-code must not include Bambu Studio container markers, heater/fan shutdowns, or M400 P waits.');
-  } else ok('Generated output uses plain raw G-code without container markers or unverified startup commands');
+  if (!['HEADER_BLOCK_START','HEADER_BLOCK_END','CONFIG_BLOCK_START','CONFIG_BLOCK_END','EXECUTABLE_BLOCK_START','EXECUTABLE_BLOCK_END','print_compatible_printers = "Bambu Lab A1 0.4 nozzle"','printable_area = 0x0,256x0,256x256,0x256'].every(marker => generatedHead.includes(marker))) {
+    fail('Generated G-code must preserve the proven Bambu A1 HEADER/CONFIG/EXECUTABLE block structure and machine profile.');
+  } else ok('Generated output preserves the Bambu A1 container blocks and printer profile from the working 5.0.0 baseline');
   if (!html.includes('M400 P отключена') || !html.includes('M400 S50 ; 50-second placement window') || !html.includes('getJustifyCorrectionScale') || !html.includes('blob.arrayBuffer()') || !html.includes('M73 P0 R1') || !html.includes('M73 P100 R0') || html.includes('M83 ; relative extrusion mode; no E moves')) fail('A1-specific validation must retain M73 markers, omit unused M83 and require the 50-second placement wait.');
   else ok('A1-specific validation retains M73, omits unused M83, keeps M400 S and rejects M400 P');
   if (!errors.length) ok('Z limits, pause commands, homing and motion mode markers are present');
