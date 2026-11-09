@@ -355,7 +355,7 @@ Hello, world!</textarea></label>
       <p class="calibration-note">Это настраиваемая консервативная зона безопасности, а не точный заводской размер Bambu. Измерь свою пластину и оставь дополнительный зазор; приложение не может проверить физическое положение бумаги.</p>
     </details>
     <div class="bed-svg-wrap"><svg id="bedPreview" viewBox="0 0 256 310" role="img" aria-label="Положение листа и точки маршрута на пластине принтера"></svg></div>
-    <div class="route-legend"><span><i class="dot corner"></i> положение сопла при второй остановке — снаружи левого края листа</span><span><i class="dot textstart"></i> отдельная точка начала текста</span><span><i class="dot red"></i> красная граница текста</span></div>
+    <div class="route-legend"><span><i class="dot corner"></i> положение сопла при второй остановке — 3 мм слева и 3 мм ниже верхнего края листа</span><span><i class="dot textstart"></i> отдельная точка начала текста</span><span><i class="dot red"></i> красная граница текста</span></div>
     <div class="route-controls" aria-label="Этапы маршрута пера">
       <button class="route-btn" id="stage1" type="button" aria-pressed="false">1 · Пауза 1<br>Подготовка</button>
       <button class="route-btn" id="stage2" type="button" aria-pressed="true">2 · Остановка у угла<br>130 сек по умолч.</button>
@@ -402,7 +402,7 @@ Hello, world!</textarea></label>
   <div id="generationProgress" class="generation-progress" hidden><div class="generation-progress-track"><span id="generationProgressBar"></span></div><p id="generationProgressLabel">Подготовка…</p></div>
   <p id="gcodeStatus" class="status" aria-live="polite">Сначала обнови предпросмотр и проверь лист на пластине.</p>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
-  <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется непосредственно над верхним левым углом листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
+  <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
 <p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.2.0 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
@@ -452,7 +452,7 @@ function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent){
  return uppercaseAscent>0?Math.min(1,(lowercaseAscent*1.08)/uppercaseAscent):1;
 }
 function findLargestFittingTenth(currentMm,fitsAt){let low=20,high=Math.floor((currentMm-.001)*10),best=null;while(low<=high){const mid=Math.floor((low+high)/2);if(fitsAt(mid/10)){best=mid;low=mid+1}else high=mid-1}return best===null?null:best/10}
-function getCornerPausePosition(pageX,pageMachineY){return {x:Math.max(3,pageX),y:Math.max(3,pageMachineY)}}
+function getCornerPausePosition(pageX,pageMachineY){return {x:Math.max(3,pageX-3),y:Math.max(3,pageMachineY-3)}}
 const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
 function startOptionalFontStylesheet(){
@@ -586,7 +586,7 @@ function bedPlacement(w,h){
  return {pageX,pageY,support:{left:Math.max(0,-pageX),right:Math.min(w,BED.w-pageX),bottom:Math.min(h,BED.h-pageY)},overLeft:pageX<0,overRight:pageRight>BED.w,overBottom:pageBottom>BED.h,tabOverlap,tab};
 }
 function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch){
- const tab=pl.tab||getPlateTab(),x=pl.pageX,y=pl.pageY,cornerX=x,cornerY=y,tx=x+sx,ty=y+sy;
+ const tab=pl.tab||getPlateTab(),x=pl.pageX,y=pl.pageY,cornerX=x-3,cornerY=y+3,tx=x+sx,ty=y+sy;
  const viewX=Math.min(-12,x-12),viewR=Math.max(310,x+w+12),viewBottom=Math.max(300,y+h+14,BED.h+tab.depth+20),viewTop=-8,viewW=viewR-viewX,viewH=viewBottom-viewTop;
  let s=`<defs><clipPath id="bedPaperClip"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#ffe8e5"/><line x1="0" y1="0" x2="0" y2="4" stroke="#d85b55"/></pattern><marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5z" fill="#2770bd"/></marker></defs>`;
  s+=`<rect x="0" y="0" width="256" height="256" rx="2" fill="#cfd6dc" stroke="#53616c"/>`;
@@ -623,7 +623,7 @@ function updatePauseUI(){
  $('pauseLive').textContent=`Пауза у угла: ${formatDuration(sec)}.`;
  $('stage2').innerHTML=`2 · Остановка у угла<br>${formatDuration(sec)}`;
  document.querySelectorAll('[data-pause-seconds]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.pauseSeconds)===sec)));
- const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано прямо над верхним левым углом листа. Автоматическая остановка — ${formatDuration(sec)}.`:`Этап 3: после ${formatDuration(sec)} головка перемещается к первой букве с поднятой ручкой.`;}
+ const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Автоматическая остановка — ${formatDuration(sec)}.`:`Этап 3: после ${formatDuration(sec)} головка перемещается к первой букве с поднятой ручкой.`;}
 }
 function updateLiveStats(txt,lines,bottom,inkBottom,pageHeight){
  const clean=String(txt||'').trim(),words=clean?clean.split(/\s+/u).length:0,visible=lines.filter(x=>!x.blank).length;
@@ -712,9 +712,9 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  $('layoutStatus').textContent=errors.length?errors.join(' '):`Текст начинается в ${startX.toFixed(1)} мм от левого края (${(startX/cell).toFixed(1)} клетки); красная строка у русских абзацев ${indentEnabled?`включена (${paraIndent.toFixed(1)} мм)`:'выключена'}, английские абзацы без отступа. Заполнение до правой границы ${justifyEnabled?'включено для подходящих промежуточных строк':'выключено'}. Верхний отступ — ${topY.toFixed(1)} мм${type==='math-notebook'?' (2 клетки)':''}; дополнительного нижнего отступа нет. Нижний предел — ${bottomY<h?'граница рабочей области пластины':'физический край листа'}.`;
  $('layoutStatus').className='status '+(errors.length?'bad':'ok');
  $('bedStatus').textContent=errors.length?errors.join(' '):`Угол листа: X ${cornerX.toFixed(1)} · Y ${cornerMachineY.toFixed(1)} мм. Головка подходит к нему с поднятой ручкой.`;$('bedStatus').className='bed-status '+(errors.length?'bad':'ok');
- const pauseSecs=getPause2Seconds();$('routeStatus').textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано непосредственно над верхним левым углом листа. Автоматическая остановка — ${formatDuration(pauseSecs)}.`:`Этап 3: после ${formatDuration(pauseSecs)} головка перемещается к первой букве с поднятой ручкой.`;
+ const pauseSecs=getPause2Seconds();$('routeStatus').textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Автоматическая остановка — ${formatDuration(pauseSecs)}.`:`Этап 3: после ${formatDuration(pauseSecs)} головка перемещается к первой букве с поднятой ручкой.`;
  ['stage1','stage2','stage3'].forEach((id,i)=>$(id).setAttribute('aria-pressed',String(viewStage===i+1)));
- const checks=[['Размер бумаги',`${w} × ${h} мм`],['Вид листа',type==='a4-plain'?'чистый A4':type==='math-notebook'?'клетка 5 мм':type==='russian-notebook'?'линейка':'пользовательский'],['Отступ слева',`${startX.toFixed(1)} мм · ${(startX/cell).toFixed(1)} клетки`],['Красная строка',indentEnabled?`${paraIndent.toFixed(1)} мм у русских абзацев`:'выключена · без абзацного отступа'],['Заполнение строк',justifyEnabled?'до правой границы · промежуточные строки':'выключено · обычный край'],['Нижняя граница',bottomY<h?`предел пластины · ${bottomY.toFixed(1)} мм от верха`:'край самого листа'],['Поддержка пластины',pl.overBottom||pl.overLeft||pl.overRight?'есть неподдерживаемая часть':'лист помещается'],['Передний язычок пластины',pl.tabOverlap?'БУМАГА ПЕРЕКРЫВАЕТ ЗАПРЕТНУЮ ЗОНУ':'зона свободна · запас 18 мм'],['Остановка у угла',`${getPause2Seconds()} секунд · X ${cornerX.toFixed(1)} / Y ${cornerMachineY.toFixed(1)} мм`],['Правая граница',type==='a4-plain'?'край бумаги · резерв 1,5 мм':`${red} мм от края · резерв перед линией 1,5 мм`],['Почерк',profile.title],['Скорость письма',`${profile.drawFeed} мм/мин`],['Текст',`${txt.length} символов`]];
+ const checks=[['Размер бумаги',`${w} × ${h} мм`],['Вид листа',type==='a4-plain'?'чистый A4':type==='math-notebook'?'клетка 5 мм':type==='russian-notebook'?'линейка':'пользовательский'],['Отступ слева',`${startX.toFixed(1)} мм · ${(startX/cell).toFixed(1)} клетки`],['Красная строка',indentEnabled?`${paraIndent.toFixed(1)} мм у русских абзацев`:'выключена · без абзацного отступа'],['Заполнение строк',justifyEnabled?'до правой границы · промежуточные строки':'выключено · обычный край'],['Нижняя граница',bottomY<h?`предел пластины · ${bottomY.toFixed(1)} мм от верха`:'край самого листа'],['Поддержка пластины',pl.overBottom||pl.overLeft||pl.overRight?'есть неподдерживаемая часть':'лист помещается'],['Передний язычок пластины',pl.tabOverlap?'БУМАГА ПЕРЕКРЫВАЕТ ЗАПРЕТНУЮ ЗОНУ':'зона свободна · запас 18 мм'],['Остановка у края листа',`${getPause2Seconds()} секунд · X ${(Math.max(3,cornerX-3)).toFixed(1)} / Y ${Math.max(3,cornerMachineY-3).toFixed(1)} мм · отступ 3 мм`],['Правая граница',type==='a4-plain'?'край бумаги · резерв 1,5 мм':`${red} мм от края · резерв перед линией 1,5 мм`],['Почерк',profile.title],['Скорость письма',`${profile.drawFeed} мм/мин`],['Текст',`${txt.length} символов`]];
  $('checks').innerHTML=checks.map(([a,b])=>`<div class="check"><b>${a}</b>${b}</div>`).join('');
  updateLiveStats(txt,lines,bottomY,textBottom,h);
  lastModel={w,h,lh,pitch,left:startX,top:topY,rightX,bottomY,red,pl,lines,baseline0,fontSize,mode,hand,profile,type,txt,errors,indentEnabled,paraIndent,justifyEnabled,cornerX,cornerY,routeTolerance:profile.routeTolerance||.12,textBounds:{left:textLeft,right:textRight,top:textTop,bottom:textBottom}};
@@ -1046,7 +1046,7 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  const homeIndex=lines.findIndex(line=>line.startsWith('G28 ; home all axes'));
  const safeLine='G1 Z'+Number(zSettings.safe).toFixed(3)+' F1200 ; safe height above plate';
  const safeIndex=lines.indexOf(safeLine);
- const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle parks directly over the upper-left paper corner';
+ const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle parks 3 mm left and 3 mm below the paper top-left corner';
  const parkIndex=lines.indexOf(parkLine);
  const travelIndex=lines.findIndex((line,i)=>i>pause2Index&&line==='G1 Z'+Number(zSettings.travel).toFixed(3)+' F1200');
  if(!(manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<pause2Index&&pause2Index<travelIndex))fail('нарушен порядок: ручная пауза → homing → безопасная высота → парковка сопла у края листа → вторая выдержка → движение к тексту.');
@@ -1099,7 +1099,7 @@ async function generateGcode(){
   `; Safety interlock: write Z must be between ${Z_LIMITS.min} and ${Z_LIMITS.max} mm.`,
   `; Z coordinates are absolute machine coordinates after homing; verify actual nozzle/pen-holder clearance physically.`,
   `; Pause 1 is manual (M400 U1). Remove pen holder before homing if clearance is unverified. After Resume: G28 homes all axes.`,
-  `; Pause 2: automatic ${pauseSeconds}s dwell with nozzle parked directly over the upper-left paper corner at safe Z ${fmtZ(zSettings.safe)} mm (M400 S${pauseSeconds}); no second Resume needed.`,
+  `; Pause 2: automatic ${pauseSeconds}s dwell with nozzle parked 3 mm left and 3 mm below the paper top-left corner at safe Z ${fmtZ(zSettings.safe)} mm (M400 S${pauseSeconds}); no second Resume needed.`, 
   `; WARNING: verify paper fixing and pen Z calibration with a short supervised test.`,
   `M73 P0 R1 ; initialize Bambu print progress`,
   `G21 ; metric units`,
@@ -1108,9 +1108,9 @@ async function generateGcode(){
   `G28 ; home all axes`,
   `G1 Z${fmtZ(zSettings.safe)} F1200 ; safe height above plate`,
   `M400`,
-  `G0 X${park.x.toFixed(3)} Y${park.y.toFixed(3)} F2000 ; nozzle parks directly over the upper-left paper corner`,
+  `G0 X${park.x.toFixed(3)} Y${park.y.toFixed(3)} F2000 ; nozzle parks 3 mm left and 3 mm below the paper top-left corner`,
   `M400`,
-  `M400 S${pauseSeconds} ; SECOND STOP: nozzle is directly over the upper-left paper corner; automatic dwell; no Resume tap needed`,
+  `M400 S${pauseSeconds} ; SECOND STOP: nozzle is parked 3 mm left and 3 mm below the paper top-left corner; automatic dwell; no Resume tap needed`,
   `; After the ${pauseSeconds}-second corner dwell: lower to pen-up travel Z, move to first text stroke, then write`,
   `G1 Z${fmtZ(zSettings.travel)} F1200`,
   ...draw,
