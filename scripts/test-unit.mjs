@@ -102,14 +102,14 @@ const validGcode=[
   "G0 X128.000 Y246.000 F2000 ; park/present bed",
   "M400",
   "; END"
-].join('\\n')+'\\n';
+].join('\n')+'\n';
 assert(context.validateGeneratedGcode(validGcode,130,{x:45.5,y:253},{safe:50,travel:34})===true,'G-code preflight accepts plain raw ASCII output with both pauses and safe corner parking');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 P30000\\nM400 S130'),130,{x:45.5,y:253},{safe:50,travel:34}),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G21 ; metric units','M104 S0\\nG21 ; metric units'),130,{x:45.5,y:253},{safe:50,travel:34}),/нагревателями/,'G-code preflight rejects startup heater/fan shutdown commands');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 P30000\nM400 S130'),130,{x:45.5,y:253},{safe:50,travel:34}),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G21 ; metric units','M104 S0\nG21 ; metric units'),130,{x:45.5,y:253},{safe:50,travel:34}),/нагревателями/,'G-code preflight rejects startup heater/fan shutdown commands');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:45.5,y:253},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M73 P100'),130,{x:45.5,y:253},{safe:50,travel:34}),/ручная пауза/,'G-code preflight rejects a missing manual pause');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,{x:45.5,y:253},{safe:50,travel:34}),/нарушен порядок/,'G-code preflight rejects a second pause at an unexpected Z level');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('; Title: test','; HEADER_BLOCK_START\\n; Title: test'),130,{x:45.5,y:253},{safe:50,travel:34}),/контейнерными блоками/,'G-code preflight rejects Bambu Studio container markers');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('; Title: test','; HEADER_BLOCK_START\n; Title: test'),130,{x:45.5,y:253},{safe:50,travel:34}),/контейнерными блоками/,'G-code preflight rejects Bambu Studio container markers');
 let z = context.getPenZSettings();
 assert(z.write === 30 && z.travel === 34 && z.safe === 50, 'Default Z=30 produces write/travel/safe levels 30/34/50');
 zInput = '10';
