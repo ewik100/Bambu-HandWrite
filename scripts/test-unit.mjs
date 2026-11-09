@@ -92,12 +92,11 @@ assert(context.getJustifyCorrectionScale(justifyLines,[{x:10,width:100}],100,1,1
 assert(context.getJustifyCorrectionScale(justifyLines,[{x:10,width:80}],100,1,1)===1,'SVG calibration leaves a line unchanged when it already fits');
 assert(context.getJustifyCorrectionScale([{text:'singleword',extraWordSpace:4}],[{x:10,width:100}],100,1,1)===1,'SVG calibration ignores lines without spaces');
 const validGcode=[
-  "; Bambu HandWrite 5.3.0 - raw G-code for Bambu Lab A1",
+  "; Bambu HandWrite 5.4.0 - raw G-code for Bambu Lab A1",
   "; Title: test",
+  "M73 P0 R1",
   "G21 ; metric units",
   "G90 ; absolute positioning",
-  "M83 ; relative extrusion mode; no E moves",
-  "M400",
   "M400 U1 ; manual pause",
   "G28 ; home all axes",
   "G1 Z50.000 F1200 ; safe height above plate",
@@ -124,6 +123,7 @@ const validGcode=[
   "G1 Z34.000 F1200",
   "G1 Z50.000 F1200 ; final safe lift",
   "G0 X128.000 Y246.000 F2000 ; park/present bed",
+  "M73 P100 R0",
   "M400",
   "; END"
 ].join('\n')+'\n';
@@ -138,10 +138,12 @@ throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X210.500 Y253.0
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M400 U0'),130,testPause,testSidePark,testPage,testZ),/ручная пауза/,'G-code preflight rejects a missing manual pause');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 P30000 ; unsupported wait\nM400 S130 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S130 — SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M83 ; relative extrusion mode; no E moves','M73 P0 R1'),130,testPause,testSidePark,testPage,testZ),/M73/,'G-code preflight rejects progress markers');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P0 R1\n',''),130,testPause,testSidePark,testPage,testZ),/стартовый маркер M73/,'G-code preflight requires the original start progress marker');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P100 R0\n',''),130,testPause,testSidePark,testPage,testZ),/завершающий маркер M73/,'G-code preflight requires the original completion progress marker');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G90 ; absolute positioning','G90 ; absolute positioning\nM83 ; relative extrusion mode; no E moves'),130,testPause,testSidePark,testPage,testZ),/M83/,'G-code preflight rejects the unnecessary extrusion mode');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,testPause,testSidePark,testPage,testZ),/нарушен восстановленный порядок/,'G-code preflight rejects an unexpected second-pause height');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('; Title: test','; HEADER_BLOCK_START\n; Title: test'),130,testPause,testSidePark,testPage,testZ),/контейнерные блоки/,'G-code preflight rejects Bambu Studio container markers');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G0 X128.000 Y246.000 F2000 ; park/present bed\nM400\n; END','G0 X128.000 Y246.000 F2000 ; park/present bed\n; END'),130,testPause,testSidePark,testPage,testZ),/финальной последовательности|нарушена восстановленная последовательность завершения/,'G-code preflight rejects a damaged completion sequence');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G0 X128.000 Y246.000 F2000 ; park/present bed\nM73 P100 R0\nM400\n; END','G0 X128.000 Y246.000 F2000 ; park/present bed\nM73 P100 R0\n; END'),130,testPause,testSidePark,testPage,testZ),/финальной последовательности|нарушена восстановленная последовательность завершения/,'G-code preflight rejects a damaged completion sequence');
 let z = context.getPenZSettings();
 assert(z.write === 30 && z.travel === 34 && z.safe === 50, 'Default Z=30 produces write/travel/safe levels 30/34/50');
 zInput = '10';
