@@ -29,7 +29,7 @@ if (html) {
   for (const marker of ['Bambu HandWrite 5.2.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.0.1, letter-size fixes and both line-spacing modes are present');
+  if (!errors.length) ok('Version 5.2.0, letter-size fixes and both line-spacing modes are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
