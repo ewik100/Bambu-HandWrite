@@ -2,7 +2,7 @@
 
 **Bambu HandWrite** — небольшое браузерное приложение, которое превращает набранный текст в рукописный макет и строит для него G-code: команды перемещения головки 3D-принтера.
 
-> **Важно:** это независимый проект сообщества, а не программа Bambu Lab. В 5.2.0 генератор переключён с контейнерного формата Bambu Studio на обычный исполняемый G-code: удалены неполные служебные блоки HEADER/CONFIG/EXECUTABLE и команды выключения нагревателей/вентилятора в начале. Для задержки используется только `M400 S...`: на тестовом Bambu A1 `M400 S30` ждал около 30 секунд, а `M400 P30000` завершался сразу. Это обоснованное диагностикой изменение, но полная физическая печать нового файла ещё не подтверждена. Координаты, геометрия штрихов и высоты Z не менялись. Перед полноценной работой проверьте запуск коротким контролируемым тестом и прочитайте [инструкцию для начинающих](docs/USER_GUIDE_RU.md) и [правила безопасности](docs/SAFETY.md).
+> **Важно:** это независимый проект сообщества, а не программа Bambu Lab. В 5.2.0 добавлена калибровка растяжения пробелов по фактической ширине SVG-строки, усилена предполётная проверка команд движения и добавлено повторное чтение экспортированного файла. Координаты, геометрия штрихов, размеры букв и высоты Z сохранены. Исправление мгновенного завершения печати пока не подтверждено физическим запуском на A1; для этого необходим контрольный тест после форматирования карты и сравнение с заведомо работающим файлом из Bambu Studio. Перед полноценной работой проверьте запуск коротким контролируемым тестом и прочитайте [инструкцию для начинающих](docs/USER_GUIDE_RU.md) и [правила безопасности](docs/SAFETY.md).
 
 ## Запустить программу
 
@@ -107,4 +107,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 4.8 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 5.2.0 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
