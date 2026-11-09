@@ -98,7 +98,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.0.1.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',
