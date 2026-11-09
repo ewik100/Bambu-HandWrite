@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<title>Bambu HandWrite 5.2.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.3.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#20252b;background:#f5f1e8;--ink:#183c70;--muted:#65707b;--line:#dce4e9;--accent:#263b54}*{box-sizing:border-box}body{margin:0;padding:14px;max-width:980px;margin-inline:auto}header{padding:8px 2px 12px}h1{font-size:25px;margin:0 0 5px}h2{font-size:17px;margin:0 0 12px}.sub{margin:0;color:var(--muted);font-size:14px;line-height:1.45}.card{background:#fff;border:1px solid #e2ddd3;border-radius:17px;padding:15px;margin:11px 0;box-shadow:0 2px 12px #00000008}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.wide{grid-column:1/-1}label{display:block;font-size:13px;color:#4d5660}input,textarea,select{width:100%;padding:11px;border:1px solid #cfd5db;border-radius:10px;font:inherit;margin-top:5px;background:white;color:#20252b}textarea{min-height:116px;resize:vertical;line-height:1.4}input:focus,textarea:focus,select:focus{outline:2px solid #96b5d2;outline-offset:1px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.btn{border:0;border-radius:11px;padding:12px 15px;font-weight:650;background:var(--accent);color:white;min-height:44px;cursor:pointer}.btn.secondary{background:#e8edf2;color:#263b54}.btn.ghost{background:#f8f8f7;color:#263b54;border:1px solid #d8dee3}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.status{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.4}.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;border-radius:999px;background:#eef4ef;color:#2f6544}.pill.loading{background:#fff3dc;color:#76551c}.pill.offline{background:#fff0ed;color:#884132}.pill:before{content:"";height:7px;width:7px;border-radius:50%;background:currentColor}.preview-head{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}.paper-wrap{overflow:auto;background:#e8e4dc;padding:12px;border-radius:13px;margin-top:12px}#paper{display:block;background:white;max-width:100%;height:auto;box-shadow:0 2px 12px #0002;margin:auto}.status.ok{color:#28613a;font-weight:650}.status.bad{color:#a12c25;font-weight:700}.warning{background:#fff4dc;border:1px solid #f0d28b;border-radius:12px;padding:12px;color:#694c13;font-size:13px;line-height:1.45}.good{background:#edf5ef;border:1px solid #cde1d1;border-radius:12px;padding:12px;color:#315e3b;font-size:13px;line-height:1.45}.tiny{font-size:11px;color:var(--muted)}.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check{border:1px solid #e1e5e8;border-radius:10px;padding:9px;font-size:12px}.check b{display:block;font-size:13px;margin-bottom:3px}.mono{font-variant-numeric:tabular-nums}.orientation-guide{margin-top:12px;padding:12px;border:1px solid #d5e2eb;border-radius:12px;background:#f4f8fb;color:#29445c;font-size:13px;line-height:1.45}.orientation-head{font-weight:700;margin-bottom:8px}.orientation-flow{display:grid;grid-template-columns:1fr;justify-items:center;gap:5px;text-align:center}.orientation-edge{font-size:11px;font-weight:700;letter-spacing:.02em;color:#53697b}.orientation-arrow{font-size:13px;font-weight:700;color:#315e86}.orientation-sheet{width:min(190px,70%);min-height:118px;border:2px solid #95a8b6;border-radius:5px;background:repeating-linear-gradient(0deg,transparent 0 15px,#d8e8f1 15px 16px),repeating-linear-gradient(90deg,transparent 0 15px,#d8e8f1 15px 16px),#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:9px 5px;box-shadow:0 2px 5px #00000010}.orientation-sheet strong{font-size:10px;color:#53697b}.orientation-sheet span{font-family:cursive;color:#244e79;font-size:19px}.orientation-axes{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:650}.orientation-explain{margin:8px 0 0;color:#465b6d}.orientation-guide .note{font-size:11px;color:#647584;margin:6px 0 0}
@@ -359,14 +359,16 @@ Hello, world!</textarea></label>
     <div class="route-controls" aria-label="Этапы маршрута пера">
       <button class="route-btn" id="stage1" type="button" aria-pressed="false">1 · Пауза 1<br>Подготовка</button>
       <button class="route-btn" id="stage2" type="button" aria-pressed="true">2 · Остановка у угла<br>130 сек по умолч.</button>
-      <button class="route-btn" id="stage3" type="button" aria-pressed="false">3 · Начало письма</button>
+      <button class="route-btn" id="stage3" type="button" aria-pressed="false">3 · Контур + лист<br>50 сек</button>
     </div>
     <p id="routeStatus" class="route-status" aria-live="polite"></p>
     <p id="bedStatus" class="bed-status" aria-live="polite"></p>
-    <details class="pause-details"><summary>Что делать во время двух остановок</summary><div class="pause-guide">
-      <div class="pause-item"><b>Пауза 1 — подготовка</b>Закрепи бумагу и проверь свободный ход. Перед поиском нуля (G28) сними с головки держатель ручки, если его безопасный проход при homing не проверен. После продолжения принтер выполнит homing.</div>
-      <div class="pause-item"><b>Остановка 2 — установка ручки</b>После homing сопло остановится на 3 мм снаружи левого края и на 3 мм ниже верхнего края листа, на безопасной высоте. Это точка парковки сопла, а не точка пера. Во время выдержки установи держатель и ручку и проверь зазор. По окончании времени работа продолжится сама — повторно нажимать «Продолжить» не нужно.</div>
-      <div class="pause-item"><b>После автоматической остановки</b>Ручка остаётся поднятой, головка перемещается от угла к рассчитанному началу первой строки. Опускается только перед письмом.</div>
+    <details class="pause-details"><summary>Паузы, контур и установка листа</summary><div class="pause-guide">
+      <div class="pause-item"><b>До запуска — защитный A4</b>Положи нижний защитный лист A4 на пластину и надёжно зафиксируй его до начала задания. Контур будет нарисован именно на нём.</div>
+      <div class="pause-item"><b>Пауза 1 — подготовка</b>Проверь защитный A4 и свободный ход. Перед G28 сними держатель ручки, если его безопасный проход при homing не проверен.</div>
+      <div class="pause-item"><b>Пауза 2 — над верхним левым углом</b>После homing сопло остановится непосредственно над верхним левым углом будущего листа на безопасной высоте. Это автоматическая выдержка; второй раз нажимать «Продолжить» не нужно. Заверши установку держателя и проверь зазор.</div>
+      <div class="pause-item"><b>Контур на защитном A4</b>После второй остановки ручка обведёт прямоугольник точного размера выбранного листа на нижнем защитном A4.</div>
+      <div class="pause-item"><b>50 секунд для установки</b>Головка поднимется и отъедет в сторону за границы рабочего листа. Пока она неподвижна на безопасной высоте, положи рабочий лист точно по контуру. Через 50 секунд письмо начнётся автоматически. Учти толщину второго листа и проверь, что держатель ручки допускает её.</div>
     </div></details>
   </div>
 </section>
@@ -404,7 +406,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.2.0 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.3.0 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -452,7 +454,19 @@ function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent){
  return uppercaseAscent>0?Math.min(1,(lowercaseAscent*1.08)/uppercaseAscent):1;
 }
 function findLargestFittingTenth(currentMm,fitsAt){let low=20,high=Math.floor((currentMm-.001)*10),best=null;while(low<=high){const mid=Math.floor((low+high)/2);if(fitsAt(mid/10)){best=mid;low=mid+1}else high=mid-1}return best===null?null:best/10}
-function getCornerPausePosition(pageX,pageMachineY){return {x:Math.max(3,pageX-3),y:Math.max(3,pageMachineY-3)}}
+function getCornerPausePosition(pageX,pageMachineY){return {x:Math.max(3,Math.min(253,pageX)),y:Math.max(3,Math.min(253,pageMachineY))}}
+function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,tab){
+ const left=Number(pageX),top=Number(pageMachineY),right=left+Number(pageWidth),bottom=top-Number(pageHeight),centerX=(left+right)/2,centerY=(top+bottom)/2;
+ const candidates=[{x:right+8,y:centerY,clearance:253-right},{x:left-8,y:centerY,clearance:left-3},{x:centerX,y:bottom-8,clearance:bottom-3},{x:centerX,y:top+8,clearance:253-top}];
+ const usable=candidates.filter(p=>{
+  if(!Number.isFinite(p.x)||!Number.isFinite(p.y)||p.x<3||p.x>253||p.y<3||p.y>253)return false;
+  const bedY=253-p.y,t=tab||{};
+  const inTab=Number.isFinite(t.x)&&Number.isFinite(t.w)&&bedY>=256-(Number(t.clearance)||0)&&bedY<=256+(Number(t.depth)||0)&&p.x>=t.x&&p.x<=t.x+t.w;
+  return !inTab;
+ }).sort((a,b)=>b.clearance-a.clearance);
+ if(!usable.length)throw Error('Не осталось безопасного места сбоку листа для 50-секундной установки. Уменьши размер листа или измени его положение.');
+ return {x:Number(usable[0].x.toFixed(3)),y:Number(usable[0].y.toFixed(3))};
+}
 const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
 function startOptionalFontStylesheet(){
@@ -623,7 +637,7 @@ function updatePauseUI(){
  $('pauseLive').textContent=`Пауза у угла: ${formatDuration(sec)}.`;
  $('stage2').innerHTML=`2 · Остановка у угла<br>${formatDuration(sec)}`;
  document.querySelectorAll('[data-pause-seconds]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.pauseSeconds)===sec)));
- const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: подготовка и первая пауза перед homing.':viewStage===2?`Этап 2: сопло припарковано на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Автоматическая остановка — ${formatDuration(sec)}.`:`Этап 3: после ${formatDuration(sec)} головка перемещается к первой букве с поднятой ручкой.`;}
+ const stage=$('routeStatus');if(stage&&typeof viewStage!=='undefined'){stage.textContent=viewStage===1?'Этап 1: защитный лист A4 закреплён; первая ручная пауза перед homing.':viewStage===2?`Этап 2: сопло остановлено непосредственно над верхним левым углом будущего листа. Автоматическая выдержка — ${formatDuration(sec)}.`:'Этап 3: после второй остановки ручка рисует контур на защитном A4, затем головка отъезжает за край и ждёт 50 секунд для укладки рабочего листа по контуру.';}
 }
 function updateLiveStats(txt,lines,bottom,inkBottom,pageHeight){
  const clean=String(txt||'').trim(),words=clean?clean.split(/\s+/u).length:0,visible=lines.filter(x=>!x.blank).length;
@@ -1001,7 +1015,7 @@ function renderQuality(d){
  if(d.warnings.length){panel.className='quality-panel warn';panel.innerHTML=`<b>Есть подозрительные штрихи — обязательно проверь визуализацию.</b><ul>${d.warnings.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><p>Автоматически отличить все точки/знаки от обрывков букв надёжно нельзя; подозрительные короткие фрагменты не удалялись.</p>`;return}
  panel.className='quality-panel ok';panel.innerHTML=`<b>Проверка траектории пройдена.</b><p>Дубликаты и выход за безопасные границы не обнаружены. Предпросмотр маршрута доступен ниже.</p>`;
 }
-function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
+function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings){
  const fail=message=>{throw Error('Проверка G-code не пройдена: '+message)};
  if(typeof file!=='string'||!file.endsWith('\n'))fail('файл должен завершаться переводом строки.');
  if(file.charCodeAt(0)===0xFEFF||file.includes('\r'))fail('обнаружен BOM или нестандартный перевод строки.');
@@ -1010,51 +1024,53 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  const forbiddenMarkers=['; HEADER_BLOCK_START','; HEADER_BLOCK_END','; CONFIG_BLOCK_START','; CONFIG_BLOCK_END','; EXECUTABLE_BLOCK_START','; EXECUTABLE_BLOCK_END'];
  if(lines.some(line=>forbiddenMarkers.includes(line)))fail('обнаружены контейнерные блоки Bambu Studio; генератор должен выдавать обычный исполняемый G-code.');
  const manual=lines.map((line,i)=>line.startsWith('M400 U1')?i:-1).filter(i=>i>=0);
- const timed=lines.map((line,i)=>line.startsWith('M400 S'+pauseSeconds+' ')?i:-1).filter(i=>i>=0);
+ const cornerDwell=lines.map((line,i)=>line.startsWith('M400 S'+pauseSeconds+' ; SECOND STOP')?i:-1).filter(i=>i>=0);
+ const placementDwell=lines.map((line,i)=>line==='M400 S50 ; 50-second placement window'?i:-1).filter(i=>i>=0);
  if(manual.length!==1)fail('должна быть ровно одна первая ручная пауза M400 U1.');
- if(timed.length!==1)fail('должна быть ровно одна вторая автоматическая пауза M400 S'+pauseSeconds+'.');
+ if(cornerDwell.length!==1)fail('должна быть ровно одна вторая автоматическая остановка M400 S'+pauseSeconds+'.');
+ if(placementDwell.length!==1)fail('должно быть ровно одно 50-секундное окно для установки листа после контура.');
+ if(lines.filter(line=>/^M400 S\d+\b/.test(line)).length!==2)fail('допускаются только две выдержки: остановка у угла и 50-секундная установка листа.');
  if(lines.some(line=>/^M400 P(?:\d|\s|$)/.test(line)))fail('M400 P отключена: на проверенном A1 эта команда завершила короткий тест сразу.');
- const progressStart=lines.map((line,i)=>/^M73 P0 R1(?:\s|$)/.test(line)?i:-1).filter(i=>i>=0);
- const progressEnd=lines.map((line,i)=>/^M73 P100 R0(?:\s|$)/.test(line)?i:-1).filter(i=>i>=0);
- if(progressStart.length!==1||progressEnd.length!==1||progressStart[0]>=progressEnd[0])fail('нужны ровно один начальный M73 P0 R1 и один завершающий M73 P100 R0.');
+ if(lines.some(line=>/^M73\b/.test(line)))fail('маркеры M73 отключены: используется восстановленная последовательность без маркеров прогресса.');
+ if(lines.filter(line=>line.startsWith('M83 ; relative extrusion mode; no E moves')).length!==1)fail('должна быть восстановлена исходная команда M83 без оси E.');
  if(lines.some(line=>/^M(?:104|140|106)\b/.test(line)))fail('в начале pen-plotter файла не должно быть команд управления нагревателями или вентилятором.');
- const allowed=new Set(['G0','G1','G21','G28','G90','M73','M400']);
- for(const line of lines){
-  const trimmed=line.trim();
-  if(!trimmed||trimmed.startsWith(';'))continue;
-  const command=trimmed.split(/\s+/,1)[0];
-  if(!allowed.has(command))fail('обнаружена непроверенная команда '+command+'.');
- }
+ const allowed=new Set(['G0','G1','G21','G28','G90','M83','M400']);
+ for(const line of lines){const trimmed=line.trim();if(!trimmed||trimmed.startsWith(';'))continue;const command=trimmed.split(/\s+/,1)[0];if(!allowed.has(command))fail('обнаружена непроверенная команда '+command+'.');}
  const executable=lines.map((line,index)=>({line,index,text:line.split(';',1)[0].trim()})).filter(x=>x.text);
- if(executable[0]?.text!=='M73 P0 R1'||executable[1]?.text!=='G21'||executable[2]?.text!=='G90'||!executable[3]?.text.startsWith('M400 U1'))fail('неверное начало файла: ожидаются M73 P0 R1 → G21 → G90 → ручная пауза M400 U1.');
- const endIndex=lines.lastIndexOf('; END');
- if(endIndex<0||lines.slice(endIndex+1).some(line=>line.trim()))fail('после маркера ; END не должно быть никаких данных.');
+ if(executable.slice(0,5).map(x=>x.text).join('|')!=='G21|G90|M83|M400|M400 U1')fail('неверное начало файла: ожидаются G21 → G90 → M83 → M400 → M400 U1.');
+ const endIndex=lines.lastIndexOf('; END');if(endIndex<0||lines.slice(endIndex+1).some(line=>line.trim()))fail('после маркера ; END не должно быть никаких данных.');
  let xyMoves=0,zMoves=0,drawMoves=0;
- for(const item of executable){
-  const t=item.text,cmd=t.split(/\s+/,1)[0];
-  if(cmd==='G0'||cmd==='G1'){
-   if(!/^G[01](?:\s+[XYZF]-?\d+(?:\.\d+)?)*$/.test(t))fail('неверный формат команды движения в строке '+(item.index+1)+'.');
-   const axes=[...t.matchAll(/([XYZF])(-?\d+(?:\.\d+)?)/g)];
-   if(!axes.length)fail('пустая команда движения в строке '+(item.index+1)+'.');
-   for(const a of axes){const v=Number(a[2]);if(!Number.isFinite(v))fail('некорректная координата в строке '+(item.index+1)+'.');if(a[1]==='X'||a[1]==='Y'){if(v<3||v>253)fail('координата '+a[1]+' выходит за пределы безопасной области в строке '+(item.index+1)+'.');}if(a[1]==='Z'){if(v<0||v>256)fail('координата Z выходит за физический ход A1 в строке '+(item.index+1)+'.');zMoves++;}}
-   if(axes.some(a=>a[1]==='X'||a[1]==='Y'))xyMoves++;
-   if(cmd==='G1'&&axes.some(a=>a[1]==='X'||a[1]==='Y'))drawMoves++;
-  }
- }
+ for(const item of executable){const t=item.text,cmd=t.split(/\s+/,1)[0];if(cmd==='G0'||cmd==='G1'){if(!/^G[01](?:\s+[XYZF]-?\d+(?:\.\d+)?)*$/.test(t))fail('неверный формат команды движения в строке '+(item.index+1)+'.');const axes=[...t.matchAll(/([XYZF])(-?\d+(?:\.\d+)?)/g)];if(!axes.length)fail('пустая команда движения в строке '+(item.index+1)+'.');for(const a of axes){const v=Number(a[2]);if(!Number.isFinite(v))fail('некорректная координата в строке '+(item.index+1)+'.');if(a[1]==='X'||a[1]==='Y'){if(v<3||v>253)fail('координата '+a[1]+' выходит за пределы безопасной области в строке '+(item.index+1)+'.');}if(a[1]==='Z'){if(v<0||v>256)fail('координата Z выходит за физический ход A1 в строке '+(item.index+1)+'.');zMoves++;}}if(axes.some(a=>a[1]==='X'||a[1]==='Y'))xyMoves++;if(cmd==='G1'&&axes.some(a=>a[1]==='X'||a[1]==='Y'))drawMoves++;}}
  if(!xyMoves||!zMoves||!drawMoves)fail('неполный маршрут: нужны перемещения XY, изменения Z и рисующие G1 XY.');
- const manualIndex=manual[0],pause2Index=timed[0];
+ const fmtZ=n=>Number(n).toFixed(3),manualIndex=manual[0],cornerDwellIndex=cornerDwell[0],placementDwellIndex=placementDwell[0];
  const homeIndex=lines.findIndex(line=>line.startsWith('G28 ; home all axes'));
- const safeLine='G1 Z'+Number(zSettings.safe).toFixed(3)+' F1200 ; safe height above plate';
- const safeIndex=lines.indexOf(safeLine);
- const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle parks 3 mm left and 3 mm below the paper top-left corner';
- const parkIndex=lines.indexOf(parkLine);
- const travelIndex=lines.findIndex((line,i)=>i>pause2Index&&line==='G1 Z'+Number(zSettings.travel).toFixed(3)+' F1200');
- if(!(manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<pause2Index&&pause2Index<travelIndex))fail('нарушен порядок: ручная пауза → homing → безопасная высота → парковка сопла у края листа → вторая выдержка → движение к тексту.');
- for(let i=safeIndex+1;i<pause2Index;i++){if(/^G[01] Z/.test(lines[i]))fail('высота Z меняется во время второй остановки; сопло должно оставаться на заданной безопасной высоте.');}
- const finalProgressCommand=(lines[lines.length-3]||'').split(';',1)[0].trim();
- const finalSyncCommand=(lines[lines.length-2]||'').split(';',1)[0].trim();
- if(finalProgressCommand!=='M73 P100 R0'||finalSyncCommand!=='M400'||lines[lines.length-1]!=='; END')fail('файл должен завершаться M73 P100 R0 → M400 → ; END.');
- if(!lines.some(line=>/^G1 X/.test(line)))fail('в файле нет команд рисования.');
+ const safeLine='G1 Z'+fmtZ(zSettings.safe)+' F1200 ; safe height above plate',safeIndex=lines.indexOf(safeLine,homeIndex);
+ const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle pauses directly above the paper top-left corner',parkIndex=lines.indexOf(parkLine);
+ if(!(lines.indexOf('M400')<manualIndex&&manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<cornerDwellIndex))fail('нарушен восстановленный порядок: M83 → sync → ручная пауза → homing → безопасная высота → остановка над верхним левым углом листа.');
+ for(let i=safeIndex+1;i<cornerDwellIndex;i++){if(/^G[01] Z/.test(lines[i]))fail('высота Z меняется во время второй остановки; сопло должно оставаться на безопасной высоте.');}
+ const left=Number(page.x),top=Number(page.y),right=left+Number(page.w),bottom=top-Number(page.h);
+ if(left<3||right>253||top>253||bottom<3)fail('контур листа выходит за безопасную рабочую область.');
+ if(placementPark.x<3||placementPark.x>253||placementPark.y<3||placementPark.y>253)fail('точка ожидания установки листа выходит за безопасную область.');
+ if(placementPark.x>=left&&placementPark.x<=right&&placementPark.y<=top&&placementPark.y>=bottom)fail('точка 50-секундного ожидания должна находиться за пределами листа.');
+ const outlineLines=[
+  'G1 Z'+fmtZ(zSettings.travel)+' F1200 ; pen up before drawing the page outline',
+  'G0 X'+left.toFixed(3)+' Y'+top.toFixed(3)+' F1900 ; outline start on protective A4',
+  'G1 Z'+fmtZ(zSettings.write)+' F1200 ; draw outline on protective A4',
+  'G1 X'+right.toFixed(3)+' Y'+top.toFixed(3)+' F1250 ; outline top edge',
+  'G1 X'+right.toFixed(3)+' Y'+bottom.toFixed(3)+' F1250 ; outline right edge',
+  'G1 X'+left.toFixed(3)+' Y'+bottom.toFixed(3)+' F1250 ; outline bottom edge',
+  'G1 X'+left.toFixed(3)+' Y'+top.toFixed(3)+' F1250 ; close outline',
+  'G1 Z'+fmtZ(zSettings.safe)+' F1200 ; lift before sheet placement',
+  'G0 X'+Number(placementPark.x).toFixed(3)+' Y'+Number(placementPark.y).toFixed(3)+' F2000 ; move clear of page for placement',
+  'M400','M400 S50 ; 50-second placement window',
+  'G1 Z'+fmtZ(zSettings.travel)+' F1200 ; pen-up travel after placement'
+ ];
+ const outlineStart=lines.indexOf(outlineLines[0],cornerDwellIndex+1);
+ if(outlineStart<0||lines.slice(outlineStart,outlineStart+outlineLines.length).join('\n')!==outlineLines.join('\n'))fail('контур на защитном A4, безопасная парковка и 50-секундное окно установки листа стоят не в нужном порядке.');
+ if(!(cornerDwellIndex<outlineStart&&outlineStart<placementDwellIndex&&placementDwellIndex<lines.findIndex((line,i)=>i>placementDwellIndex&&line==='G1 Z'+fmtZ(zSettings.travel)+' F1200')))fail('контур должен идти после второй остановки, а письмо — после 50-секундного окна.');
+ const finalSafeLine='G1 Z'+fmtZ(zSettings.safe)+' F1200 ; final safe lift',finalSafeIndex=lines.lastIndexOf(finalSafeLine);
+ const finalSequence=[finalSafeLine,'G0 X128.000 Y246.000 F2000 ; park/present bed','M400','; END'];
+ if(lines.slice(finalSafeIndex,finalSafeIndex+finalSequence.length).join('\n')!==finalSequence.join('\n'))fail('нарушена восстановленная последовательность завершения: подъём → парковка → M400 → ; END.');
  return true;
 }
 let generatedGcodeUrl=null;
@@ -1085,11 +1101,11 @@ async function generateGcode(){
   setGenerationProgress(78,'Собираю маршрут пера и проверяю штрихи…');const topology=analyzeSkeleton(raster.bin,raster.w,raster.h,paths,raster.scale),result=gcodeForPaths(paths,m,raster),diag=diagnoseRoutes(raster,paths,topology,result,m);
   if(diag.fatal.length){renderQuality(diag);throw Error(diag.fatal.join(' '));}
   if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');
-  const draw=result.commands,x=m.pl.pageX,y=253-m.pl.pageY,park=getCornerPausePosition(x,y),pauseSeconds=getPause2Seconds();
+  const draw=result.commands,x=m.pl.pageX,y=253-m.pl.pageY,page={x,y,w:m.w,h:m.h},park=getCornerPausePosition(x,y),placementPark=getPagePlacementParkPosition(x,y,m.w,m.h,m.pl.tab),pauseSeconds=getPause2Seconds(),right=x+m.w,bottom=y-m.h;
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
-  `; Bambu HandWrite 5.2.0 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.2.0`,
+  `; Bambu HandWrite 5.3.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.3.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.w} x ${m.h} mm; paper top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -1099,28 +1115,39 @@ async function generateGcode(){
   `; Safety interlock: write Z must be between ${Z_LIMITS.min} and ${Z_LIMITS.max} mm.`,
   `; Z coordinates are absolute machine coordinates after homing; verify actual nozzle/pen-holder clearance physically.`,
   `; Pause 1 is manual (M400 U1). Remove pen holder before homing if clearance is unverified. After Resume: G28 homes all axes.`,
-  `; Pause 2: automatic ${pauseSeconds}s dwell with nozzle parked 3 mm left and 3 mm below the paper top-left corner at safe Z ${fmtZ(zSettings.safe)} mm (M400 S${pauseSeconds}); no second Resume needed.`, 
+  `; Pause 2: automatic ${pauseSeconds}s dwell directly above the upper-left paper corner at safe Z ${fmtZ(zSettings.safe)} mm (M400 S${pauseSeconds}); no second Resume needed.`, 
   `; WARNING: verify paper fixing and pen Z calibration with a short supervised test.`,
-  `M73 P0 R1 ; initialize Bambu print progress`,
   `G21 ; metric units`,
   `G90 ; absolute positioning`,
-  `M400 U1 ; PAUSE 1: secure paper; remove pen holder before homing if clearance is unverified; press Resume`,
+  `M83 ; relative extrusion mode; no E moves`,
+  `M400`,
+  `M400 U1 ; PAUSE 1: secure protective A4; remove pen holder before homing if clearance is unverified; press Resume`,
   `G28 ; home all axes`,
   `G1 Z${fmtZ(zSettings.safe)} F1200 ; safe height above plate`,
   `M400`,
-  `G0 X${park.x.toFixed(3)} Y${park.y.toFixed(3)} F2000 ; nozzle parks 3 mm left and 3 mm below the paper top-left corner`,
+  `G0 X${park.x.toFixed(3)} Y${park.y.toFixed(3)} F2000 ; nozzle pauses directly above the paper top-left corner`,
   `M400`,
   `M400 S${pauseSeconds} ; SECOND STOP: nozzle is parked 3 mm left and 3 mm below the paper top-left corner; automatic dwell; no Resume tap needed`,
-  `; After the ${pauseSeconds}-second corner dwell: lower to pen-up travel Z, move to first text stroke, then write`,
-  `G1 Z${fmtZ(zSettings.travel)} F1200`,
+  `; After Pause 2, draw the page outline on the protective A4 underlay.`,
+  `G1 Z${fmtZ(zSettings.travel)} F1200 ; pen up before drawing the page outline`,
+  `G0 X${x.toFixed(3)} Y${y.toFixed(3)} F1900 ; outline start on protective A4`,
+  `G1 Z${fmtZ(zSettings.write)} F1200 ; draw outline on protective A4`,
+  `G1 X${right.toFixed(3)} Y${y.toFixed(3)} F1250 ; outline top edge`,
+  `G1 X${right.toFixed(3)} Y${bottom.toFixed(3)} F1250 ; outline right edge`,
+  `G1 X${x.toFixed(3)} Y${bottom.toFixed(3)} F1250 ; outline bottom edge`,
+  `G1 X${x.toFixed(3)} Y${y.toFixed(3)} F1250 ; close outline`,
+  `G1 Z${fmtZ(zSettings.safe)} F1200 ; lift before sheet placement`,
+  `G0 X${placementPark.x.toFixed(3)} Y${placementPark.y.toFixed(3)} F2000 ; move clear of page for placement`,
+  `M400`,
+  `M400 S50 ; 50-second placement window`,
+  `G1 Z${fmtZ(zSettings.travel)} F1200 ; pen-up travel after placement`,
   ...draw,
   `G1 Z${fmtZ(zSettings.safe)} F1200 ; final safe lift`,
   `G0 X128.000 Y246.000 F2000 ; park/present bed`,
-  `M73 P100 R0 ; mark completed only after all drawing moves`,
   `M400`,
   `; END`,
 ];
-  setGenerationProgress(92,'Формирую файл G-code…');const file=head.join('\n')+'\n';validateGeneratedGcode(file,pauseSeconds,park,zSettings);const blob=new Blob([file],{type:'application/octet-stream'});const exportedBytes=await blob.arrayBuffer();if(exportedBytes.byteLength!==new TextEncoder().encode(file).byteLength)throw Error('Размер скачиваемого файла не совпадает с проверенным G-code.');const exportedText=new TextDecoder('ascii',{fatal:true}).decode(exportedBytes);if(exportedText!==file)throw Error('Содержимое скачиваемого файла отличается от проверенного G-code.');validateGeneratedGcode(exportedText,pauseSeconds,park,zSettings);
+  setGenerationProgress(92,'Формирую файл G-code…');const file=head.join('\n')+'\n';validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings);const blob=new Blob([file],{type:'application/octet-stream'});const exportedBytes=await blob.arrayBuffer();if(exportedBytes.byteLength!==new TextEncoder().encode(file).byteLength)throw Error('Размер скачиваемого файла не совпадает с проверенным G-code.');const exportedText=new TextDecoder('ascii',{fatal:true}).decode(exportedBytes);if(exportedText!==file)throw Error('Содержимое скачиваемого файла отличается от проверенного G-code.');validateGeneratedGcode(exportedText,pauseSeconds,park,placementPark,page,zSettings);
   if(generatedGcodeUrl)URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=URL.createObjectURL(blob);
   const link=$('gcodeDownload');link.href=generatedGcodeUrl;link.download=`${documentFileBase()}.gcode`;link.hidden=false;
   showPenRoute(result.strokes,raster,m);renderQuality(diag);
@@ -1128,7 +1155,7 @@ async function generateGcode(){
   $('bedStatus').textContent=`Геометрические границы проверены. Верхний левый угол: X ${cx.toFixed(1)} · Y ${cy.toFixed(1)} мм. Защитная зона язычка учтена по пользовательской настройке.`;$('bedStatus').className='bed-status ok';
   const n=draw.filter(l=>l.startsWith('G1 X')).length;
   $('gcodeStatus').textContent=`G-code сформирован: ${draw.length} команд, ${result.strokes.length} штрихов, ${n} команд движения пера.`;$('gcodeStatus').className='status gcode-ready';
-  $('gcodeDetails').innerHTML=[['Диагностика',diag.warnings.length?'есть предупреждения':'геометрические проверки пройдены'],['Разрешение растра',`${raster.scale.toFixed(1)} пикс./мм · до 22 пикс./мм`],['Область обработки',`${(raster.pixelCount/1000000).toFixed(2)} млн пикс. · только зона текста`],['Итерации скелетизации',`${raster.iterations}${raster.converged?' · завершена':' · лимит достигнут'}`],['Название работы',workTitle],['Штрихи пера',result.strokes.length],['Короткие фрагменты < 0,35 мм',`${diag.shortCount} (${(diag.shortRatio*100).toFixed(1)}%) · не удалялись автоматически`],['Узлы разветвления',diag.branchNodes],['Отдельные компоненты',diag.componentCount],['Мелкие компоненты',diag.tinyComponents],['Повторяющиеся траектории',diag.duplicates],['Команды движения пера',n],['Упрощение траекторий',`${m.routeTolerance.toFixed(2)} мм · предпросмотр совпадает с G-code`],['Физический угол листа',`X ${x.toFixed(2)} · Y ${y.toFixed(2)} мм`],['Z сопла над пластиной',`письмо ${zSettings.write} мм · между штрихами ${zSettings.travel} мм · безопасно ${zSettings.safe} мм`],['Паузы',`M400 U1 вручную → G28 → M400 S${pauseSeconds} автоматически`],['Защитная зона пластины',`${m.pl.tab.x}–${m.pl.tab.x+m.pl.tab.w} мм · запас ${m.pl.tab.clearance} мм`],['Профиль',m.profile.title],['Шрифт',fontReady?'дополнительный шрифт загружен':'системный курсив · автономный режим'],['Файл',`${(blob.size/1024).toFixed(0)} КБ · .gcode`]].map(([a,b])=>`<div class="check"><b>${esc(a)}</b>${esc(String(b))}</div>`).join('');
+  $('gcodeDetails').innerHTML=[['Диагностика',diag.warnings.length?'есть предупреждения':'геометрические проверки пройдены'],['Разрешение растра',`${raster.scale.toFixed(1)} пикс./мм · до 22 пикс./мм`],['Область обработки',`${(raster.pixelCount/1000000).toFixed(2)} млн пикс. · только зона текста`],['Итерации скелетизации',`${raster.iterations}${raster.converged?' · завершена':' · лимит достигнут'}`],['Название работы',workTitle],['Штрихи пера',result.strokes.length],['Короткие фрагменты < 0,35 мм',`${diag.shortCount} (${(diag.shortRatio*100).toFixed(1)}%) · не удалялись автоматически`],['Узлы разветвления',diag.branchNodes],['Отдельные компоненты',diag.componentCount],['Мелкие компоненты',diag.tinyComponents],['Повторяющиеся траектории',diag.duplicates],['Команды движения пера',n],['Упрощение траекторий',`${m.routeTolerance.toFixed(2)} мм · предпросмотр совпадает с G-code`],['Физический угол листа',`X ${x.toFixed(2)} · Y ${y.toFixed(2)} мм`],['Z сопла над пластиной',`письмо ${zSettings.write} мм · между штрихами ${zSettings.travel} мм · безопасно ${zSettings.safe} мм`],['Паузы',`M400 U1 → G28 → M400 S${pauseSeconds} → контур на защитном A4 → отъезд и 50 сек для установки листа`],['Защитная зона пластины',`${m.pl.tab.x}–${m.pl.tab.x+m.pl.tab.w} мм · запас ${m.pl.tab.clearance} мм`],['Профиль',m.profile.title],['Шрифт',fontReady?'дополнительный шрифт загружен':'системный курсив · автономный режим'],['Файл',`${(blob.size/1024).toFixed(0)} КБ · .gcode`]].map(([a,b])=>`<div class="check"><b>${esc(a)}</b>${esc(String(b))}</div>`).join('');
  }catch(e){
   const aborted=e?.name==='AbortError'||token!==generationToken;
   if(!aborted){const message=(e&&e.message)?e.message:String(e||'неизвестная ошибка');$('gcodeStatus').textContent='G-code не создан: '+message;$('gcodeStatus').className='status gcode-error';$('dockStatus').textContent='Нужно исправить замечания';$('gcodeDetails').innerHTML=`<div class="check"><b>Причина</b>${esc(message)}</div><div class="check"><b>Следующий шаг</b>Исправь причину и повтори построение. Не используй предыдущий файл после изменения текста или настроек.</div>`;}
@@ -1180,7 +1207,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;
- return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.2.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.3.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
