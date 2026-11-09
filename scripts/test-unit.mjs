@@ -109,6 +109,8 @@ const validGcode=[
   "; END"
 ].join('\n')+'\n';
 assert(context.validateGeneratedGcode(validGcode,130,{x:45.5,y:253},{safe:50,travel:34})===true,'G-code preflight accepts plain raw ASCII output with both pauses and safe corner parking');
+const commentedCompletion=validGcode.replace('M73 P100 R0\\n','M73 P100 R0 ; completion marker\\n');
+assert(context.validateGeneratedGcode(commentedCompletion,130,{x:45.5,y:253},{safe:50,travel:34})===true,'G-code preflight accepts an inline comment on the final M73 command');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 P30000\nM400 S130'),130,{x:45.5,y:253},{safe:50,travel:34}),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('G21 ; metric units','M104 S0\nG21 ; metric units'),130,{x:45.5,y:253},{safe:50,travel:34}),/нагревателями/,'G-code preflight rejects startup heater/fan shutdown commands');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:45.5,y:253},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
