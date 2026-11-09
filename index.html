@@ -1029,10 +1029,10 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  if(endIndex<0||lines.slice(endIndex+1).some(line=>line.trim()))fail('после маркера ; END не должно быть никаких данных.');
  let xyMoves=0,zMoves=0,drawMoves=0;
  for(const item of executable){
-  const t=item.text,cmd=t.split(/\\s+/,1)[0];
+  const t=item.text,cmd=t.split(/\s+/,1)[0];
   if(cmd==='G0'||cmd==='G1'){
-   if(!/^G[01](?:\\s+[XYZF]-?\\d+(?:\\.\\d+)?)*$/.test(t))fail('неверный формат команды движения в строке '+(item.index+1)+'.');
-   const axes=[...t.matchAll(/([XYZF])(-?\\d+(?:\\.\\d+)?)/g)];
+   if(!/^G[01](?:\s+[XYZF]-?\d+(?:\.\d+)?)*$/.test(t))fail('неверный формат команды движения в строке '+(item.index+1)+'.');
+   const axes=[...t.matchAll(/([XYZF])(-?\d+(?:\.\d+)?)/g)];
    if(!axes.length)fail('пустая команда движения в строке '+(item.index+1)+'.');
    for(const a of axes){const v=Number(a[2]);if(!Number.isFinite(v))fail('некорректная координата в строке '+(item.index+1)+'.');if(a[1]==='X'||a[1]==='Y'){if(v<3||v>253)fail('координата '+a[1]+' выходит за пределы безопасной области в строке '+(item.index+1)+'.');}if(a[1]==='Z'){if(v<0||v>256)fail('координата Z выходит за физический ход A1 в строке '+(item.index+1)+'.');zMoves++;}}
    if(axes.some(a=>a[1]==='X'||a[1]==='Y'))xyMoves++;
