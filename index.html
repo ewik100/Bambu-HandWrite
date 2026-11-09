@@ -1050,7 +1050,7 @@ function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSetti
  const homeIndex=lines.findIndex(line=>line.startsWith('G28 ; home all axes'));
  const safeLine='G1 Z'+fmtZ(zSettings.safe)+' F1200 ; safe height above plate',safeIndex=lines.indexOf(safeLine,homeIndex);
  const parkLine='G0 X'+Number(park.x).toFixed(3)+' Y'+Number(park.y).toFixed(3)+' F2000 ; nozzle pauses directly above the paper top-left corner',parkIndex=lines.indexOf(parkLine);
- if(!(progressStart[0]===0&&progressStart[0]<manualIndex&&manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<cornerDwellIndex))fail('нарушен порядок 5.2: стартовый M73 → G21 → G90 → ручная пауза → homing → безопасная высота → остановка над верхним левым углом листа.');
+ if(!(progressStart[0]===executable[0].index&&progressStart[0]<manualIndex&&manualIndex<homeIndex&&homeIndex<safeIndex&&safeIndex<parkIndex&&parkIndex<cornerDwellIndex))fail('нарушен порядок 5.2: стартовый M73 → G21 → G90 → ручная пауза → homing → безопасная высота → остановка над верхним левым углом листа.');
  for(let i=safeIndex+1;i<cornerDwellIndex;i++){if(/^G[01] Z/.test(lines[i]))fail('высота Z меняется во время второй остановки; сопло должно оставаться на безопасной высоте.');}
  const left=Number(page.x),top=Number(page.y),right=left+Number(page.w),bottom=top-Number(page.h);
  if(left<3||right>253||top>253||bottom<3)fail('контур листа выходит за безопасную рабочую область.');
