@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<title>Bambu HandWrite 5.0.1 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.2.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#20252b;background:#f5f1e8;--ink:#183c70;--muted:#65707b;--line:#dce4e9;--accent:#263b54}*{box-sizing:border-box}body{margin:0;padding:14px;max-width:980px;margin-inline:auto}header{padding:8px 2px 12px}h1{font-size:25px;margin:0 0 5px}h2{font-size:17px;margin:0 0 12px}.sub{margin:0;color:var(--muted);font-size:14px;line-height:1.45}.card{background:#fff;border:1px solid #e2ddd3;border-radius:17px;padding:15px;margin:11px 0;box-shadow:0 2px 12px #00000008}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.wide{grid-column:1/-1}label{display:block;font-size:13px;color:#4d5660}input,textarea,select{width:100%;padding:11px;border:1px solid #cfd5db;border-radius:10px;font:inherit;margin-top:5px;background:white;color:#20252b}textarea{min-height:116px;resize:vertical;line-height:1.4}input:focus,textarea:focus,select:focus{outline:2px solid #96b5d2;outline-offset:1px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.btn{border:0;border-radius:11px;padding:12px 15px;font-weight:650;background:var(--accent);color:white;min-height:44px;cursor:pointer}.btn.secondary{background:#e8edf2;color:#263b54}.btn.ghost{background:#f8f8f7;color:#263b54;border:1px solid #d8dee3}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.status{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.4}.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 9px;border-radius:999px;background:#eef4ef;color:#2f6544}.pill.loading{background:#fff3dc;color:#76551c}.pill.offline{background:#fff0ed;color:#884132}.pill:before{content:"";height:7px;width:7px;border-radius:50%;background:currentColor}.preview-head{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}.paper-wrap{overflow:auto;background:#e8e4dc;padding:12px;border-radius:13px;margin-top:12px}#paper{display:block;background:white;max-width:100%;height:auto;box-shadow:0 2px 12px #0002;margin:auto}.status.ok{color:#28613a;font-weight:650}.status.bad{color:#a12c25;font-weight:700}.warning{background:#fff4dc;border:1px solid #f0d28b;border-radius:12px;padding:12px;color:#694c13;font-size:13px;line-height:1.45}.good{background:#edf5ef;border:1px solid #cde1d1;border-radius:12px;padding:12px;color:#315e3b;font-size:13px;line-height:1.45}.tiny{font-size:11px;color:var(--muted)}.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check{border:1px solid #e1e5e8;border-radius:10px;padding:9px;font-size:12px}.check b{display:block;font-size:13px;margin-bottom:3px}.mono{font-variant-numeric:tabular-nums}.orientation-guide{margin-top:12px;padding:12px;border:1px solid #d5e2eb;border-radius:12px;background:#f4f8fb;color:#29445c;font-size:13px;line-height:1.45}.orientation-head{font-weight:700;margin-bottom:8px}.orientation-flow{display:grid;grid-template-columns:1fr;justify-items:center;gap:5px;text-align:center}.orientation-edge{font-size:11px;font-weight:700;letter-spacing:.02em;color:#53697b}.orientation-arrow{font-size:13px;font-weight:700;color:#315e86}.orientation-sheet{width:min(190px,70%);min-height:118px;border:2px solid #95a8b6;border-radius:5px;background:repeating-linear-gradient(0deg,transparent 0 15px,#d8e8f1 15px 16px),repeating-linear-gradient(90deg,transparent 0 15px,#d8e8f1 15px 16px),#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:9px 5px;box-shadow:0 2px 5px #00000010}.orientation-sheet strong{font-size:10px;color:#53697b}.orientation-sheet span{font-family:cursive;color:#244e79;font-size:19px}.orientation-axes{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:650}.orientation-explain{margin:8px 0 0;color:#465b6d}.orientation-guide .note{font-size:11px;color:#647584;margin:6px 0 0}
@@ -404,7 +404,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется непосредственно над верхним левым углом листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.0.1 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.2.0 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -547,6 +547,22 @@ function getLinePitchMm(cell){const raw=String($('pitchMm')?.value??'15').trim()
 function updateLineSpacingUI(){const active=$('paperType')?.value==='math-notebook';$('pitchUnitField').hidden=!active;$('pitchCellsField').hidden=!active||$('pitchUnit')?.value!=='cells';$('pitchMmField').hidden=!active||$('pitchUnit')?.value!=='mm';}
 function measureMixed(t,mode,hand,size){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;return runsFor(t,mode,hand).reduce((n,r)=>{mctx.font=`${size}px ${fontCss(r.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return n+mctx.measureText(r.text).width*(p.widthScale||1);},0);}
 function wrapLine(text,maxW,mode,hand,size){const words=text.split(/(\s+)/u);let out=[],line='';for(const word of words){if(!word)continue;const cand=line+word;if(line&&measureMixed(cand,mode,hand,size)>maxW){out.push(line.trimEnd());line=word.trimStart()}else line=cand}if(line.trim()||!out.length)out.push(line.trimEnd());const final=[];for(const ln of out){if(measureMixed(ln,mode,hand,size)<=maxW){final.push(ln);continue}let part='';for(const ch of ln){if(part&&measureMixed(part+ch,mode,hand,size)>maxW){final.push(part);part=ch}else part+=ch}if(part)final.push(part)}return final}
+function getJustifyCorrectionScale(lines,boxes,rightX,widthScale,currentScale=1){
+ let nextScale=currentScale;
+ const width=Math.max(.01,Number(widthScale)||1);
+ for(let i=0;i<lines.length;i++){
+  const line=lines[i],box=boxes[i];
+  if(!line||!box||!(line.extraWordSpace>0))continue;
+  const spaces=(line.text.match(/ /g)||[]).length;
+  if(!spaces)continue;
+  const added=line.extraWordSpace*spaces*width;
+  if(!(added>0))continue;
+  const unexpandedRight=box.x+box.width-added;
+  const allowed=Math.max(0,rightX-.35-unexpandedRight);
+  if(allowed+1e-6<added)nextScale=Math.min(nextScale,currentScale*Math.max(0,Math.min(1,allowed/added)));
+ }
+ return Math.max(0,Math.min(currentScale,nextScale));
+}
 function lineJustifySpacing(text,maxW,mode,hand,size){const spaces=(text.match(/ /g)||[]).length;if(spaces<1)return 0;const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha,natural=measureMixed(text,mode,hand,size),free=maxW-natural;if(free<.35)return 0;const extra=free/(spaces*(p.widthScale||1));return extra<=8.5?extra:0}
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]))}
 function getTopMarginMm(type,cell){return type==='math-notebook'?Math.max(0,Number(cell)||5)*2:0}
@@ -619,14 +635,14 @@ function setRouteInkMode(enabled){
  const paper=$('paper'),btn=$('routeInkModeBtn');if(!paper||!btn)return;
  const on=!!enabled&&routePlayback.strokes.length>0;paper.classList.toggle('route-ink-mode',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'Показать почерк под линиями':'Сравнить линии с текстом';
 }
-function build(skipFitSuggestion=false,heightOverride=null){
+function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0){
   const rawHeight=heightOverride===null?readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh):Number(heightOverride),lh=Number.isFinite(rawHeight)?Math.max(2,Math.min(20,rawHeight)):DEFAULTS.lh;
  const w=clampValue('pw',40,420),h=clampValue('ph',40,420),pitchInput=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch),cell=clampValue('cell',2,15),red=clampValue('margin',2,100),configuredIndent=clampValue('paragraphIndent',0,20),indentEnabled=$('paragraphIndentToggle').checked,paraIndent=indentEnabled?configuredIndent:0,justifyEnabled=$('justifyToggle').checked;
  const mode=$('scriptMode').value,hand=$('handFont').value,profile=FONT_PROFILES[hand]||FONT_PROFILES.neucha,txt=$('txt').value.replace(/\r/g,''),type=$('paperType').value,pl=bedPlacement(w,h),startX=clampValue('left',0,30),rightX=type==='a4-plain'?w-1.5:w-red-1.5,bottomY=Math.min(h,253-pl.pageY-3),topY=clampValue('top',0,30),fontSize=lh*1.28;
  const pitch=type==='math-notebook'?getLinePitchMm(cell):pitchInput;
  $('orientationField').style.display=(type==='math-notebook'||type==='russian-notebook'||type==='custom-paper')?'none':'';updateLineSpacingUI();
  $('justifyHelp').textContent=type==='a4-plain'?'Растягивать пробелы в подходящих промежуточных строках до безопасной правой границы листа. Последняя строка абзаца остаётся обычной.':'Распределять пробелы в промежуточных строках до безопасной правой границы. Последняя строка перед пустой строкой или концом текста остаётся обычной.';
- const paragraphLines=txt.split('\n'),lines=[];let pn=0;for(let paraIndex=0;paraIndex<paragraphLines.length;paraIndex++){const para=paragraphLines[paraIndex];if(!para.trim()){lines.push({text:'',x:startX,paragraph:pn,blank:true,russian:false,extraWordSpace:0});pn++;continue}const isRussian=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(para),indent=isRussian?paraIndent:0,firstX=startX+indent,wrapped=wrapLine(para,Math.max(.1,rightX-firstX-1),mode,hand,fontSize),hasFollowingLine=!!(paragraphLines[paraIndex+1]&&paragraphLines[paraIndex+1].trim());wrapped.forEach((line,j)=>{const x=j===0?firstX:startX,maxLineW=Math.max(.1,rightX-x-1),isIntermediate=j<wrapped.length-1||hasFollowingLine,extraWordSpace=justifyEnabled&&isIntermediate?lineJustifySpacing(line,maxLineW,mode,hand,fontSize):0;lines.push({text:line,x,paragraph:pn,blank:false,russian:isRussian,extraWordSpace})});pn++}
+ const paragraphLines=txt.split('\n'),lines=[];let pn=0;for(let paraIndex=0;paraIndex<paragraphLines.length;paraIndex++){const para=paragraphLines[paraIndex];if(!para.trim()){lines.push({text:'',x:startX,paragraph:pn,blank:true,russian:false,extraWordSpace:0});pn++;continue}const isRussian=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(para),indent=isRussian?paraIndent:0,firstX=startX+indent,wrapped=wrapLine(para,Math.max(.1,rightX-firstX-1),mode,hand,fontSize),hasFollowingLine=!!(paragraphLines[paraIndex+1]&&paragraphLines[paraIndex+1].trim());wrapped.forEach((line,j)=>{const x=j===0?firstX:startX,maxLineW=Math.max(.1,rightX-x-1),isIntermediate=j<wrapped.length-1||hasFollowingLine,extraWordSpace=justifyEnabled&&isIntermediate?lineJustifySpacing(line,maxLineW,mode,hand,fontSize)*justifyScale:0;lines.push({text:line,x,paragraph:pn,blank:false,russian:isRussian,extraWordSpace})});pn++}
  const rawBaseline=topY+fontSize*1.25,baseline0=type==='math-notebook'?Math.ceil((rawBaseline-1e-6)/cell)*cell:rawBaseline;
  let svg=`<rect x="0" y="0" width="${w}" height="${h}" fill="#fff"/>`;
  if(type==='math-notebook'){
@@ -671,7 +687,13 @@ function build(skipFitSuggestion=false,heightOverride=null){
  const firstLine=lines.findIndex(l=>!l.blank),startLine=firstLine<0?0:firstLine,startY=baseline0+startLine*pitch;const textStartX=lines[startLine]?.x??startX;
  const bedMarkup=bedSVG(w,h,textStartX,startY,red,pl,viewStage,type,cell,pitch);const bedNode=new DOMParser().parseFromString(bedMarkup,'image/svg+xml').documentElement;const bed=$('bedPreview');if(!bed||bedNode.nodeName.toLowerCase()==='parsererror')throw Error('Не удалось обновить схему положения листа. Перезагрузи приложение.');for(const attr of ['viewBox','width','height']){const value=bedNode.getAttribute(attr);if(value)bed.setAttribute(attr,value)}bed.innerHTML=bedNode.innerHTML;
  const cornerX=pl.pageX,cornerY=pl.pageY,cornerMachineY=253-cornerY;
- const boxes=[...$('paper').querySelectorAll('text[data-line]')].map(el=>{try{return el.getBBox()}catch(e){return null}}).filter(Boolean);
+ const boxesByLine=new Array(lines.length).fill(null);
+ [...$('paper').querySelectorAll('text[data-line]')].forEach(el=>{const index=Number(el.getAttribute('data-line'));try{if(Number.isInteger(index)&&index>=0&&index<boxesByLine.length)boxesByLine[index]=el.getBBox()}catch(e){}});
+ const boxes=boxesByLine.filter(Boolean);
+ if(justifyEnabled&&justifyPass<4){
+  const correctedScale=getJustifyCorrectionScale(lines,boxesByLine,rightX,profile.widthScale||1,justifyScale);
+  if(correctedScale<justifyScale-.001)return build(skipFitSuggestion,heightOverride,correctedScale,justifyPass+1);
+ }
  const textBottom=boxes.length?Math.max(...boxes.map(b=>b.y+b.height)):0,textTop=boxes.length?Math.min(...boxes.map(b=>b.y)):0,textLeft=boxes.length?Math.min(...boxes.map(b=>b.x)):0,textRight=boxes.length?Math.max(...boxes.map(b=>b.x+b.width)):0;
  const errors=[];
  if(rightX<=startX+2)errors.push('Нет места между текстом и правой границей.');
@@ -994,13 +1016,30 @@ function validateGeneratedGcode(file,pauseSeconds,park,zSettings){
  if(lines.some(line=>/^M400 P(?:\d|\s|$)/.test(line)))fail('M400 P отключена: на проверенном A1 эта команда завершила короткий тест сразу.');
  if(lines.some(line=>/^M73\b/.test(line)))fail('команды M73 отключены, чтобы не передавать принтеру маркеры прогресса/завершения.');
  if(lines.some(line=>/^M(?:104|140|106)\b/.test(line)))fail('в начале pen-plotter файла не должно быть команд управления нагревателями или вентилятором.');
- const allowed=new Set(['G0','G1','G21','G28','G90','M83','M400']);
+ const allowed=new Set(['G0','G1','G21','G28','G90','M400']);
  for(const line of lines){
   const trimmed=line.trim();
   if(!trimmed||trimmed.startsWith(';'))continue;
   const command=trimmed.split(/\s+/,1)[0];
   if(!allowed.has(command))fail('обнаружена непроверенная команда '+command+'.');
  }
+ const executable=lines.map((line,index)=>({line,index,text:line.split(';',1)[0].trim()})).filter(x=>x.text);
+ if(executable[0]?.text!=='G21'||executable[1]?.text!=='G90'||!executable[2]?.text.startsWith('M400 U1'))fail('неверное начало файла: ожидаются G21 → G90 → ручная пауза M400 U1.');
+ const endIndex=lines.lastIndexOf('; END');
+ if(endIndex<0||lines.slice(endIndex+1).some(line=>line.trim()))fail('после маркера ; END не должно быть никаких данных.');
+ let xyMoves=0,zMoves=0,drawMoves=0;
+ for(const item of executable){
+  const t=item.text,cmd=t.split(/\\s+/,1)[0];
+  if(cmd==='G0'||cmd==='G1'){
+   if(!/^G[01](?:\\s+[XYZF]-?\\d+(?:\\.\\d+)?)*$/.test(t))fail('неверный формат команды движения в строке '+(item.index+1)+'.');
+   const axes=[...t.matchAll(/([XYZF])(-?\\d+(?:\\.\\d+)?)/g)];
+   if(!axes.length)fail('пустая команда движения в строке '+(item.index+1)+'.');
+   for(const a of axes){const v=Number(a[2]);if(!Number.isFinite(v))fail('некорректная координата в строке '+(item.index+1)+'.');if(a[1]==='X'||a[1]==='Y'){if(v<3||v>253)fail('координата '+a[1]+' выходит за пределы безопасной области в строке '+(item.index+1)+'.');}if(a[1]==='Z'){if(v<0||v>256)fail('координата Z выходит за физический ход A1 в строке '+(item.index+1)+'.');zMoves++;}}
+   if(axes.some(a=>a[1]==='X'||a[1]==='Y'))xyMoves++;
+   if(cmd==='G1'&&axes.some(a=>a[1]==='X'||a[1]==='Y'))drawMoves++;
+  }
+ }
+ if(!xyMoves||!zMoves||!drawMoves)fail('неполный маршрут: нужны перемещения XY, изменения Z и рисующие G1 XY.');
  const manualIndex=manual[0],pause2Index=timed[0];
  const homeIndex=lines.findIndex(line=>line.startsWith('G28 ; home all axes'));
  const safeLine='G1 Z'+Number(zSettings.safe).toFixed(3)+' F1200 ; safe height above plate';
@@ -1045,8 +1084,8 @@ async function generateGcode(){
   const draw=result.commands,x=m.pl.pageX,y=253-m.pl.pageY,park=getCornerPausePosition(x,y),pauseSeconds=getPause2Seconds();
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
-  `; Bambu HandWrite 5.0.1 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.0.1`,
+  `; Bambu HandWrite 5.2.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.2.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.w} x ${m.h} mm; paper top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -1060,8 +1099,6 @@ async function generateGcode(){
   `; WARNING: verify paper fixing and pen Z calibration with a short supervised test.`,
   `G21 ; metric units`,
   `G90 ; absolute positioning`,
-  `M83 ; relative extrusion mode; no E moves`,
-  `M400`,
   `M400 U1 ; PAUSE 1: secure paper; remove pen holder before homing if clearance is unverified; press Resume`,
   `G28 ; home all axes`,
   `G1 Z${fmtZ(zSettings.safe)} F1200 ; safe height above plate`,
@@ -1077,7 +1114,7 @@ async function generateGcode(){
   `M400`,
   `; END`,
 ];
-  setGenerationProgress(92,'Формирую файл G-code…');const file=head.join('\n')+'\n';validateGeneratedGcode(file,pauseSeconds,park,zSettings);const blob=new Blob([file],{type:'application/octet-stream'});
+  setGenerationProgress(92,'Формирую файл G-code…');const file=head.join('\n')+'\n';validateGeneratedGcode(file,pauseSeconds,park,zSettings);const blob=new Blob([file],{type:'application/octet-stream'});const exportedBytes=await blob.arrayBuffer();if(exportedBytes.byteLength!==new TextEncoder().encode(file).byteLength)throw Error('Размер скачиваемого файла не совпадает с проверенным G-code.');const exportedText=new TextDecoder('ascii',{fatal:true}).decode(exportedBytes);if(exportedText!==file)throw Error('Содержимое скачиваемого файла отличается от проверенного G-code.');validateGeneratedGcode(exportedText,pauseSeconds,park,zSettings);
   if(generatedGcodeUrl)URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=URL.createObjectURL(blob);
   const link=$('gcodeDownload');link.href=generatedGcodeUrl;link.download=`${documentFileBase()}.gcode`;link.hidden=false;
   showPenRoute(result.strokes,raster,m);renderQuality(diag);
@@ -1137,7 +1174,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;
- return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.0.1',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.2.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
