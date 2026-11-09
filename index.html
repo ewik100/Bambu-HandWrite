@@ -1035,8 +1035,8 @@ function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSetti
  const progressEnd=lines.map((line,i)=>line.startsWith('M73 P100 R0')?i:-1).filter(i=>i>=0);
  if(progressStart.length!==1)fail('должен быть ровно один стартовый маркер M73 P0 R1.');
  if(progressEnd.length!==1)fail('должен быть ровно один завершающий маркер M73 P100 R0.');
- if(lines.filter(line=>/^M73\\b/.test(line)).length!==2)fail('разрешены только два маркера прогресса: M73 P0 R1 и M73 P100 R0.');
- if(lines.some(line=>/^M83\\b/.test(line)))fail('M83 не используется: в маршруте пера нет команд экструдера.');
+ if(lines.filter(line=>/^M73\b/.test(line)).length!==2)fail('разрешены только два маркера прогресса: M73 P0 R1 и M73 P100 R0.');
+ if(lines.some(line=>/^M83\b/.test(line)))fail('M83 не используется: в маршруте пера нет команд экструдера.');
  if(lines.some(line=>/^M(?:104|140|106)\b/.test(line)))fail('в начале pen-plotter файла не должно быть команд управления нагревателями или вентилятором.');
  const allowed=new Set(['G0','G1','G21','G28','G90','M73','M400']);
  for(const line of lines){const trimmed=line.trim();if(!trimmed||trimmed.startsWith(';'))continue;const command=trimmed.split(/\s+/,1)[0];if(!allowed.has(command))fail('обнаружена непроверенная команда '+command+'.');}
