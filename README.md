@@ -1,14 +1,14 @@
-# Bambu HandWrite 5.4.0
+# Bambu HandWrite 5.4.2
 
 **Bambu HandWrite** — небольшое браузерное приложение, которое превращает набранный текст в рукописный макет и строит для него G-code: команды перемещения головки 3D-принтера.
 
-> **Важно:** это независимый проект сообщества, а не программа Bambu Lab. В 5.4.0 сохранены шрифты, размеры букв, раскладка текста и траектории письма. Возвращены проверенные в 5.2.0 маркеры прогресса `M73 P0 R1` и `M73 P100 R0`; стартовая последовательность снова начинается с `M73 P0 R1` → `G21` → `G90` → `M400 U1`, без `M83` и лишнего начального `M400`. Вторая автоматическая остановка находится непосредственно над верхним левым углом выбранного листа без смещения на 3 мм. После неё ручка рисует прямоугольный контур на заранее закреплённом защитном листе A4, затем головка отъезжает в сторону и ждёт 50 секунд, чтобы положить рабочую бумагу по контуру. Это обновление ещё не прошло полный физический тест на A1: сначала проверь короткий запуск под наблюдением. Прочитай [инструкцию для начинающих](docs/USER_GUIDE_RU.md), [правила безопасности](docs/SAFETY.md) и [памятку перед печатью](docs/BEFORE_PRINT_CHECKLIST_RU.md).
+> **Важно:** это независимый проект сообщества, а не программа Bambu Lab. В 5.4.2 сохранены шрифты, размеры букв, раскладка текста и траектории письма. Возвращены проверенные в 5.2.0 маркеры прогресса `M73 P0 R1` и `M73 P100 R0`; стартовая последовательность снова начинается с `M73 P0 R1` → `G21` → `G90` → `M400 U1`, без `M83` и лишнего начального `M400`. Вторая автоматическая остановка находится непосредственно над верхним левым углом выбранного листа без смещения на 3 мм. После неё ручка рисует прямоугольный контур на заранее закреплённом защитном листе A4, затем головка отъезжает в сторону и ждёт 50 секунд, чтобы положить рабочую бумагу по контуру. Это обновление ещё не прошло полный физический тест на A1: сначала проверь короткий запуск под наблюдением. Прочитай [инструкцию для начинающих](docs/USER_GUIDE_RU.md), [правила безопасности](docs/SAFETY.md) и [памятку перед печатью](docs/BEFORE_PRINT_CHECKLIST_RU.md).
 
 ## Запустить программу
 
-**Самый простой способ:** откройте [отдельную версию 5.4.0](releases/Bambu-HandWrite-5.4.0.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
+**Самый простой способ:** откройте [отдельную версию 5.4.2](releases/Bambu-HandWrite-5.4.2.html) или [`index.html`](index.html) в актуальном браузере на компьютере или телефоне. Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 5.4.0](releases/Bambu-HandWrite-5.4.0.html).
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . Также можно скачать [отдельный HTML-файл версии 5.4.2](releases/Bambu-HandWrite-5.4.2.html).
 
 ## Что умеет программа
 
@@ -109,4 +109,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 5.4.0 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 5.4.2 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
