@@ -26,7 +26,7 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.0.1', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
+  for (const marker of ['Bambu HandWrite 5.2.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
   if (!errors.length) ok('Version 5.0.1, letter-size fixes and both line-spacing modes are present');
@@ -79,10 +79,10 @@ if (html) {
   const headEnd = html.indexOf('];', headStart);
   const generatedHead = headStart >= 0 && headEnd > headStart ? html.slice(headStart, headEnd) : '';
   if (!generatedHead.includes('raw G-code for Bambu Lab A1')) fail('The generator must identify its output as raw A1 G-code.');
-  if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P'].some(marker => generatedHead.includes(marker))) {
+  if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P','M83 ; relative extrusion mode'].some(marker => generatedHead.includes(marker))) {
     fail('Generated raw G-code must not include Bambu Studio container markers, heater/fan shutdowns, or M400 P waits.');
   } else ok('Generated output uses plain raw G-code without container markers or unverified startup commands');
-  if (!html.includes('M400 P отключена') || !html.includes('M400 S')) fail('A1-specific pause validation must reject M400 P and retain M400 S.');
+  if (!html.includes('M400 P отключена') || !html.includes('M400 S') || !html.includes('getJustifyCorrectionScale') || !html.includes('blob.arrayBuffer()')) fail('A1-specific pause validation must reject M400 P and retain M400 S.');
   else ok('A1-specific pause validation accepts M400 S and rejects M400 P');
   if (!errors.length) ok('Z limits, pause commands, homing and motion mode markers are present');
 
