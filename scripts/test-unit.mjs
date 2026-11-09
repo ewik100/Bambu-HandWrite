@@ -90,6 +90,7 @@ assert(context.getJustifyCorrectionScale([{text:'singleword',extraWordSpace:4}],
 const validGcode=[
   "; Bambu HandWrite 5.2.0 - raw G-code for Bambu Lab A1",
   "; Title: test",
+  "M73 P0 R1",
   "G21 ; metric units",
   "G90 ; absolute positioning",
   "M400 U1 ; manual pause",
@@ -103,6 +104,7 @@ const validGcode=[
   "G1 X10.000 Y20.000 F1500",
   "G1 Z50.000 F1200 ; final safe lift",
   "G0 X128.000 Y246.000 F2000 ; park/present bed",
+  "M73 P100 R0",
   "M400",
   "; END"
 ].join('\n')+'\n';
@@ -111,6 +113,7 @@ throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 P
 throws(()=>context.validateGeneratedGcode(validGcode.replace('G21 ; metric units','M104 S0\nG21 ; metric units'),130,{x:45.5,y:253},{safe:50,travel:34}),/нагревателями/,'G-code preflight rejects startup heater/fan shutdown commands');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130','M400 S130 —'),130,{x:45.5,y:253},{safe:50,travel:34}),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M73 P100'),130,{x:45.5,y:253},{safe:50,travel:34}),/ручная пауза/,'G-code preflight rejects a missing manual pause');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P100 R0','M73 P99 R0'),130,{x:45.5,y:253},{safe:50,travel:34}),/завершающий M73/,'G-code preflight rejects a missing completion marker');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,{x:45.5,y:253},{safe:50,travel:34}),/нарушен порядок/,'G-code preflight rejects a second pause at an unexpected Z level');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('; Title: test','; HEADER_BLOCK_START\n; Title: test'),130,{x:45.5,y:253},{safe:50,travel:34}),/контейнерные блоки/,'G-code preflight rejects Bambu Studio container markers');
 let z = context.getPenZSettings();
