@@ -548,6 +548,8 @@ function updateLineSpacingUI(){const active=$('paperType')?.value==='math-notebo
 function measureMixed(t,mode,hand,size){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;return runsFor(t,mode,hand).reduce((n,r)=>{mctx.font=`${size}px ${fontCss(r.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return n+mctx.measureText(r.text).width*(p.widthScale||1);},0);}
 function wrapLine(text,maxW,mode,hand,size){const words=text.split(/(\s+)/u);let out=[],line='';for(const word of words){if(!word)continue;const cand=line+word;if(line&&measureMixed(cand,mode,hand,size)>maxW){out.push(line.trimEnd());line=word.trimStart()}else line=cand}if(line.trim()||!out.length)out.push(line.trimEnd());const final=[];for(const ln of out){if(measureMixed(ln,mode,hand,size)<=maxW){final.push(ln);continue}let part='';for(const ch of ln){if(part&&measureMixed(part+ch,mode,hand,size)>maxW){final.push(part);part=ch}else part+=ch}if(part)final.push(part)}return final}
 function lineJustifySpacing(text,maxW,mode,hand,size){const spaces=(text.match(/ /g)||[]).length;if(spaces<1)return 0;const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha,natural=measureMixed(text,mode,hand,size),free=maxW-natural;if(free<.35)return 0;const extra=free/(spaces*(p.widthScale||1));return extra<=8.5?extra:0}
+// Canvas and SVG font metrics can differ. This ratio corrects only added word spacing against the real SVG bounds.
+function fitJustifiedLineRatio(extra,spaces,widthScale,actualRight,safeRight){const e=Number(extra),n=Number(spaces),w=Number(widthScale),overflow=Number(actualRight)-Number(safeRight);if(!Number.isFinite(e)||e<=0||!Number.isFinite(n)||n<1||!Number.isFinite(w)||w<=0||!Number.isFinite(overflow)||overflow<=0)return 1;const addedWidth=n*e*w;if(!(addedWidth>0))return 1;return Math.max(0,Math.min(1,(addedWidth-overflow)/addedWidth));}
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]))}
 function getTopMarginMm(type,cell){return type==='math-notebook'?Math.max(0,Number(cell)||5)*2:0}
 function setPreset(type,orientation,fromUser=true){
@@ -671,6 +673,21 @@ function build(skipFitSuggestion=false,heightOverride=null){
  const firstLine=lines.findIndex(l=>!l.blank),startLine=firstLine<0?0:firstLine,startY=baseline0+startLine*pitch;const textStartX=lines[startLine]?.x??startX;
  const bedMarkup=bedSVG(w,h,textStartX,startY,red,pl,viewStage,type,cell,pitch);const bedNode=new DOMParser().parseFromString(bedMarkup,'image/svg+xml').documentElement;const bed=$('bedPreview');if(!bed||bedNode.nodeName.toLowerCase()==='parsererror')throw Error('Не удалось обновить схему положения листа. Перезагрузи приложение.');for(const attr of ['viewBox','width','height']){const value=bedNode.getAttribute(attr);if(value)bed.setAttribute(attr,value)}bed.innerHTML=bedNode.innerHTML;
  const cornerX=pl.pageX,cornerY=pl.pageY,cornerMachineY=253-cornerY;
+ // Fit justified lines to the actual SVG rendering before rasterization. This prevents a Canvas/SVG font-metric mismatch from pushing text into the red-field safety margin.
+ if(justifyEnabled){
+  for(const el of $('paper').querySelectorAll('text[data-line]')){
+   const lineIndex=Number(el.getAttribute('data-line')),line=lines[lineIndex];
+   if(!line||!(line.extraWordSpace>0))continue;
+   const spaces=(line.text.match(/ /g)||[]).length;if(!spaces)continue;
+   try{
+    const box=el.getBBox(),ratio=fitJustifiedLineRatio(line.extraWordSpace,spaces,profile.widthScale||1,box.x+box.width,rightX-1);
+    if(ratio<.999999){
+     el.querySelectorAll('tspan[dx]').forEach(t=>{const dx=Number(t.getAttribute('dx'));if(Number.isFinite(dx))t.setAttribute('dx',(dx*ratio).toFixed(3))});
+     line.extraWordSpace*=ratio;
+    }
+   }catch(e){}
+  }
+ }
  const boxes=[...$('paper').querySelectorAll('text[data-line]')].map(el=>{try{return el.getBBox()}catch(e){return null}}).filter(Boolean);
  const textBottom=boxes.length?Math.max(...boxes.map(b=>b.y+b.height)):0,textTop=boxes.length?Math.min(...boxes.map(b=>b.y)):0,textLeft=boxes.length?Math.min(...boxes.map(b=>b.x)):0,textRight=boxes.length?Math.max(...boxes.map(b=>b.x+b.width)):0;
  const errors=[];

@@ -28,8 +28,8 @@ const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,page
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const lineTransformMatch = html.match(/function withCanvasLineTransform\(cx,x,y,width,heightScale,draw\)\{[\s\S]*?\n\}/);
 const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,zSettings\)\{[\s\S]*?\n\}/);
-const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
+const justifyFitMatch = html.match(/function fitJustifiedLineRatio\(extra,spaces,widthScale,actualRight,safeRight\)\{[^}]+\}/);\nconst routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !fitSearchMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch || !justifyFitMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -46,13 +46,18 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${fitSearchMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${justifyFitMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
 assert(context.getLinePitchMm(5) === 5, 'One cell produces exactly one 5 mm grid step');
 pitchCellsInput = '6';
 assert(context.getLinePitchMm(5) === 30, 'Six cells produce a 30 mm baseline step');
+assert(context.fitJustifiedLineRatio(2, 4, 1, 145, 145) === 1, 'Justified line spacing is unchanged when the actual SVG text already fits');
+const fitRatio = context.fitJustifiedLineRatio(2, 4, 1, 148, 145);
+assert(Math.abs(fitRatio - 0.625) < 1e-9, 'SVG overflow is removed by reducing only the added spaces, not the glyphs');
+assert(context.fitJustifiedLineRatio(2, 4, 1, 154, 145) === 0, 'Justification correction never hides overflow caused by the natural text width');
+assert(Math.abs(context.fitJustifiedLineRatio(2, 4, 0.9, 148, 145) - (1 - 3/7.2)) < 1e-9, 'Justification correction accounts for the rendered horizontal scale');
 pitchCellsInput = '1';
 assert(context.getLinePitchMm(4.5) === 4.5, 'One cell follows a 4.5 mm notebook grid exactly');
 pitchCellsInput = '2';
