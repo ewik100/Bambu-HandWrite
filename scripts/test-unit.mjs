@@ -87,7 +87,7 @@ assert(context.getJustifyCorrectionScale(justifyLines,[{x:10,width:100}],100,1,1
 assert(context.getJustifyCorrectionScale(justifyLines,[{x:10,width:80}],100,1,1)===1,'SVG calibration leaves a line unchanged when it already fits');
 assert(context.getJustifyCorrectionScale([{text:'singleword',extraWordSpace:4}],[{x:10,width:100}],100,1,1)===1,'SVG calibration ignores lines without spaces');
 const validGcode=[
-  "; Bambu HandWrite 5.0.1 - raw G-code for Bambu Lab A1",
+  "; Bambu HandWrite 5.2.0 - raw G-code for Bambu Lab A1",
   "; Title: test",
   "G21 ; metric units",
   "G90 ; absolute positioning",
