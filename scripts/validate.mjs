@@ -68,11 +68,11 @@ if (html) {
   if (missingReferences.length) fail(`Static DOM references without a matching id: ${missingReferences.join(', ')}`);
   else ok('Static DOM id lookups have matching elements');
 
-  for (const required of ['function validateGeneratedGcode(file,pauseSeconds,park,zSettings)', 'validateGeneratedGcode(file,pauseSeconds,park,zSettings);', 'function getPenZSettings()', 'const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20}', 'M400 U1', 'M400 S${pauseSeconds}', 'G28 ; home all axes', 'G21 ; metric units', 'G90 ; absolute positioning']) {
+  for (const required of ['function validateGeneratedGcode(file,pauseSeconds,park,zSettings)', 'validateGeneratedGcode(file,pauseSeconds,park,zSettings);', 'function getPenZSettings()', 'const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20}', 'M400 U1', 'M400 S${pauseSeconds}', 'M73 P0 R1', 'M73 P100 R0', 'G28 ; home all axes', 'G21 ; metric units', 'G90 ; absolute positioning']) {
     if (!html.includes(required)) fail(`Missing expected safety/G-code marker: ${required}`);
   }
-  if (html.includes('M73 P0 R1') || html.includes('M73 P100 R0')) fail('Legacy M73 progress markers must be absent from raw G-code output.');
-  else ok('Legacy M73 progress markers are absent');
+  if (!html.includes('M73 P0 R1') || !html.includes('M73 P100 R0')) fail('Bambu progress markers must initialize at start and complete only at the end.');
+  else ok('Bambu progress markers are present at the start and end');
   if (!html.includes('должна быть ровно одна вторая автоматическая пауза') || !html.includes('не-ASCII символы')) fail('Generated G-code preflight must validate pause sequence and ASCII-only output.');
   else ok('G-code preflight checks ASCII output and the two-pause sequence');
   const headStart = html.indexOf('const head=[');
@@ -82,7 +82,7 @@ if (html) {
   if (['HEADER_BLOCK_START','CONFIG_BLOCK_START','EXECUTABLE_BLOCK_START','M104 S0','M140 S0','M106 S0','M400 P','M83 ; relative extrusion mode'].some(marker => generatedHead.includes(marker))) {
     fail('Generated raw G-code must not include Bambu Studio container markers, heater/fan shutdowns, or M400 P waits.');
   } else ok('Generated output uses plain raw G-code without container markers or unverified startup commands');
-  if (!html.includes('M400 P отключена') || !html.includes('M400 S') || !html.includes('getJustifyCorrectionScale') || !html.includes('blob.arrayBuffer()')) fail('A1-specific pause validation must reject M400 P and retain M400 S.');
+  if (!html.includes('M400 P отключена') || !html.includes('M400 S') || !html.includes('getJustifyCorrectionScale') || !html.includes('blob.arrayBuffer()') || !html.includes('M73 P0 R1') || !html.includes('M73 P100 R0')) fail('A1-specific pause validation must reject M400 P and retain M400 S.');
   else ok('A1-specific pause validation accepts M400 S and rejects M400 P');
   if (!errors.length) ok('Z limits, pause commands, homing and motion mode markers are present');
 
