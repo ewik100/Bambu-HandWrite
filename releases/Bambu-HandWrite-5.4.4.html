@@ -1060,7 +1060,7 @@ function renderQuality(d){
 }
 function validateTextRouteCommands(commands,zSettings){
  const fail=message=>{throw Error('Проверка маршрута пера не пройдена: '+message)};
- if(!Array.isArray(commands)||commands.length<5)fail('маршрут текста пустой или слишком короткий; файл не будет сформирован.');
+ if(!Array.isArray(commands)||commands.length===0)fail('маршрут текста пустой; файл не будет сформирован.');
  const travel='G1 Z'+Number(zSettings.travel).toFixed(3)+' F1200';
  const write='G1 Z'+Number(zSettings.write).toFixed(3)+' F1200';
  const xy=/^G[01] X-?\d+(?:\.\d+)? Y-?\d+(?:\.\d+)? F\d+$/;
