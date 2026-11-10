@@ -71,6 +71,7 @@ pitchUnitInput = 'cells'; pitchCellsInput = '2';
 assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook starts two 5 mm cells below the top edge');
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
+assert(html.includes("indent=isRussian&&paperFlip!=='left'?paraIndent:0"),'Flipped pages use exactly the one-cell margin instead of adding a second paragraph indent');
 const normalPage=context.getPaperWritingBounds(165,'math-notebook',20,5,'right',10);
 assert(normalPage.startX===10&&normalPage.rightX===143.5&&normalPage.redLineX===145,'Default 5.4.2 notebook layout stays at the same 10 mm start and 1.5 mm safety inset before the right red field');
 const flippedGrid=context.getPaperWritingBounds(165,'math-notebook',20,5,'left',10);
