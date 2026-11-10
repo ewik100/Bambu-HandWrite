@@ -70,7 +70,7 @@ if (html) {
 
   for (const required of [
     'function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings,expectedDraw)',
-    'validateTextRouteCommands(draw,zSettings)',
+    'validateTextRouteCommands(expectedDraw,zSettings)',
     'маршрут текста в скачиваемом файле отличается от проверенных траекторий',
     'validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings,draw);',
     'validateGeneratedGcode(exportedText,pauseSeconds,park,placementPark,page,zSettings,draw);',
