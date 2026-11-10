@@ -26,10 +26,10 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.4.2', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell']) {
+  for (const marker of ['Bambu HandWrite 5.4.4', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'function validateTextRouteCommands(commands,zSettings)']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Stable version 5.4.2, letter-size fixes and both line-spacing modes are present');
+  if (!errors.length) ok('Version 5.4.4, page-side flipping, letter-size fixes and both line-spacing modes are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
@@ -69,7 +69,9 @@ if (html) {
   else ok('Static DOM id lookups have matching elements');
 
   for (const required of [
-    'function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings)',
+    'function validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings,expectedDraw)',
+    'validateTextRouteCommands(draw,zSettings)',
+    'маршрут текста в скачиваемом файле отличается от проверенных траекторий',
     'validateGeneratedGcode(file,pauseSeconds,park,placementPark,page,zSettings);',
     'function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,tab)',
     'function getPenZSettings()',
@@ -114,7 +116,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md', 'docs/GCODE_BASELINE_5.4.2.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html', 'releases/Bambu-HandWrite-5.4.3.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html', 'releases/Bambu-HandWrite-5.4.3.html', 'releases/Bambu-HandWrite-5.4.4.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',

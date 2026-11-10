@@ -29,9 +29,9 @@ const pagePlacementMatch = html.match(/function getPagePlacementParkPosition\(pa
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const justifyCorrectionMatch = html.match(/function getJustifyCorrectionScale\(lines,boxes,rightX,widthScale,currentScale=1\)\{[\s\S]*?\n\}/);
 const lineTransformMatch = html.match(/function withCanvasLineTransform\(cx,x,y,width,heightScale,draw\)\{[\s\S]*?\n\}/);
-const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings\)\{[\s\S]*?\n\}/);
+const routeGuardMatch = html.match(/function validateTextRouteCommands\(commands,zSettings\)\{[\s\S]*?\n\}/);\nconst writingBoundsMatch = html.match(/function getPaperWritingBounds\(width,type,red,cell,flip='right',leftInset=10\)\{[\s\S]*?\n\}/);\nconst preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings,expectedDraw\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -48,7 +48,7 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
@@ -70,6 +70,16 @@ pitchUnitInput = 'cells'; pitchCellsInput = '2';
 assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook starts two 5 mm cells below the top edge');
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
+const normalPage=context.getPaperWritingBounds(165,'math-notebook',20,5,'right',10);
+assert(normalPage.startX===10&&normalPage.rightX===143.5&&normalPage.redLineX===145,'Normal 5.4.4 notebook layout exactly preserves the 5.4.2 margins');
+const flippedGrid=context.getPaperWritingBounds(165,'math-notebook',20,5,'left',10);
+assert(flippedGrid.startX===25&&flippedGrid.rightX===155&&flippedGrid.redLineX===20,'Flipped grid page starts one cell after the left red line and leaves 10 mm at the far edge');
+const flippedRuled=context.getPaperWritingBounds(165,'russian-notebook',20,8.35,'left',10);
+assert(flippedRuled.startX===25&&flippedRuled.rightX===155,'Flipped ruled paper uses the 5 mm start offset and 10 mm far-edge margin');
+const flippedPlain=context.getPaperWritingBounds(210,'a4-plain',20,8.35,'left',10);
+assert(flippedPlain.guideOnly&&flippedPlain.startX===15&&flippedPlain.rightX===200,'Flipped plain A4 has a preview-only guide, 5 mm start offset and 10 mm end margin');
+const normalPlain=context.getPaperWritingBounds(210,'a4-plain',20,8.35,'right',10);
+assert(normalPlain.startX===10&&normalPlain.rightX===208.5&&normalPlain.redLineX===null,'Normal plain A4 keeps the original 5.4.2 margins');
 assert(context.scaleToLowercaseHeight(4.8, 2.4) === 2, 'A 4.8 mm lowercase target scales the measured x-height to 4.8 mm');
 const mockCanvas={depth:0,saves:0,restores:0,save(){this.depth++;this.saves++},restore(){this.depth--;this.restores++},translate(){},transform(){}};
 context.withCanvasLineTransform(mockCanvas,100,200,1,1.2,()=>{});
@@ -160,22 +170,29 @@ const testPage={x:45.5,y:253,w:165,h:203};
 const testPause={x:45.5,y:253};
 const testSidePark={x:128,y:42};
 const testZ={safe:50,travel:34,write:30};
-assert(context.validateGeneratedGcode(validGcode,130,testPause,testSidePark,testPage,testZ)===true,'G-code preflight accepts restored startup, second pause, protective-A4 outline and 50-second placement wait');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S129 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/вторая автоматическая остановка/,'G-code preflight rejects a missing or altered second pause');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S50 ; 50-second placement window','M400 S49 ; 49-second placement window'),130,testPause,testSidePark,testPage,testZ),/50-секундное окно/,'G-code preflight requires the fixed 50-second placement window');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X210.500 Y253.000 F1250 ; outline top edge','G1 X209.500 Y253.000 F1250 ; outline top edge'),130,testPause,testSidePark,testPage,testZ),/контур на защитном A4/,'G-code preflight checks the exact page outline');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP\n','M400 S130 ; SECOND STOP\nG0 X50.000 Y250.000 F2000 ; unexpected move\n'),130,testPause,testSidePark,testPage,testZ),/после второй остановки первым движением/,'G-code preflight rejects any extra movement between pause 2 and the protective-A4 outline');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X60.000 Y240.000 F1500\n',''),130,testPause,testSidePark,testPage,testZ),/после 50-секундного окна нет рисующих движений текста/,'G-code preflight requires actual text strokes after the 50-second placement wait');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M400 U0'),130,testPause,testSidePark,testPage,testZ),/ручная пауза/,'G-code preflight rejects a missing manual pause');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 P30000 ; unsupported wait\nM400 S130 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S130 — SECOND STOP'),130,testPause,testSidePark,testPage,testZ),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P0 R1\n',''),130,testPause,testSidePark,testPage,testZ),/стартовый маркер M73/,'G-code preflight requires the original start progress marker');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P100 R0\n',''),130,testPause,testSidePark,testPage,testZ),/завершающий маркер M73/,'G-code preflight requires the original completion progress marker');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G90 ; absolute positioning','G90 ; absolute positioning\nM83 ; relative extrusion mode; no E moves'),130,testPause,testSidePark,testPage,testZ),/M83/,'G-code preflight rejects the unnecessary extrusion mode');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,testPause,testSidePark,testPage,testZ),/нарушен порядок 5\.2/,'G-code preflight rejects an unexpected second-pause height');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('; HEADER_BLOCK_START','; MISSING_HEADER_BLOCK_START'),130,testPause,testSidePark,testPage,testZ),/служебный блок Bambu/,'G-code preflight rejects a missing Bambu header marker');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('; CONFIG_BLOCK_START','; HEADER_BLOCK_START'),130,testPause,testSidePark,testPage,testZ),/служебный блок Bambu|неверный порядок блоков/,'G-code preflight rejects duplicated or misordered Bambu block markers');
-throws(()=>context.validateGeneratedGcode(validGcode.replace('G0 X128.000 Y246.000 F2000 ; park/present bed\nM73 P100 R0\nM400\n; EXECUTABLE_BLOCK_END','G0 X128.000 Y246.000 F2000 ; park/present bed\nM73 P100 R0\n; EXECUTABLE_BLOCK_END'),130,testPause,testSidePark,testPage,testZ),/после последней команды движения|нарушена восстановленная последовательность завершения/,'G-code preflight rejects a damaged completion sequence');
+const drawCommands=['G1 Z34.000 F1200','G0 X55.000 Y240.000 F1800','G1 Z30.000 F1200','G1 X60.000 Y240.000 F1500','G1 Z34.000 F1200'];
+const routeCheck=context.validateTextRouteCommands(drawCommands,testZ,drawCommands);
+assert(routeCheck.strokes===1&&routeCheck.segments===1,'Route guard accepts one complete pen-up/travel/write/XY/lift stroke');
+throws(()=>context.validateTextRouteCommands(drawCommands.slice(0,4),testZ,drawCommands),/последний штрих не завершён/,'Route guard rejects a stroke that never raises the pen at the end');
+throws(()=>context.validateTextRouteCommands(['G1 Z34.000 F1200','G0 X55.000 Y240.000 F1800','G1 X60.000 Y240.000 F1500','G1 Z34.000 F1200'],testZ,drawCommands),/вне режима письма/,'Route guard rejects XY drawing while the pen is not down');
+throws(()=>context.validateTextRouteCommands(['G1 Z34.000 F1200','G1 Z30.000 F1200'],testZ,drawCommands),/без предварительного подвода/,'Route guard rejects lowering the pen without a preceding XY approach');
+assert(context.validateGeneratedGcode(validGcode,130,testPause,testSidePark,testPage,testZ,drawCommands)===true,'G-code preflight accepts restored startup, second pause, protective-A4 outline and 50-second placement wait');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S129 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ,drawCommands),/вторая автоматическая остановка/,'G-code preflight rejects a missing or altered second pause');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S50 ; 50-second placement window','M400 S49 ; 49-second placement window'),130,testPause,testSidePark,testPage,testZ,drawCommands),/50-секундное окно/,'G-code preflight requires the fixed 50-second placement window');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X210.500 Y253.000 F1250 ; outline top edge','G1 X209.500 Y253.000 F1250 ; outline top edge'),130,testPause,testSidePark,testPage,testZ,drawCommands),/контур на защитном A4/,'G-code preflight checks the exact page outline');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP\n','M400 S130 ; SECOND STOP\nG0 X50.000 Y250.000 F2000 ; unexpected move\n'),130,testPause,testSidePark,testPage,testZ,drawCommands),/после второй остановки первым движением/,'G-code preflight rejects any extra movement between pause 2 and the protective-A4 outline');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X60.000 Y240.000 F1500\n',''),130,testPause,testSidePark,testPage,testZ,drawCommands),/Проверка маршрута пера|рисующих движений текста|маршрут текста в скачиваемом файле/,'G-code preflight rejects a missing text stroke');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 X60.000 Y240.000 F1500','G1 X61.000 Y240.000 F1500'),130,testPause,testSidePark,testPage,testZ,drawCommands),/маршрут текста в скачиваемом файле отличается/,'G-code preflight rejects a file whose exported text route differs from the validated route array');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 U1','M400 U0'),130,testPause,testSidePark,testPage,testZ,drawCommands),/ручная пауза/,'G-code preflight rejects a missing manual pause');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 P30000 ; unsupported wait\nM400 S130 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ,drawCommands),/M400 P отключена/,'G-code preflight rejects M400 P on the tested A1');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S130 — SECOND STOP'),130,testPause,testSidePark,testPage,testZ,drawCommands),/не-ASCII/,'G-code preflight rejects non-ASCII characters');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P0 R1\n',''),130,testPause,testSidePark,testPage,testZ,drawCommands),/стартовый маркер M73/,'G-code preflight requires the original start progress marker');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('M73 P100 R0\n',''),130,testPause,testSidePark,testPage,testZ,drawCommands),/завершающий маркер M73/,'G-code preflight requires the original completion progress marker');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G90 ; absolute positioning','G90 ; absolute positioning\nM83 ; relative extrusion mode; no E moves'),130,testPause,testSidePark,testPage,testZ,drawCommands),/M83/,'G-code preflight rejects the unnecessary extrusion mode');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G1 Z50.000 F1200 ; safe height above plate','G1 Z49.000 F1200 ; safe height above plate'),130,testPause,testSidePark,testPage,testZ,drawCommands),/нарушен порядок 5\.2/,'G-code preflight rejects an unexpected second-pause height');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('; HEADER_BLOCK_START','; MISSING_HEADER_BLOCK_START'),130,testPause,testSidePark,testPage,testZ,drawCommands),/служебный блок Bambu/,'G-code preflight rejects a missing Bambu header marker');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('; CONFIG_BLOCK_START','; HEADER_BLOCK_START'),130,testPause,testSidePark,testPage,testZ,drawCommands),/служебный блок Bambu|неверный порядок блоков/,'G-code preflight rejects duplicated or misordered Bambu block markers');
+throws(()=>context.validateGeneratedGcode(validGcode.replace('G0 X128.000 Y246.000 F2000 ; park/present bed\nM73 P100 R0\nM400\n; EXECUTABLE_BLOCK_END','G0 X128.000 Y246.000 F2000 ; park/present bed\nM73 P100 R0\n; EXECUTABLE_BLOCK_END'),130,testPause,testSidePark,testPage,testZ,drawCommands),/после последней команды движения|нарушена восстановленная последовательность завершения/,'G-code preflight rejects a damaged completion sequence');
 let z = context.getPenZSettings();
 assert(z.write === 30 && z.travel === 34 && z.safe === 50, 'Default Z=30 produces write/travel/safe levels 30/34/50');
 zInput = '10';
