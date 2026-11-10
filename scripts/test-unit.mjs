@@ -23,6 +23,7 @@ const pitchMmMatch = html.match(/function getLinePitchMm\(cell\)\{[^}]+\}/);
 const zFunctionMatch = html.match(/function getPenZSettings\(\)\{[\s\S]*?\n\}/);
 const pauseFunctionMatch = html.match(/function getPause2Seconds\(\)\{[\s\S]*?\n\}/);
 const topMarginMatch = html.match(/function getTopMarginMm\(type,cell\)\{[^}]+\}/);
+const writingBoundsMatch = html.match(/function getPaperWritingBounds\(width,type,red,cell,flip='right',leftInset=10\)\{[\s\S]*?\n\}/);
 const lowercaseScaleMatch = html.match(/function scaleToLowercaseHeight\(targetMm,lowercaseAscentPx\)\{[^}]+\}/);
 const cornerPauseMatch = html.match(/function getCornerPausePosition\(pageX,pageMachineY\)\{return \{[^}]+\}\}/);
 const pagePlacementMatch = html.match(/function getPagePlacementParkPosition\(pageX,pageMachineY,pageWidth,pageHeight,tab\)\{[\s\S]*?\n\}/);
@@ -31,7 +32,7 @@ const justifyCorrectionMatch = html.match(/function getJustifyCorrectionScale\(l
 const lineTransformMatch = html.match(/function withCanvasLineTransform\(cx,x,y,width,heightScale,draw\)\{[\s\S]*?\n\}/);
 const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !writingBoundsMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !preflightMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -48,7 +49,7 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${writingBoundsMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
@@ -70,6 +71,16 @@ pitchUnitInput = 'cells'; pitchCellsInput = '2';
 assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook starts two 5 mm cells below the top edge');
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
+const normalPage=context.getPaperWritingBounds(165,'math-notebook',20,5,'right',10);
+assert(normalPage.startX===10&&normalPage.rightX===143.5&&normalPage.redLineX===145,'Default 5.4.2 notebook layout stays at the same 10 mm start and 1.5 mm safety inset before the right red field');
+const flippedGrid=context.getPaperWritingBounds(165,'math-notebook',20,5,'left',10);
+assert(flippedGrid.redLineX===20&&flippedGrid.startX===25&&flippedGrid.rightX===155,'Flipped grid page starts one 5 mm cell after the left red line and leaves 10 mm at the far edge');
+const flippedRuled=context.getPaperWritingBounds(165,'russian-notebook',20,8.35,'left',10);
+assert(flippedRuled.redLineX===20&&flippedRuled.startX===25&&flippedRuled.rightX===155,'Flipped ruled notebook uses a 5 mm start offset and a 10 mm far-edge margin');
+const flippedA4=context.getPaperWritingBounds(210,'a4-plain',20,8.35,'left',10);
+assert(flippedA4.guideOnly&&flippedA4.redLineX===10&&flippedA4.startX===15&&flippedA4.rightX===200,'Flipped plain A4 uses a preview-only 10 mm guide, starts 5 mm after it and leaves 10 mm at the far edge');
+const normalA4=context.getPaperWritingBounds(210,'a4-plain',20,8.35,'right',10);
+assert(normalA4.startX===10&&normalA4.rightX===208.5&&normalA4.redLineX===null,'Default plain A4 layout remains unchanged when flip is not selected');
 assert(context.scaleToLowercaseHeight(4.8, 2.4) === 2, 'A 4.8 mm lowercase target scales the measured x-height to 4.8 mm');
 const mockCanvas={depth:0,saves:0,restores:0,save(){this.depth++;this.saves++},restore(){this.depth--;this.restores++},translate(){},transform(){}};
 context.withCanvasLineTransform(mockCanvas,100,200,1,1.2,()=>{});
