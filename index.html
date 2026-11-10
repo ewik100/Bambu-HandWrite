@@ -161,6 +161,14 @@ label{font-size:13px;font-weight:600;color:#405463}input,textarea,select{border-
 .z-levels.invalid{background:#fff2ef;border-color:#e5b9b1;color:#923c32}
 @media(max-width:520px){.z-setting{padding:11px}.z-presets button{flex:1;min-width:62px}}
 
+
+/* Static safety reminder: intentionally no G-code or printer-command changes. */
+.paper-safety{display:flex;gap:12px;align-items:flex-start;margin:10px 0 14px;padding:14px 15px;border:2px solid #d79b36;border-radius:14px;background:#fff3d9;color:#593b0b;box-shadow:0 2px 10px #8a5a0012}
+.paper-safety-icon{font-size:27px;line-height:1;flex:0 0 auto}
+.paper-safety h2{font-size:16px;margin:0 0 6px;color:#7b2e20}
+.paper-safety p{font-size:13px;line-height:1.5;margin:4px 0}
+.paper-safety strong{color:#7b2e20}
+@media(max-width:520px){.paper-safety{padding:12px;gap:9px}}
 </style>
 </head>
 <body>
@@ -169,6 +177,14 @@ label{font-size:13px;font-weight:600;color:#405463}input,textarea,select{border-
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill">Генератор готов · интернет не обязателен</span></p>
 </header>
+<section class="paper-safety" role="alert" aria-labelledby="paperSafetyTitle">
+  <div class="paper-safety-icon" aria-hidden="true">⚠️</div>
+  <div>
+    <h2 id="paperSafetyTitle">ОБЯЗАТЕЛЬНО: не забудь защитный лист под рабочей бумагой!</h2>
+    <p><strong>Перед запуском положи отдельный защитный лист A4 на пластину принтера.</strong> Во время второй паузы положи рабочий лист сверху — по контуру, который нарисует ручка.</p>
+    <p>Не клади рабочую бумагу прямо на пластину и не запускай печать без защитного листа: при проверке контура ручка может выйти за край рабочего листа и поцарапать пластину.</p>
+  </div>
+</section>
 <section class="card controls">
   <h2>1. Текст и почерк</h2>
   <label>Текст домашней работы<textarea id="txt" spellcheck="false">Мама мыла раму.
