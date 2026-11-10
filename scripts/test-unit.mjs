@@ -29,7 +29,9 @@ const pagePlacementMatch = html.match(/function getPagePlacementParkPosition\(pa
 const fitSearchMatch = html.match(/function findLargestFittingTenth\(currentMm,fitsAt\)\{[\s\S]*?return best===null\?null:best\/10\}/);
 const justifyCorrectionMatch = html.match(/function getJustifyCorrectionScale\(lines,boxes,rightX,widthScale,currentScale=1\)\{[\s\S]*?\n\}/);
 const lineTransformMatch = html.match(/function withCanvasLineTransform\(cx,x,y,width,heightScale,draw\)\{[\s\S]*?\n\}/);
-const routeGuardMatch = html.match(/function validateTextRouteCommands\(commands,zSettings\)\{[\s\S]*?\n\}/);\nconst writingBoundsMatch = html.match(/function getPaperWritingBounds\(width,type,red,cell,flip='right',leftInset=10\)\{[\s\S]*?\n\}/);\nconst preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings,expectedDraw\)\{[\s\S]*?\n\}/);
+const routeGuardMatch = html.match(/function validateTextRouteCommands\(commands,zSettings\)\{[\s\S]*?\n\}/);
+const writingBoundsMatch = html.match(/function getPaperWritingBounds\(width,type,red,cell,flip='right',leftInset=10\)\{[\s\S]*?\n\}/);
+const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings,expectedDraw\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
 if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
@@ -171,11 +173,11 @@ const testPause={x:45.5,y:253};
 const testSidePark={x:128,y:42};
 const testZ={safe:50,travel:34,write:30};
 const drawCommands=['G1 Z34.000 F1200','G0 X55.000 Y240.000 F1800','G1 Z30.000 F1200','G1 X60.000 Y240.000 F1500','G1 Z34.000 F1200'];
-const routeCheck=context.validateTextRouteCommands(drawCommands,testZ,drawCommands);
+const routeCheck=context.validateTextRouteCommands(drawCommands,testZ);
 assert(routeCheck.strokes===1&&routeCheck.segments===1,'Route guard accepts one complete pen-up/travel/write/XY/lift stroke');
-throws(()=>context.validateTextRouteCommands(drawCommands.slice(0,4),testZ,drawCommands),/последний штрих не завершён/,'Route guard rejects a stroke that never raises the pen at the end');
-throws(()=>context.validateTextRouteCommands(['G1 Z34.000 F1200','G0 X55.000 Y240.000 F1800','G1 X60.000 Y240.000 F1500','G1 Z34.000 F1200'],testZ,drawCommands),/вне режима письма/,'Route guard rejects XY drawing while the pen is not down');
-throws(()=>context.validateTextRouteCommands(['G1 Z34.000 F1200','G1 Z30.000 F1200'],testZ,drawCommands),/без предварительного подвода/,'Route guard rejects lowering the pen without a preceding XY approach');
+throws(()=>context.validateTextRouteCommands(drawCommands.slice(0,4),testZ),/последний штрих не завершён/,'Route guard rejects a stroke that never raises the pen at the end');
+throws(()=>context.validateTextRouteCommands(['G1 Z34.000 F1200','G0 X55.000 Y240.000 F1800','G1 X60.000 Y240.000 F1500','G1 Z34.000 F1200'],testZ),/вне режима письма/,'Route guard rejects XY drawing while the pen is not down');
+throws(()=>context.validateTextRouteCommands(['G1 Z34.000 F1200','G1 Z30.000 F1200'],testZ),/без предварительного подвода/,'Route guard rejects lowering the pen without a preceding XY approach');
 assert(context.validateGeneratedGcode(validGcode,130,testPause,testSidePark,testPage,testZ,drawCommands)===true,'G-code preflight accepts restored startup, second pause, protective-A4 outline and 50-second placement wait');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S130 ; SECOND STOP','M400 S129 ; SECOND STOP'),130,testPause,testSidePark,testPage,testZ,drawCommands),/вторая автоматическая остановка/,'G-code preflight rejects a missing or altered second pause');
 throws(()=>context.validateGeneratedGcode(validGcode.replace('M400 S50 ; 50-second placement window','M400 S49 ; 49-second placement window'),130,testPause,testSidePark,testPage,testZ,drawCommands),/50-секундное окно/,'G-code preflight requires the fixed 50-second placement window');
