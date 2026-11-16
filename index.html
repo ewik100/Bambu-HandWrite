@@ -274,11 +274,11 @@ Hello, world!</textarea></label>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel" hidden>
       <div class="school-variation-heading"><b>Живой школьный почерк</b><output id="schoolRoughnessValue" for="schoolRoughness">100%</output></div>
-      <label for="schoolRoughness">Неаккуратность почерка — размер, ширина, связки и нажим
-        <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="100">
+      <label for="schoolRoughness">Аккуратность почерка — естественные небольшие изменения размера и положения
+        <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="50">
       </label>
-      <div class="school-variation-scale"><span>0 · ровнее</span><span>100 · неаккуратнее</span></div>
-      <p class="tiny">100% — намеренно очень плохой школьный почерк: слова резко отличаются по высоте и ширине, заметно наклоняются в разные стороны и гуляют относительно строки. При этом каждое слово рисуется цельным фрагментом, поэтому настоящие соединения букв не разрываются. Пробелы между словами сохраняются.</p>
+      <div class="school-variation-scale"><span>0 · очень неровно</span><span>50 · естественно</span><span>100 · идеально ровно</span></div>
+      <p class="tiny">0% — заметная, но контролируемая неровность; 50% — естественный почерк; 100% — ровный исходный шрифт без случайных деформаций. Каждое слово формируется цельным текстовым фрагментом: отдельные буквы не перемещаются, поэтому соединения Pecita сохраняются. Сильных скачков, чрезмерного наклона и наложения из-за случайных смещений нет.</p>
       <div id="schoolFontLoader" class="school-font-loader">
         <p class="tiny">Используется встроенный шрифт <b>Pecita</b>: связное рукописное письмо, кириллица, контекстные формы и лигатуры. Он уже находится в проекте и работает без загрузки с внешних сайтов.</p>
         <p class="tiny">Автор: Philippe Cochy. Лицензия SIL Open Font License 1.1. <a href="https://github.com/googlefonts/pecita" target="_blank" rel="noopener">Исходный репозиторий шрифта</a>. Полная копия лицензии находится в папке fonts проекта.</p>
@@ -457,7 +457,7 @@ Hello, world!</textarea></label>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={handwritingRoughness:38,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={handwritingRoughness:38,schoolRoughness:50,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
@@ -561,7 +561,7 @@ const FONT_PROFILES={
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
  lobster:{title:'Связный красивый — Lobster',tag:'СВЯЗНЫЙ · ВЫРАЗИТЕЛЬНЫЙ',description:'Более нарядный связный курсив с выразительными соединениями букв. Лучше всего подходит для коротких фраз и заголовков; перед длинным текстом обязательно проверь траектории.',lh:5.0,pitch:8.8,drawFeed:1250,rapidFeed:1900,widthScale:.98,slantDeg:0,letterSpacing:0,wordSpacing:.62,routeTolerance:.07,character:'плавный, выразительный',connection:'связные буквы'},
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
- school:{title:'Школьный почерк — Pecita',tag:'ЭКСТРЕМАЛЬНАЯ НЕАККУРАТНОСТЬ',description:'Основа — Pecita: связный рукописный шрифт с контекстными формами букв и лигатурами. Случайные изменения размера, ширины и наклона применяются к целым словам, чтобы не разрывать соединения.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'естественные соединения Pecita'},
+ school:{title:'Школьный почерк — Pecita',tag:'ЖИВОЙ · ЕСТЕСТВЕННЫЙ',description:'Основа — встроенный Pecita с поддержкой кириллицы и связными формами. Ползунок регулирует только мягкую вариативность целых слов: буквы не разъединяются, а строка остаётся спокойной и читаемой.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'естественные соединения Pecita'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
 // Editable decimal fields must not be clamped while the user is midway through typing.
@@ -591,7 +591,7 @@ function refreshFontMetrics(){
  const sample=$('fontSample');if(sample){const family=modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'neucha');sample.style.fontFamily=fontCss(family)+',cursive';sample.style.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1,"dlig" 1';sample.style.fontVariantLigatures='common-ligatures contextual';sample.textContent='Красивый почерк — мама мыла раму. 123';}
  const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=$('handFont')?.value!=='school';
  updateSchoolFontLoader();
- const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolRoughness()+'%';
+ const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolAccuracy()+'%';
 }
 function applyFontProfile(key){
  const p=FONT_PROFILES[key]||FONT_PROFILES.neucha;
@@ -608,7 +608,8 @@ function clampValue(id,min,max){const el=$(id);let n=Number(el.value);if(!Number
 function scriptOf(ch,last='latn'){if(/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(ch))return 'cyrl';if(/[A-Za-z\u00C0-\u024F]/u.test(ch))return 'latn';return last}
 function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(hand==='school')return FONT.school;if(hand==='badscript')return FONT.badscript;if(hand==='neucha')return FONT.neucha;if(hand==='pangolin')return FONT.pangolin;if(hand==='lobster')return FONT.lobster;if(hand==='caveat')return FONT.caveat;if(hand==='marck')return FONT.marck;if(hand==='great')return sc==='cyrl'?FONT.neucha:FONT.great;if(hand==='recommended')return FONT.neucha;if(mode==='ru')return FONT.marck;if(mode==='en')return FONT.dancing;if(mode==='universal')return sc==='cyrl'?FONT.marck:FONT.dancing;return sc==='cyrl'?FONT.marck:FONT.dancing}
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
-function schoolRoughness(){return Math.max(0,Math.min(100,Number($('schoolRoughness')?.value)||0))}
+function schoolAccuracy(){const value=Number($('schoolRoughness')?.value);return Number.isFinite(value)?Math.max(0,Math.min(100,value)):50}
+function schoolRoughness(){return 100-schoolAccuracy()}
 function schoolNoise(seed,index,salt){
  let h=2166136261;const value=String(seed)+'|'+index+'|'+salt;
  for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)}
@@ -616,14 +617,12 @@ function schoolNoise(seed,index,salt){
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed){
  const level=Math.max(0,Math.min(100,roughness))/100,metrics=ctx.measureText(word);
- // Keep each word as one shaped text run: Pecita supplies connected glyphs and contextual alternates.
- // Splitting into individual letters would destroy its ligatures and connected strokes.
- // At 100% this is intentionally far from neat calligraphy: each whole word
- // gets a different scale, width, tilt and baseline while its internal joins stay intact.
- const size=1+(schoolNoise(seed,0,3)-.5)*.82*level;       // 0.59–1.41
- const widthScale=1+(schoolNoise(seed,0,4)-.5)*.90*level; // 0.55–1.45
- const rotation=(schoolNoise(seed,0,2)-.5)*18*level;      // -9°…+9°
- const baselineJitter=(schoolNoise(seed,0,5)-.5)*2.4*level; // ±1.2 mm
+ // Shape each complete word in one text run so contextual cursive joins remain intact.
+ // Variation is deliberately restrained: it must look handwritten, not distorted.
+ const size=1+(schoolNoise(seed,0,3)-.5)*.28*level;       // ±14% at the messiest setting
+ const widthScale=1+(schoolNoise(seed,0,4)-.5)*.20*level; // ±10% at the messiest setting
+ const rotation=(schoolNoise(seed,0,2)-.5)*3.2*level;     // ±1.6 degrees maximum
+ const baselineJitter=(schoolNoise(seed,0,5)-.5)*.9*level; // ±0.45 mm maximum
  const endX=startX+metrics.width*widthScale*size+letterSpacing;
  return {text:word,x:startX,y:baseline+baselineJitter,rotation,size,widthScale,metrics,endX,level};
 }
@@ -1431,7 +1430,7 @@ function importProjectBackup(file){
    const allowed=Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']);
    for(const k of allowed){if(v[k]===undefined||!$(k))continue;const el=$(k);
     if(el.tagName==='SELECT'){if([...el.options].some(o=>o.value===String(v[k])))el.value=String(v[k]);continue}
-    if(el.type==='number'||el.type==='hidden'){
+    if(el.type==='number'||el.type==='hidden'||el.type==='range'){
      const n=Number(v[k]);if(!Number.isFinite(n))continue;let lo=el.min!==''?Number(el.min):-100000,hi=el.max!==''?Number(el.max):100000;
      if(k==='pause2Seconds'){lo=1;hi=600}el.value=String(Math.max(lo,Math.min(hi,n)));continue;
     }
@@ -1486,7 +1485,7 @@ $('gcodeHelpBtn').addEventListener('click',()=>{$('gcodeInstruction').hidden=!$(
 $('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paperZoom+.2)*10)/10);applyPaperZoom()});$('zoomOut').addEventListener('click',()=>{paperZoom=Math.max(1,Math.round((paperZoom-.2)*10)/10);applyPaperZoom()});$('zoomFit').addEventListener('click',()=>{paperZoom=1;applyPaperZoom()});
 $('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
 $('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);try{build();save()}catch(e){}refreshFontAvailability(lastModel)});
-$('schoolRoughness').addEventListener('input',()=>{const value=schoolRoughness();$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
+$('schoolRoughness').addEventListener('input',()=>{const value=schoolAccuracy();$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
 ['lh','pitch','pitchMm'].forEach(id=>$(id).addEventListener('change',()=>{const isHeight=id==='lh',isMm=id==='pitchMm',min=isMm?5:2,max=isMm?60:(isHeight?20:30),fallback=isHeight?(lastModel?.lh??DEFAULTS.lh):(isMm?DEFAULTS.pitchMm:(lastModel?.pitch??DEFAULTS.pitch)),digits=isMm?1:(isHeight?1:2);commitEditableDecimal(id,min,max,fallback,digits);invalidateGeneratedGcode();refreshFontMetrics();try{build();save()}catch(e){$('layoutStatus').textContent='Проверь высоту букв и межстрочный интервал: '+(e?.message||e);$('layoutStatus').className='status bad'}}));
 ['txt','scriptMode','lh','pitch','pitchMm','bedTopGap','plateTabX','plateTabWidth','plateTabClearance','plateTabDepth','paragraphIndent'].forEach(id=>$(id).addEventListener('input',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()}));
 ['paragraphIndentToggle','justifyToggle','pitchCells','pitchUnit'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();updateLineSpacingUI();build();save()}));
