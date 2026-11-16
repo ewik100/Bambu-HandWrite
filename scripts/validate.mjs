@@ -37,9 +37,9 @@ if (html) {
   const modeEnd=html.indexOf('</select>',modeStart);
   const handSelect=handStart>=0&&handEnd>handStart?html.slice(handStart,handEnd):'';
   const modeSelect=modeStart>=0&&modeEnd>modeStart?html.slice(modeStart,modeEnd):'';
-  if ((handSelect.match(/<option\\b/g)||[]).length!==1 || !handSelect.includes('value="lobster"')) fail('Lobster must be the only handwriting font option.');
+  if ((handSelect.split('<option').length-1)!==1 || !handSelect.includes('value="lobster"')) fail('Lobster must be the only handwriting font option.');
   else ok('Lobster is the only handwriting font option');
-  if ((modeSelect.match(/<option\\b/g)||[]).length!==1 || !modeSelect.includes('value="auto"')) fail('Lobster must be used for both Russian and English.');
+  if ((modeSelect.split('<option').length-1)!==1 || !modeSelect.includes('value="auto"')) fail('Lobster must be used for both Russian and English.');
   else ok('The language setting keeps Lobster for Russian and English');
   for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing,`${line.text}:${i}:${wordIndex++}`,hand)', 'Не удалось загрузить оригинальный шрифт Lobster']) {
     if (!html.includes(marker)) fail(`Missing Lobster feature: ${marker}`);
