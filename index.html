@@ -273,13 +273,13 @@ Hello, world!</textarea></label>
       <p class="tiny">Используется один основной шрифт Lobster для кириллицы и латиницы. Рекомендуемая высота строчных букв — 5,0 мм, шаг строк — 8,8 мм. Высоту и шаг можно менять вручную.</p>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel" hidden>
-      <div class="school-variation-heading"><b>Естественная неровность Lobster</b><output id="schoolRoughnessValue" for="schoolRoughness">50%</output></div>
-      <label for="schoolRoughness">Сила естественных различий в размере и положении целых слов
+      <div class="school-variation-heading"><b>Вариативность почерка</b><output id="schoolRoughnessValue" for="schoolRoughness">50%</output></div>
+      <label for="schoolRoughness">Настройка естественного вида целых слов
         <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="50">
       </label>
       <div class="school-variation-scale"><span>0 · ровно</span><span>50 · естественно</span><span>100 · заметно неровно</span></div>
-      <p class="tiny">0% — исходный ровный Lobster; 50% — небольшие естественные различия; 100% — более заметная, но ограниченная вариативность. Каждое слово остаётся единым текстовым фрагментом: внутренние соединения шрифта не разбиваются на отдельные буквы. Буквы не прыгают по отдельности, программный наклон не добавляется.</p>
-      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для этого профиля используется Lobster.</p></div>
+      <p class="tiny">Для Lobster меняется сила небольших различий между целыми словами. Для школьного Pecita регулируется аккуратность письма. В обоих случаях отдельные буквы не перемещаются, а соединения внутри слова не разбиваются.</p>
+      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
     <div class="layout-options wide" aria-label="Настройки абзацев и заполнения строк">
@@ -586,9 +586,13 @@ function refreshFontMetrics(){
  const lh=readEditableDecimal('lh',2,20,fallbackLh),pitch=readEditableDecimal('pitch',2,30,fallbackPitch);
  if($('fontProfileMetrics'))$('fontProfileMetrics').innerHTML=`<span>Высота / шаг строк: <b>${lh.toFixed(1).replace('.',',')} / ${pitch.toFixed(2).replace('.',',')} мм</b></span><span>Ширина / доп. наклон: <b>${Math.round(p.widthScale*100)}% / ${p.slantDeg}°</b></span><span>Межбуквенное / межсловное: <b>${CANVAS_SPACING.letter?p.letterSpacing.toFixed(2):'0.00'} / ${CANVAS_SPACING.word?p.wordSpacing.toFixed(2):'0.00'} мм</b></span><span>Скорость / детализация: <b>${p.drawFeed} мм/мин / ${p.routeTolerance.toFixed(2)} мм</b></span><span>Соединение: <b>${p.connection}</b></span>`;
  const sample=$('fontSample');if(sample){const family=modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'neucha');sample.style.fontFamily=fontCss(family)+',cursive';sample.style.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1,"dlig" 1';sample.style.fontVariantLigatures='common-ligatures contextual';sample.textContent='Красивый почерк — мама мыла раму. 123';}
- const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=!['school','lobster'].includes($('handFont')?.value);
+ const schoolPanel=$('schoolVariationPanel'),schoolMode=$('handFont')?.value==='school';if(schoolPanel)schoolPanel.hidden=!['school','lobster'].includes($('handFont')?.value);
  updateSchoolFontLoader();
- const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolVariation()+'%';
+ const heading=schoolPanel?.querySelector('.school-variation-heading b'),sliderLabel=schoolPanel?.querySelector('label[for="schoolRoughness"]'),scale=schoolPanel?.querySelectorAll('.school-variation-scale span');
+ if(heading)heading.textContent=schoolMode?'Аккуратность школьного почерка':'Естественная неровность Lobster';
+ if(sliderLabel?.firstChild)sliderLabel.firstChild.textContent=schoolMode?'Аккуратность почерка — от неровного к ровному':'Сила естественных различий между целыми словами';
+ if(scale?.length===3){scale[0].textContent=schoolMode?'0 · очень неровно':'0 · ровно';scale[1].textContent='50 · естественно';scale[2].textContent=schoolMode?'100 · ровно':'100 · заметно неровно'}
+ const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=(schoolMode?schoolAccuracy():schoolVariation())+'%';
 }
 function applyFontProfile(key){
  const p=FONT_PROFILES[key]||FONT_PROFILES.neucha;
