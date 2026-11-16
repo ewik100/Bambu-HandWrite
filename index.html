@@ -618,7 +618,7 @@ function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpac
    return {glyphs,endX:cursor};
   }
   function schoolConnectorSegments(glyphs,fontSize){
-   const result=[],isLetter=ch=>/[\\p{L}\\p{M}]/u.test(ch);
+   const result=[],isLetter=ch=>/[\p{L}\p{M}]/u.test(ch);
    const rotatedPoint=(g,localX,localY)=>{
     const angle=(g.rotation||0)*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle);
     return {x:g.x+localX*c-localY*s,y:g.y+localX*s+localY*c};
