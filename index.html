@@ -508,11 +508,11 @@ function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,ta
  if(!usable.length)throw Error('Не осталось безопасного места сбоку листа для 50-секундной установки. Уменьши размер листа или измени его положение.');
  return {x:Number(usable[0].x.toFixed(3)),y:Number(usable[0].y.toFixed(3))};
 }
-const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Marck Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
+const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Pacifico',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
 function startOptionalFontStylesheet(){
  if($('handwritingFontCss'))return;
- const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='print';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pangolin&family=Lobster&display=swap';
+ const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='print';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Pacifico&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pangolin&family=Lobster&display=swap';
  link.addEventListener('load',()=>{link.media='all';fontStylesheetReady=true;window.dispatchEvent(new Event('handwritingfontsready'))},{once:true});
  link.addEventListener('error',()=>window.dispatchEvent(new Event('handwritingfontserror')),{once:true});
  document.head.appendChild(link);
@@ -604,60 +604,21 @@ function schoolNoise(seed,index,salt){
  return (h>>>0)/4294967295;
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed){
-   const level=Math.max(0,Math.min(100,roughness))/100,glyphs=[];let cursor=startX;
-   const chars=Array.from(word);
-   for(let i=0;i<chars.length;i++){
-    const ch=chars[i],metrics=ctx.measureText(ch);
-    // At 100% the handwriting is deliberately very irregular, while the word baseline stays stable.
-    const size=1+(schoolNoise(seed,i,3)-.5)*.48*level;
-    const widthScale=1+(schoolNoise(seed,i,4)-.5)*.72*level;
-    const rotation=(schoolNoise(seed,i,2)-.5)*11*level;
-    glyphs.push({ch,x:cursor,y:baseline,rotation,size,widthScale,metrics,index:i,level});
-    cursor+=metrics.width*widthScale*size+letterSpacing;
-   }
-   return {glyphs,endX:cursor};
-  }
-  function schoolConnectorSegments(glyphs,fontSize){
-   const result=[],isLetter=ch=>/[\p{L}\p{M}]/u.test(ch);
-   const rotatedPoint=(g,localX,localY)=>{
-    const angle=(g.rotation||0)*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle);
-    return {x:g.x+localX*c-localY*s,y:g.y+localX*s+localY*c};
-   };
-   for(let i=0;i<glyphs.length-1;i++){
-    const a=glyphs[i],b=glyphs[i+1];
-    if(!isLetter(a.ch)||!isLetter(b.ch))continue;
-    const level=Math.max(a.level||0,b.level||0);
-    // Join endpoints extend into both measured glyph bounds so the stroke merges with the letters.
-    const overlap=fontSize*(.24+.16*level);
-    const aRight=(a.metrics.actualBoundingBoxRight||a.metrics.width*.82)*a.widthScale*a.size;
-    const bLeft=-(b.metrics.actualBoundingBoxLeft||0)*b.widthScale*b.size;
-    const joinHeight=fontSize*(.22+.10*schoolNoise('height',i,0));
-    const p1=rotatedPoint(a,aRight-overlap,-joinHeight*a.size);
-    const p2=rotatedPoint(b,bLeft+overlap,-joinHeight*b.size);
-    const startX=p1.x,startY=p1.y,endX=p2.x,endY=p2.y;
-    const irregular=(schoolNoise('join',i,0)-.5)*fontSize*.20*level;
-    const curve=(schoolNoise('curve',i,1)-.5)*fontSize*.34*level;
-    const controlX=(startX+endX)/2+(schoolNoise('curve-x',i,3)-.5)*fontSize*.18*level;
-    const controlY=Math.min(startY,endY)-fontSize*(.035+level*.11)+curve+irregular;
-    result.push({startX,startY,controlX,controlY,endX,endY,thickness:fontSize*(.065+.075*level*(.45+schoolNoise('thick',i,2)))});
-   }
-   return result;
-  }
-  function schoolConnectorsSvg(glyphs,fontSize,transform){
-  const segments=schoolConnectorSegments(glyphs,fontSize);
-  return segments.map(s=>`<path transform="${transform}" d="M${s.startX.toFixed(4)} ${s.startY.toFixed(4)} Q${s.controlX.toFixed(4)} ${s.controlY.toFixed(4)} ${s.endX.toFixed(4)} ${s.endY.toFixed(4)}" fill="none" stroke="#173b72" stroke-width="${s.thickness.toFixed(4)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
- }
- function drawSchoolWordCanvas(ctx,layout,fontSize){
-  for(const g of layout.glyphs){
-   ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.rotation*Math.PI/180);ctx.scale(g.widthScale,g.size);ctx.fillText(g.ch,0,0);ctx.restore();
-  }
-  const segments=schoolConnectorSegments(layout.glyphs,fontSize);
-  if(segments.length){
-   ctx.save();ctx.strokeStyle='#000';ctx.lineCap='round';ctx.lineJoin='round';
-   for(const s of segments){ctx.beginPath();ctx.lineWidth=s.thickness;ctx.moveTo(s.startX,s.startY);ctx.quadraticCurveTo(s.controlX,s.controlY,s.endX,s.endY);ctx.stroke()}
-   ctx.restore();
-  }
- }
+ const level=Math.max(0,Math.min(100,roughness))/100,metrics=ctx.measureText(word);
+ // Keep each word as one shaped text run: Pacifico supplies real contextual entry/exit forms.
+ // Splitting into individual letters would destroy the font's natural joins.
+ const size=1+(schoolNoise(seed,0,3)-.5)*.48*level;
+ const widthScale=1+(schoolNoise(seed,0,4)-.5)*.48*level;
+ const rotation=(schoolNoise(seed,0,2)-.5)*7*level;
+ const endX=startX+metrics.width*widthScale*size+letterSpacing;
+ return {text:word,x:startX,y:baseline,rotation,size,widthScale,metrics,endX,level};
+}
+function schoolConnectorSegments(){return []}
+function schoolConnectorsSvg(){return ''}
+function drawSchoolWordCanvas(ctx,layout,fontSize){
+ ctx.save();ctx.translate(layout.x,layout.y);ctx.rotate(layout.rotation*Math.PI/180);
+ ctx.scale(layout.widthScale,layout.size);ctx.fillText(layout.text,0,0);ctx.restore();
+}
  const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
 const CANVAS_SPACING={letter:!!mctx&&'letterSpacing' in mctx,word:!!mctx&&'wordSpacing' in mctx};
 function measureText(t,font,size,hand='marck'){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;mctx.font=`${size}px ${fontCss(font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return mctx.measureText(t).width}
@@ -800,20 +761,20 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
   const letter=CANVAS_SPACING.letter?profile.letterSpacing:0,word=CANVAS_SPACING.word?profile.wordSpacing:0;
   const schoolTransform=`matrix(${width},0,0,${sy},${tx},${ty})`;
    if(hand==='school'){
-    svg+=`<text data-line="${i}" x="0" y="0" transform="${schoolTransform}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:none;white-space:pre">`;
-    let cursor=line.x,wordIndex=0,connectors='';
+    svg+=`<text data-line="${i}" x="0" y="0" transform="${schoolTransform}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">`;
+    let cursor=line.x,wordIndex=0;
     for(const run of runs){
      mctx.font=`${fontSize}px ${fontCss(run.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing='0px';if(CANVAS_SPACING.word)mctx.wordSpacing='0px';
      for(const part of run.text.split(/(\s+)/u)){
       if(!part)continue;
       if(/^\s+$/u.test(part)){cursor+=mctx.measureText(part).width+(part.match(/ /g)||[]).length*profile.wordSpacing;continue}
       const layout=schoolWordLayout(mctx,part,cursor,y,fontSize,schoolRoughness(),profile.letterSpacing,`${line.text}:${i}:${wordIndex++}`);
-      for(const g of layout.glyphs){const gx=g.x,gy=g.y,wx=g.widthScale,syGlyph=g.size;svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}" rotate="${g.rotation.toFixed(3)}" transform="translate(${gx.toFixed(4)} ${gy.toFixed(4)}) scale(${wx.toFixed(4)} ${syGlyph.toFixed(4)}) translate(${-gx.toFixed(4)} ${-gy.toFixed(4)})">${esc(g.ch)}</tspan>`;}
-      connectors+=schoolConnectorsSvg(layout.glyphs,fontSize,schoolTransform);
+      const gx=layout.x,gy=layout.y;
+      svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}" transform="translate(${gx.toFixed(4)} ${gy.toFixed(4)}) rotate(${layout.rotation.toFixed(3)}) scale(${layout.widthScale.toFixed(4)} ${layout.size.toFixed(4)}) translate(${-gx.toFixed(4)} ${-gy.toFixed(4)})">${esc(layout.text)}</tspan>`;
       cursor=layout.endX;
      }
     }
-    svg+='</text>'+connectors;
+    svg+='</text>';
    }else{
     svg+=`<text data-line="${i}" x="${line.x}" y="${y}" transform="${schoolTransform}" letter-spacing="${letter}" word-spacing="${word}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">`;
     {
