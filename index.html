@@ -277,7 +277,7 @@ Hello, world!</textarea></label>
         <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="100">
       </label>
       <div class="school-variation-scale"><span>0 · ровнее</span><span>100 · неаккуратнее</span></div>
-      <p class="tiny">На 100% слова сильно различаются по размеру, ширине и наклону. Каждое слово остаётся цельным текстовым фрагментом: соединения создаёт сам шрифт, а не нарисованные поверх дуги. Пробелы между словами сохраняются.</p>
+      <p class="tiny">100% — намеренно очень плохой школьный почерк: слова резко отличаются по высоте и ширине, заметно наклоняются в разные стороны и гуляют относительно строки. При этом каждое слово рисуется цельным фрагментом, поэтому настоящие соединения букв не разрываются. Пробелы между словами сохраняются.</p>
       <div id="schoolFontLoader" class="school-font-loader">
         <label for="schoolFontFile">Файл TT Lovelies Script (.otf, .ttf, .woff или .woff2)
           <input id="schoolFontFile" type="file" accept=".otf,.ttf,.woff,.woff2,font/otf,font/ttf,font/woff,font/woff2">
@@ -661,11 +661,14 @@ function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpac
  const level=Math.max(0,Math.min(100,roughness))/100,metrics=ctx.measureText(word);
  // Keep each word as one shaped text run: TT Lovelies Script supplies natural contextual joins.
  // Splitting into individual letters would destroy its ligatures and connected strokes.
- const size=1+(schoolNoise(seed,0,3)-.5)*.48*level;
- const widthScale=1+(schoolNoise(seed,0,4)-.5)*.48*level;
- const rotation=(schoolNoise(seed,0,2)-.5)*7*level;
+ // At 100% this is intentionally far from neat calligraphy: each whole word
+ // gets a different scale, width, tilt and baseline while its internal joins stay intact.
+ const size=1+(schoolNoise(seed,0,3)-.5)*.82*level;       // 0.59–1.41
+ const widthScale=1+(schoolNoise(seed,0,4)-.5)*.90*level; // 0.55–1.45
+ const rotation=(schoolNoise(seed,0,2)-.5)*18*level;      // -9°…+9°
+ const baselineJitter=(schoolNoise(seed,0,5)-.5)*2.4*level; // ±1.2 mm
  const endX=startX+metrics.width*widthScale*size+letterSpacing;
- return {text:word,x:startX,y:baseline,rotation,size,widthScale,metrics,endX,level};
+ return {text:word,x:startX,y:baseline+baselineJitter,rotation,size,widthScale,metrics,endX,level};
 }
 function schoolConnectorSegments(){return []}
 function schoolConnectorsSvg(){return ''}
