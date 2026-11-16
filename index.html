@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<title>Bambu HandWrite 5.5.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.5.1 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 @font-face{font-family:"Pecita School Local";src:url("./fonts/Pecita.otf") format("opentype");font-style:normal;font-weight:400;font-display:swap}
@@ -183,7 +183,7 @@ label{font-size:13px;font-weight:600;color:#405463}input,textarea,select{border-
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.5.0 · LOBSTER HANDWRITING</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.5.1 · MULTI FONT</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю Lobster…</span></p>
 </header>
@@ -240,12 +240,24 @@ Hello, world!</textarea></label>
     </label>
     <label>Язык и почерк
       <select id="scriptMode">
-        <option value="auto" selected>Lobster для русского и английского</option>
+        <option value="auto">Авто: русский и English каждый своим почерком</option>
+        <option value="ru">Только русский рукописный</option>
+        <option value="en">Только английский рукописный</option>
+        <option value="universal">Один почерк для обоих языков</option>
+        <option value="print">Упрощённый печатный · контурный, не single-line</option>
       </select>
     </label>
     <label>Основной шрифт
       <select id="handFont">
-        <option value="lobster" selected>Lobster · связный русский и английский</option>
+        <option value="school">Обычный школьный — связный, неидеальный</option>
+        <option value="marck">Школьный прописной — Marck Script</option>
+        <option value="neucha" selected>Аккуратный повседневный — Neucha</option>
+        <option value="badscript">Естественный реалистичный — Bad Script</option>
+        <option value="pangolin">Мягкий рукописный — Pangolin</option>
+        <option value="lobster">Связный красивый — Lobster</option>
+        <option value="caveat">Быстрый — Caveat</option>
+        <option value="great">Каллиграфический — Great Vibes (латиница)</option>
+        <option value="recommended">Авто · подбирает почерк под язык</option>
       </select>
     </label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
@@ -437,7 +449,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.5.0 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.5.1 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -502,7 +514,7 @@ const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Da
 function fontCss(font){return `"${font}", cursive`}
 function startOptionalFontStylesheet(){
  if($('handwritingFontCss'))return;
- const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='print';link.href='https://fonts.googleapis.com/css2?family=Lobster&display=swap';
+ const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='print';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Lobster&family=Marck+Script&family=Neucha&family=Pacifico&family=Pangolin&display=swap';
  link.addEventListener('load',()=>{link.media='all';fontStylesheetReady=true;window.dispatchEvent(new Event('handwritingfontsready'))},{once:true});
  link.addEventListener('error',()=>window.dispatchEvent(new Event('handwritingfontserror')),{once:true});
  document.head.appendChild(link);
@@ -532,8 +544,8 @@ async function ensureFonts(fonts,size,timeoutMs=2200){
 function fontsForModel(model){const fonts=new Set();for(const line of model.lines)if(!line.blank)for(const run of runsFor(line.text,model.mode,model.hand))fonts.add(run.font);return [...fonts]}
 function setFontStatus(online){
  const status=$('fontStatus'),note=$('fontNote');
- if(online){status.textContent='Lobster загружен';status.className='pill';note.textContent='Используется Lobster для русского и английского текста.'}
- else{status.textContent='Lobster не загружен';status.className='pill offline';note.textContent='Оригинальный Lobster недоступен. G-code не будет создан с подменённым системным шрифтом.'}
+ if(online){status.textContent=($('handFont')?.selectedOptions?.[0]?.textContent||'Выбранный шрифт')+' · загружен';status.className='pill';note.textContent='Выбранный шрифт загружен и используется в предпросмотре и генерации.'}
+ else{status.textContent='Шрифт не загружен';status.className='pill offline';note.textContent='Выбранный шрифт недоступен. G-code не будет создан с подменённым начертанием.'}
 }
 async function refreshFontAvailability(model=lastModel){
  if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,1800);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build()}return online;
@@ -569,7 +581,7 @@ function updateSchoolFontLoader(){
  if(panel)panel.hidden=$('handFont')?.value!=='school';
 }
 function refreshFontMetrics(){
- const p=FONT_PROFILES[$('handFont')?.value]||FONT_PROFILES.lobster;
+ const p=FONT_PROFILES[$('handFont')?.value]||FONT_PROFILES.neucha;
  const fallbackLh=lastModel?.lh??p.lh,fallbackPitch=lastModel?.pitch??p.pitch;
  const lh=readEditableDecimal('lh',2,20,fallbackLh),pitch=readEditableDecimal('pitch',2,30,fallbackPitch);
  if($('fontProfileMetrics'))$('fontProfileMetrics').innerHTML=`<span>Высота / шаг строк: <b>${lh.toFixed(1).replace('.',',')} / ${pitch.toFixed(2).replace('.',',')} мм</b></span><span>Ширина / доп. наклон: <b>${Math.round(p.widthScale*100)}% / ${p.slantDeg}°</b></span><span>Межбуквенное / межсловное: <b>${CANVAS_SPACING.letter?p.letterSpacing.toFixed(2):'0.00'} / ${CANVAS_SPACING.word?p.wordSpacing.toFixed(2):'0.00'} мм</b></span><span>Скорость / детализация: <b>${p.drawFeed} мм/мин / ${p.routeTolerance.toFixed(2)} мм</b></span><span>Соединение: <b>${p.connection}</b></span>`;
@@ -579,7 +591,7 @@ function refreshFontMetrics(){
  const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolVariation()+'%';
 }
 function applyFontProfile(key){
- const p=FONT_PROFILES[key]||FONT_PROFILES.lobster;
+ const p=FONT_PROFILES[key]||FONT_PROFILES.neucha;
  $('lh').value=p.lh;$('pitch').value=p.pitch;
  if($('fontProfileTitle'))$('fontProfileTitle').textContent=p.title;
  if($('fontProfileTag'))$('fontProfileTag').textContent=p.tag;
@@ -595,7 +607,7 @@ function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
 function schoolVariation(){const value=Number($('schoolRoughness')?.value);return Number.isFinite(value)?Math.max(0,Math.min(100,value)):50}
 function schoolAccuracy(){return 100-schoolVariation()}
-function schoolRoughness(){return schoolVariation()}
+function schoolRoughness(){return $('handFont')?.value==='school'?100-schoolVariation():schoolVariation()}
 function schoolNoise(seed,index,salt){
  let h=2166136261;const value=String(seed)+'|'+index+'|'+salt;
  for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)}
@@ -1249,7 +1261,7 @@ async function generateGcode(){
   const zSettings=getPenZSettings();
   let m=build();m.zSettings=zSettings;if(!m.txt.trim())throw Error('Сначала введи текст.');
   if(m.pl.tabOverlap)throw Error('Лист перекрывает настраиваемую защитную зону переднего язычка/ручки пластины A1. G-code не создан. Измерь свою пластину или измени формат/положение бумаги.');
-  setGenerationProgress(10,'Подготавливаю шрифты…');const fontReady=await ensureFonts(fontsForModel(m),m.fontSize,2200);if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');setFontStatus(fontReady);if(!fontReady)throw Error('Не удалось загрузить оригинальный шрифт Lobster. Проверь подключение к интернету и повтори попытку: G-code с подменённым шрифтом не создаётся.');m=build();m.zSettings=zSettings;
+  setGenerationProgress(10,'Подготавливаю шрифты…');const fontReady=await ensureFonts(fontsForModel(m),m.fontSize,2200);if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');setFontStatus(fontReady);if(!fontReady)throw Error('Не удалось загрузить выбранный шрифт. Проверь подключение к интернету и повтори попытку: G-code с подменённым шрифтом не создаётся.');m=build();m.zSettings=zSettings;
   if(m.errors.length)throw Error('Сначала исправь размещение листа: '+m.errors.join(' '));
   if(m.rightX<=m.left+2)throw Error('Между началом текста и правой границей недостаточно места.');
   const cx=m.pl.pageX,cy=253-m.pl.pageY;if(cx<3||cx>253||cy<3||cy>253)throw Error('Физический верхний левый угол листа вне безопасной области пластины.');
@@ -1268,7 +1280,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.5.0`,
+  `; generated by Bambu HandWrite 5.5.1`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1399,7 +1411,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;
- return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.5.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.5.1',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
@@ -1422,7 +1434,7 @@ function importProjectBackup(file){
     }
     if(k==='txt'||k==='documentTitle')el.value=String(v[k]);
    }
-   $('handFont').value='lobster';$('scriptMode').value='auto';if(typeof v.paragraphIndentEnabled==='boolean')$('paragraphIndentToggle').checked=v.paragraphIndentEnabled;
+   if(typeof v.paragraphIndentEnabled==='boolean')$('paragraphIndentToggle').checked=v.paragraphIndentEnabled;
    else if(v.paragraphIndent!==undefined)$('paragraphIndentToggle').checked=Number(v.paragraphIndent)>0;
    if(typeof v.justifyLines==='boolean')$('justifyToggle').checked=v.justifyLines;if(v.pitchCells)$('pitchCells').value=v.pitchCells;   document.querySelectorAll('[data-paper-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.paperChoice===$('paperType').value)));$('customPaperSize').hidden=$('paperType').value!=='custom-paper';
    invalidateGeneratedGcode();updatePauseUI();updatePenZUI();const fp=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.marck;$('fontProfileTitle').textContent=fp.title;$('fontProfileTag').textContent=fp.tag;$('fontProfileDescription').textContent=fp.description;refreshFontMetrics();build();save();initTextHistory();refreshFontAvailability(lastModel);
@@ -1433,7 +1445,7 @@ function importProjectBackup(file){
 }
 
 function restore(){
- try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];$('handFont').value='lobster';$('scriptMode').value='auto';if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=!!v.justifyLines;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';return true}}
+ try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=!!v.justifyLines;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';return true}}
  catch(e){}return false
 }
 function save(){const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']).forEach(k=>{if($(k))v[k]=$(k).value});
@@ -1446,7 +1458,7 @@ let previewDebounce=null,generationToken=0,isGenerating=false;
 function refreshPreviewAndSave(){if(previewDebounce)clearTimeout(previewDebounce);previewDebounce=setTimeout(()=>{try{build();save()}catch(e){$('layoutStatus').textContent='Не удалось обновить предпросмотр: '+(e?.message||e);$('layoutStatus').className='status bad'}},180)}
 $('applyFitSuggestion').addEventListener('click',()=>{const value=Number($('applyFitSuggestion').dataset.value);if(!Number.isFinite(value)||value<2||value>20)return;invalidateGeneratedGcode();$('lh').value=value.toFixed(1);refreshPreviewAndSave()});
 $('draw').addEventListener('click',()=>{invalidateGeneratedGcode();try{build();save()}catch(e){$('layoutStatus').textContent='Ошибка предпросмотра: '+(e?.message||e);$('layoutStatus').className='status bad'}});
-$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('scriptMode').value='auto';$('handFont').value='lobster';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('lobster');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
+$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('scriptMode').value='auto';$('handFont').value='neucha';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('neucha');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
 $('paperType').addEventListener('change',e=>{invalidateGeneratedGcode();setPreset(e.target.value,$('paperOrientation').value,true);save()});
 $('paperFlip').addEventListener('change',()=>{invalidateGeneratedGcode();build();save()});
 ['customPaperW','customPaperH'].forEach((id)=>$(id).addEventListener('input',()=>{if($('paperType').value!=='custom-paper')return;const key=id==='customPaperW'?'pw':'ph';$(key).value=String(clampValue(id,40,420));invalidateGeneratedGcode();refreshPreviewAndSave()}));$('paperOrientation').addEventListener('change',()=>{invalidateGeneratedGcode();setPreset($('paperType').value,$('paperOrientation').value,false);save()});
@@ -1477,5 +1489,5 @@ $('schoolRoughness').addEventListener('input',()=>{const value=schoolVariation()
 ['paragraphIndentToggle','justifyToggle','pitchCells','pitchUnit'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();updateLineSpacingUI();build();save()}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRoutePlayback()});window.addEventListener('pagehide',()=>{stopRoutePlayback();if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}});
 
-const hadSavedSettings=restore();if(hadSavedSettings)save();updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.lobster;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
+const hadSavedSettings=restore();if(hadSavedSettings)save();updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
 </script></body></html>
