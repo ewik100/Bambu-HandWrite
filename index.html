@@ -626,9 +626,7 @@ function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpac
    const bLeft=a.metrics.actualBoundingBoxLeft||0;
    const overlap=fontSize*(.10+.15*((a.level||0)));
    const startX=a.x+aRight*a.widthScale-overlap;
-   const endX=b.x+bLeft+overlap;
-   const gap=endX-startX;
-   if(gap< -fontSize*.5||gap>fontSize*1.15)continue;
+   const endX=b.x+bLeft*b.widthScale+overlap;
    const level=Math.max(a.level||0,b.level||0);
    const irregular=(schoolNoise('join',i,0)-.5)*fontSize*.10*level;
    const startY=a.y-fontSize*(.105+irregular/fontSize);
