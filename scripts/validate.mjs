@@ -26,10 +26,10 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.5.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'function validateTextRouteCommands(commands,zSettings)']) {
+  for (const marker of ['Bambu HandWrite 5.5.1', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'function validateTextRouteCommands(commands,zSettings)']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.5.0, Lobster-only font selection and existing page-layout features are present');
+  if (!errors.length) ok('Version 5.5.1, restored multi-font selection and existing page-layout features are present');
 
   const handStart=html.indexOf('<select id="handFont">');
   const handEnd=html.indexOf('</select>',handStart);
@@ -37,12 +37,14 @@ if (html) {
   const modeEnd=html.indexOf('</select>',modeStart);
   const handSelect=handStart>=0&&handEnd>handStart?html.slice(handStart,handEnd):'';
   const modeSelect=modeStart>=0&&modeEnd>modeStart?html.slice(modeStart,modeEnd):'';
-  if ((handSelect.split('<option').length-1)!==1 || !handSelect.includes('value="lobster"')) fail('Lobster must be the only handwriting font option.');
-  else ok('Lobster is the only handwriting font option');
-  if ((modeSelect.split('<option').length-1)!==1 || !modeSelect.includes('value="auto"')) fail('Lobster must be used for both Russian and English.');
-  else ok('The language setting keeps Lobster for Russian and English');
-  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing,`${line.text}:${i}:${wordIndex++}`,hand)', 'Не удалось загрузить оригинальный шрифт Lobster']) {
-    if (!html.includes(marker)) fail(`Missing Lobster feature: ${marker}`);
+  const expectedFonts=['school','marck','neucha','badscript','pangolin','lobster','caveat','great','recommended'];
+  const actualFonts=[...handSelect.matchAll(/<option\s+value="([^"]+)"/g)].map(match=>match[1]);
+  if (JSON.stringify(actualFonts)!==JSON.stringify(expectedFonts)) fail('All nine handwriting profiles must remain available.');
+  else ok('All nine handwriting profiles are available');
+  if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
+  else ok('All five language/script modes are available');
+  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт']) {
+    if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
   if (!errors.length) ok('Whole-word variation and exact-font generation guard are present');
 
