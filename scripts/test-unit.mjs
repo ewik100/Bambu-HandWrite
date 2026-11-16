@@ -50,7 +50,21 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}`, context);
+const schoolStart=html.indexOf('function schoolNoise(seed,index,salt)');
+const schoolEnd=html.indexOf('\nfunction schoolConnectorSegments()',schoolStart);
+if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract whole-word handwriting variation functions.');
+const schoolFunctions=html.slice(schoolStart,schoolEnd);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
+
+const fontMetrics={measureText:(word)=>({width:word.length*8})};
+const evenWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,0,0,'stable-seed','lobster');
+assert(evenWord.text==='связное'&&evenWord.size===1&&evenWord.widthScale===1&&evenWord.rotation===0&&evenWord.y===30,'Lobster at 0% variation preserves the original complete word');
+const middleWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,50,0,'stable-seed','lobster');
+const middleRepeat=context.schoolWordLayout(fontMetrics,'связное',12,30,20,50,0,'stable-seed','lobster');
+assert(middleWord.size>=.96&&middleWord.size<=1.04&&middleWord.widthScale>=.975&&middleWord.widthScale<=1.025&&middleWord.rotation===0&&Math.abs(middleWord.y-30)<=.075,'Lobster at 50% variation stays restrained');
+assert(middleWord.size===middleRepeat.size&&middleWord.widthScale===middleRepeat.widthScale&&middleWord.y===middleRepeat.y,'Word-level variation is deterministic for the same text and position');
+const roughWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,100,0,'stable-seed','lobster');
+assert(roughWord.size>=.92&&roughWord.size<=1.08&&roughWord.widthScale>=.95&&roughWord.widthScale<=1.05&&roughWord.rotation===0&&Math.abs(roughWord.y-30)<=.15,'Lobster at 100% remains bounded and is never rotated');
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
