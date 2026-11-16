@@ -273,7 +273,7 @@ Hello, world!</textarea></label>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel" hidden>
       <div class="school-variation-heading"><b>Живой школьный почерк</b><output id="schoolRoughnessValue" for="schoolRoughness">38%</output></div>
-      <label for="schoolRoughness">Неидеальность почерка
+      <label for="schoolRoughness">Неаккуратность почерка — размер, ширина, связки и нажим
         <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="38">
       </label>
       <div class="school-variation-scale"><span>0 · ровнее</span><span>100 · неаккуратнее</span></div>
@@ -508,7 +508,7 @@ function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,ta
  if(!usable.length)throw Error('Не осталось безопасного места сбоку листа для 50-секундной установки. Уменьши размер листа или измени его положение.');
  return {x:Number(usable[0].x.toFixed(3)),y:Number(usable[0].y.toFixed(3))};
 }
-const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Bad Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
+const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Marck Script',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
 function startOptionalFontStylesheet(){
  if($('handwritingFontCss'))return;
@@ -555,7 +555,7 @@ const FONT_PROFILES={
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
  lobster:{title:'Связный красивый — Lobster',tag:'СВЯЗНЫЙ · ВЫРАЗИТЕЛЬНЫЙ',description:'Более нарядный связный курсив с выразительными соединениями букв. Лучше всего подходит для коротких фраз и заголовков; перед длинным текстом обязательно проверь траектории.',lh:5.0,pitch:8.8,drawFeed:1250,rapidFeed:1900,widthScale:.98,slantDeg:0,letterSpacing:0,wordSpacing:.62,routeTolerance:.07,character:'плавный, выразительный',connection:'связные буквы'},
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
- school:{title:'Обычный школьный — связный курсив',tag:'ШКОЛЬНЫЙ · ЖИВОЙ',description:'Повседневный школьный почерк: соседние буквы в словах соединяются тонкими естественными связками. Небольшие различия наклона, размера и высоты делают строки менее механическими.',lh:4.7,pitch:8.25,drawFeed:1550,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:-.08,wordSpacing:.52,routeTolerance:.08,character:'обычный, немного неровный',connection:'соседние буквы соединены'},
+ school:{title:'Школьный почерк — связный и живой',tag:'СВЯЗНЫЙ · НЕАККУРАТНЫЙ',description:'Основа — рукописный курсив Marck Script. Все соседние буквы в слове соединяются; ползунок меняет размер, ширину и характер соединений, не раскачивая слова по строке.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:-.12,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'буквы соединяются внутри слов'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
 // Editable decimal fields must not be clamped while the user is midway through typing.
@@ -604,50 +604,56 @@ function schoolNoise(seed,index,salt){
  return (h>>>0)/4294967295;
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed){
- const level=Math.max(0,Math.min(100,roughness))/100,glyphs=[];let cursor=startX;
- const chars=Array.from(word);
- for(let i=0;i<chars.length;i++){
-  const ch=chars[i],metrics=ctx.measureText(ch);
-  const dx=(schoolNoise(seed,i,0)-.5)*.045*level*fontSize;
-  const dy=(schoolNoise(seed,i,1)-.5)*.12*level*fontSize;
-  const rotation=(schoolNoise(seed,i,2)-.5)*8*level;
-  const size=1+(schoolNoise(seed,i,3)-.5)*.10*level;
-  const x=cursor+dx,y=baseline+dy;
-  glyphs.push({ch,x,y,rotation,size,metrics});
-  cursor+=metrics.width+letterSpacing;
+  const level=Math.max(0,Math.min(100,roughness))/100,glyphs=[];let cursor=startX;
+  const chars=Array.from(word);
+  for(let i=0;i<chars.length;i++){
+   const ch=chars[i],metrics=ctx.measureText(ch);
+   // Keep the writing baseline steady: variation changes the glyph itself, not its place on the line.
+   const size=1+(schoolNoise(seed,i,3)-.5)*.22*level;
+   const widthScale=1+(schoolNoise(seed,i,4)-.5)*.30*level;
+   const rotation=(schoolNoise(seed,i,2)-.5)*2.2*level;
+   glyphs.push({ch,x:cursor,y:baseline,rotation,size,widthScale,metrics,index:i,level});
+   cursor+=metrics.width*widthScale+letterSpacing;
+  }
+  return {glyphs,endX:cursor};
  }
- return {glyphs,endX:cursor};
-}
-function schoolConnectorSegments(glyphs,fontSize){
- const result=[],isLetter=ch=>ch.toUpperCase()!==ch.toLowerCase();
- for(let i=0;i<glyphs.length-1;i++){
-  const a=glyphs[i],b=glyphs[i+1];
-  if(!isLetter(a.ch)||!isLetter(b.ch))continue;
-  const startX=a.x+(a.metrics.actualBoundingBoxRight||a.metrics.width*.82);
-  const endX=b.x-(b.metrics.actualBoundingBoxLeft||0);
-  const gap=endX-startX;
-  if(gap<=fontSize*.025||gap>fontSize*.95)continue;
-  const startY=a.y-fontSize*.085,endY=b.y-fontSize*.085;
-  result.push({startX,startY,controlX:(startX+endX)/2,controlY:Math.min(startY,endY)-fontSize*.045,endX,endY});
+ function schoolConnectorSegments(glyphs,fontSize){
+  const result=[],isLetter=ch=>/[\\p{L}\\p{M}]/u.test(ch);
+  for(let i=0;i<glyphs.length-1;i++){
+   const a=glyphs[i],b=glyphs[i+1];
+   if(!isLetter(a.ch)||!isLetter(b.ch))continue;
+   const aRight=a.metrics.actualBoundingBoxRight||a.metrics.width*.82;
+   const bLeft=a.metrics.actualBoundingBoxLeft||0;
+   const overlap=fontSize*(.10+.15*((a.level||0)));
+   const startX=a.x+aRight*a.widthScale-overlap;
+   const endX=b.x+bLeft+overlap;
+   const gap=endX-startX;
+   if(gap< -fontSize*.5||gap>fontSize*1.15)continue;
+   const level=Math.max(a.level||0,b.level||0);
+   const irregular=(schoolNoise('join',i,0)-.5)*fontSize*.10*level;
+   const startY=a.y-fontSize*(.105+irregular/fontSize);
+   const endY=b.y-fontSize*(.105-irregular/fontSize);
+   const curve=(schoolNoise('curve',i,1)-.5)*fontSize*.16*level;
+   result.push({startX,startY,controlX:(startX+endX)/2,controlY:Math.min(startY,endY)-fontSize*(.055+level*.07)+curve,endX,endY,thickness:fontSize*(.045+.055*level*(.45+schoolNoise('thick',i,2)))});
+  }
+  return result;
  }
- return result;
-}
-function schoolConnectorsSvg(glyphs,fontSize,transform){
- const segments=schoolConnectorSegments(glyphs,fontSize);
- return segments.map(s=>`<path transform="${transform}" d="M${s.startX.toFixed(4)} ${s.startY.toFixed(4)} Q${s.controlX.toFixed(4)} ${s.controlY.toFixed(4)} ${s.endX.toFixed(4)} ${s.endY.toFixed(4)}" fill="none" stroke="#173b72" stroke-width="${(fontSize*.035).toFixed(4)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
-}
-function drawSchoolWordCanvas(ctx,layout,fontSize){
- for(const g of layout.glyphs){
-  ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.rotation*Math.PI/180);ctx.scale(g.size,g.size);ctx.fillText(g.ch,0,0);ctx.restore();
+ function schoolConnectorsSvg(glyphs,fontSize,transform){
+  const segments=schoolConnectorSegments(glyphs,fontSize);
+  return segments.map(s=>`<path transform="${transform}" d="M${s.startX.toFixed(4)} ${s.startY.toFixed(4)} Q${s.controlX.toFixed(4)} ${s.controlY.toFixed(4)} ${s.endX.toFixed(4)} ${s.endY.toFixed(4)}" fill="none" stroke="#173b72" stroke-width="${s.thickness.toFixed(4)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
  }
- const segments=schoolConnectorSegments(layout.glyphs,fontSize);
- if(segments.length){
-  ctx.save();ctx.strokeStyle='#000';ctx.lineWidth=fontSize*.035;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
-  for(const s of segments){ctx.moveTo(s.startX,s.startY);ctx.quadraticCurveTo(s.controlX,s.controlY,s.endX,s.endY)}
-  ctx.stroke();ctx.restore();
+ function drawSchoolWordCanvas(ctx,layout,fontSize){
+  for(const g of layout.glyphs){
+   ctx.save();ctx.translate(g.x,g.y);ctx.rotate(g.rotation*Math.PI/180);ctx.scale(g.widthScale,g.size);ctx.fillText(g.ch,0,0);ctx.restore();
+  }
+  const segments=schoolConnectorSegments(layout.glyphs,fontSize);
+  if(segments.length){
+   ctx.save();ctx.strokeStyle='#000';ctx.lineCap='round';ctx.lineJoin='round';
+   for(const s of segments){ctx.beginPath();ctx.lineWidth=s.thickness;ctx.moveTo(s.startX,s.startY);ctx.quadraticCurveTo(s.controlX,s.controlY,s.endX,s.endY);ctx.stroke()}
+   ctx.restore();
+  }
  }
-}
-const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
+ const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
 const CANVAS_SPACING={letter:!!mctx&&'letterSpacing' in mctx,word:!!mctx&&'wordSpacing' in mctx};
 function measureText(t,font,size,hand='marck'){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;mctx.font=`${size}px ${fontCss(font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return mctx.measureText(t).width}
 function getLinePitchCells(){return Math.max(1,Math.min(6,Number($('pitchCells')?.value)||2));}
@@ -797,7 +803,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
       if(!part)continue;
       if(/^\s+$/u.test(part)){cursor+=mctx.measureText(part).width+(part.match(/ /g)||[]).length*profile.wordSpacing;continue}
       const layout=schoolWordLayout(mctx,part,cursor,y,fontSize,schoolRoughness(),profile.letterSpacing,`${line.text}:${i}:${wordIndex++}`);
-      for(const g of layout.glyphs)svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${(fontSize*g.size).toFixed(4)}" x="${g.x.toFixed(4)}" y="${g.y.toFixed(4)}" rotate="${g.rotation.toFixed(3)}">${esc(g.ch)}</tspan>`;
+      for(const g of layout.glyphs){const gx=g.x,gy=g.y,wx=g.widthScale,syGlyph=g.size;svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}" rotate="${g.rotation.toFixed(3)}" transform="translate(${gx.toFixed(4)} ${gy.toFixed(4)}) scale(${wx.toFixed(4)} ${syGlyph.toFixed(4)}) translate(${-gx.toFixed(4)} ${-gy.toFixed(4)})">${esc(g.ch)}</tspan>`;}
       connectors+=schoolConnectorsSvg(layout.glyphs,fontSize,schoolTransform);
       cursor=layout.endX;
      }
