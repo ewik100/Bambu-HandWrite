@@ -26,10 +26,25 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.4.4', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'function validateTextRouteCommands(commands,zSettings)']) {
+  for (const marker of ['Bambu HandWrite 5.5.0', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'function validateTextRouteCommands(commands,zSettings)']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.4.4, page-side flipping, letter-size fixes and both line-spacing modes are present');
+  if (!errors.length) ok('Version 5.5.0, Lobster-only font selection and existing page-layout features are present');
+
+  const handStart=html.indexOf('<select id="handFont">');
+  const handEnd=html.indexOf('</select>',handStart);
+  const modeStart=html.indexOf('<select id="scriptMode">');
+  const modeEnd=html.indexOf('</select>',modeStart);
+  const handSelect=handStart>=0&&handEnd>handStart?html.slice(handStart,handEnd):'';
+  const modeSelect=modeStart>=0&&modeEnd>modeStart?html.slice(modeStart,modeEnd):'';
+  if ((handSelect.match(/<option\\b/g)||[]).length!==1 || !handSelect.includes('value="lobster"')) fail('Lobster must be the only handwriting font option.');
+  else ok('Lobster is the only handwriting font option');
+  if ((modeSelect.match(/<option\\b/g)||[]).length!==1 || !modeSelect.includes('value="auto"')) fail('Lobster must be used for both Russian and English.');
+  else ok('The language setting keeps Lobster for Russian and English');
+  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing,`${line.text}:${i}:${wordIndex++}`,hand)', 'Не удалось загрузить оригинальный шрифт Lobster']) {
+    if (!html.includes(marker)) fail(`Missing Lobster feature: ${marker}`);
+  }
+  if (!errors.length) ok('Whole-word variation and exact-font generation guard are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
@@ -117,7 +132,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md', 'docs/GCODE_BASELINE_5.4.2.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html', 'releases/Bambu-HandWrite-5.4.3.html', 'releases/Bambu-HandWrite-5.4.4.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html', 'releases/Bambu-HandWrite-5.4.3.html', 'releases/Bambu-HandWrite-5.4.4.html', 'releases/Bambu-HandWrite-5.5.0.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',
