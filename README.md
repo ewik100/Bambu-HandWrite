@@ -1,4 +1,4 @@
-# Bambu HandWrite 5.6.2 — боковой лист тетради и непрерывные штрихи
+# Bambu HandWrite 5.6.3 — боковой лист тетради и непрерывные штрихи
 
 **Bambu HandWrite** — небольшое браузерное приложение, которое превращает набранный текст в рукописный макет и строит для него G-code: команды перемещения головки 3D-принтера.
 
@@ -6,16 +6,16 @@
 
 ## Запустить программу
 
-**Самый простой способ:** откройте [версию 5.6.2](releases/Bambu-HandWrite-5.6.2.html) или [`index.html`](index.html). Установка, сервер и сборка не нужны.
+**Самый простой способ:** откройте [версию 5.6.3](releases/Bambu-HandWrite-5.6.3.html) или [`index.html`](index.html). Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . GitHub Pages автоматически публикует текущую версию из ветки `main`; отдельный HTML-снимок 5.6.2 доступен выше.
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . GitHub Pages автоматически публикует текущую версию из ветки `main`; отдельный HTML-снимок 5.6.3 доступен выше.
 
 ## Что умеет программа
 
-- Размещать тетрадную страницу боком на пластине A1: для левого листа верхним становится исходный правый край, для правого — исходный левый. На пластине контур занимает 203 × 165 мм вместо 165 × 203 мм; читаемый макет страницы, клетка/линейка и выбранные отступы сохраняются. После печати страницу нужно вернуть в обычное положение в тетради.
+- Размещать обе стороны тетради боком так, чтобы красная линия на пластине была сверху. Левый лист: красная линия исходной страницы справа, крестик начала — снизу слева, письмо идёт вверх. Правый лист: красная линия исходной страницы слева, крестик начала — сверху справа, письмо идёт вниз. Сторона красного поля выбирается автоматически по типу листа; в боковом режиме переключатель заблокирован от ошибочного выбора. Физический контур занимает 203 × 165 мм вместо 165 × 203 мм, при этом читаемый макет и разметка сохраняются.
 - Убирать лишние подъёмы пера там, где отдельные части скелета буквы действительно сходятся. Для возврата к такой точке используется только уже нарисованная траектория; произвольные соединительные штрихи не добавляются. Отдельные точки и несвязанные части остаются отдельными штрихами.
 
-- Выбирать сторону красного поля. Между красной линией со стороны корешка и текстом остаётся две клетки — 10 мм для стандартной клетки 5 мм; внешний край страницы сохраняет отступ 10 мм. Это работает как для левой, так и для правой красной линии.
+- Оставлять две клетки (10 мм при стандартной клетке 5 мм) между красной линией со стороны корешка и текстом; на внешнем крае также сохраняется отступ 10 мм.
 - Печатать текст на предпросмотре листа в клетку, линейку или на чистой странице.
 - Работать с русским и английским текстом.
 - Задавать название работы на русском или английском: приложение сразу транслитерирует его в латиницу для имени `.gcode` и комментария G-code; в этих полях не остаётся кириллицы.
@@ -115,4 +115,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 5.6.2 is an independent browser-based handwriting layout and G-code generator for the Bambu Lab A1. It supports normal, left-leaf and right-leaf page placement, two-cell clearance from the selected binding-side red margin, automated source validation and route regression checks. Pen-holder geometry, pen-tip clearance and paper fixing still require physical calibration on the user's own setup. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 5.6.3 is an independent browser-based handwriting layout and G-code generator for the Bambu Lab A1. It supports normal, left-leaf and right-leaf page placement, two-cell clearance from the selected binding-side red margin, automated source validation and route regression checks. Pen-holder geometry, pen-tip clearance and paper fixing still require physical calibration on the user's own setup. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
