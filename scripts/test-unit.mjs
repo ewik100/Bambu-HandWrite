@@ -266,7 +266,7 @@ assert(rightWritingStart.x===183&&rightWritingStart.y===30&&rightWritingNext.y==
 const routeRaster={w:30,h:20,scale:1,offsetX:134,offsetY:180,bin:new Uint8Array(600)};
 for(const [x,y] of [[2,2],[21,2],[2,15],[21,15]]){routeRaster.bin[y*30+x]=1;routeRaster.bin[y*30+x+1]=1}
 const pathsInReverseInputOrder=[
- [15*30+22,15*30+21],
+ [15*30+21,15*30+22],
  [2*30+22,2*30+21],
  [15*30+3,15*30+2],
  [2*30+3,2*30+2]
