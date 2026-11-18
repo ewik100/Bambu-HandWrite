@@ -57,7 +57,7 @@ if (html) {
   else ok('All nine handwriting profiles are available');
   if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
   else ok('All five language/script modes are available');
-  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт']) {
+  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт', "drawFeed:900,rapidFeed:1900", 'routeTolerance:1.0', "maxScale=model.hand==='lobster'?28:22"]) {
     if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
   if (!errors.length) ok('Whole-word variation and exact-font generation guard are present');
