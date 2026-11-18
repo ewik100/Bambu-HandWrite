@@ -757,7 +757,7 @@ function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch,flip='right',rotation='no
  s+=`<rect x="${tab.x}" y="${BED.h}" width="${tab.w}" height="${tab.depth}" rx="2" fill="#aeb8c0" stroke="#53616c" stroke-width=".8"/>`;
  s+=`<rect x="${tab.x}" y="${BED.h-tab.clearance}" width="${tab.w}" height="${tab.clearance+tab.depth}" fill="url(#hatch)" opacity=".9"/>`;
  s+=`<text x="${Math.max(viewX+2,tab.x-8)}" y="${BED.h+tab.depth+7}" font-size="4" fill="#8e3934">ЯЗЫЧОК / РУЧКА ПЛАСТИНЫ · НЕ НАКРЫВАТЬ</text>`;
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewTop} ${viewW} ${viewH}" width="${viewW*2}" height="${viewH*2}">${s}</svg>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewTop} ${viewW} ${viewH}" width="${Math.min(680,viewW*1.55)}" height="${viewH*1.55}">${s}</svg>`;
 }function getPause2Seconds(){
  const el=$('pause2Seconds');const n=Number.parseInt(el?.value??'130',10);return Number.isFinite(n)?Math.max(1,Math.min(600,n)):130;
 }
