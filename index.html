@@ -1110,6 +1110,19 @@ function mergeTouchingPaths(paths){
   const path=source.slice(),previous=merged[merged.length-1];
   if(previous&&same(previous[previous.length-1],path[0])){previous.push(...path.slice(1));continue}
   if(previous&&same(previous[previous.length-1],path[path.length-1])){previous.push(...path.slice(0,-1).reverse());continue}
+  if(previous){
+   let join=-1,branch=null;
+   for(let i=previous.length-2;i>=0;i--){
+    if(same(previous[i],path[0])){join=i;branch=path;break}
+    if(same(previous[i],path[path.length-1])){join=i;branch=path.slice().reverse();break}
+   }
+   if(join>=0){
+    // Retrace only an already-drawn skeleton segment to return to a real junction.
+    // No synthetic connector or new coordinate is ever introduced.
+    previous.push(...previous.slice(join,-1).reverse(),...branch.slice(1));
+    continue;
+   }
+  }
   merged.push(path);
  }
  return merged;
