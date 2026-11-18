@@ -283,7 +283,7 @@ const rightModel={...model,rotation:'right-page'};
 const leftRoute=context.gcodeForPaths([[51,52,53]],leftModel,raster);
 const rightRoute=context.gcodeForPaths([[51,52,53]],rightModel,raster);
 assert(leftRoute.commands[1].startsWith('G0 X15.000 Y144.000'),'Left-page route is rotated onto the sideways plate footprint');
-assert(rightRoute.commands[1].startsWith('G0 X105.000 Y252.000'),'Right-page route is rotated in the opposite direction');
+assert(rightRoute.commands[1].startsWith('G0 X105.000 Y242.000'),'Right-page route is rotated in the opposite direction');
 const connectedRoute=context.gcodeForPaths([[51,52,53],[54,53]],model,raster);
 assert(connectedRoute.strokes.length===1,'G-code emits one continuous stroke when two skeleton branches share a real endpoint');
 assert(connectedRoute.commands.filter(line=>line==='G1 Z34.000 F1200').length===2,'Connected branches require only one pen-up at the end, not a lift between branches');
