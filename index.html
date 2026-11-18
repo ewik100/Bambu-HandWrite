@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<title>Bambu HandWrite 5.6.4 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.6.5 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 @font-face{font-family:"Pecita School Local";src:url("./fonts/Pecita.otf") format("opentype");font-style:normal;font-weight:400;font-display:swap}
@@ -183,7 +183,7 @@ label{font-size:13px;font-weight:600;color:#405463}input,textarea,select{border-
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.6.4 · MULTI FONT</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.6.5 · MULTI FONT</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю Lobster…</span></p>
 </header>
@@ -457,7 +457,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.6.4 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.6.5 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -728,12 +728,12 @@ function updatePaperRotationHelp(){
  if(help)help.textContent=mode==='left-page'
   ?'Левый лист: на пластине красная линия окажется сверху. Начало — в нижнем левом углу у крестика; строка пишется снизу вверх. После снятия лист возвращается в тетрадь без зеркального отражения.'
   :mode==='right-page'
-   ?'Правый лист: на пластине красная линия также окажется сверху. Начало — в верхнем правом углу у крестика; строка пишется сверху вниз. После снятия лист возвращается в тетрадь без зеркального отражения.'
+   ?'Правый лист: на пластине красная линия также окажется сверху. Начало — в нижнем левом углу у крестика. Сначала пишется нижняя строка справа налево, затем следующие строки выше; после возвращения листа текст читается обычно. После снятия лист возвращается в тетрадь без зеркального отражения.'
    :'Обычное положение: страница лежит вертикально, 165 × 203 мм. В боковых режимах она занимает 203 × 165 мм; предпросмотр текста остаётся читаемым.';
  if(flipHelp)flipHelp.textContent=mode==='left-page'
   ?'Для левого листа красное поле автоматически выбрано справа от исходной страницы (у корешка). На пластине оно будет сверху; переключатель стороны заблокирован, чтобы не перевернуть лист неправильно.'
   :mode==='right-page'
-   ?'Для правого листа красное поле автоматически выбрано слева от исходной страницы (у корешка). На пластине оно будет сверху; переключатель стороны заблокирован, чтобы не перевернуть лист неправильно.'
+   ?'Для правого листа красное поле автоматически выбрано слева от исходной страницы (у корешка). На пластине оно будет сверху, крестик начала — снизу слева; программа сначала пишет нижнюю строку справа налево, затем переходит к строкам выше.'
    :'Выбери фактическую сторону красной линии. При боковом положении сторона определяется автоматически, чтобы красная линия была сверху.';
 }
 function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch,flip='right',rotation='none'){
@@ -1088,26 +1088,27 @@ function labelComponents(bin,w,h){
  return {labels,components};
 }
 function orderPathsByComponent(paths,raster,model){
- const reverseRead=false; // Keep logical left-to-right reading order; the page transform turns this into upward motion on the left leaf.
+ const rightLeaf=model.rotation==='right-page';
+ const reverseRead=rightLeaf,reverseRows=rightLeaf;
  const {labels,components}=labelComponents(raster.bin,raster.w,raster.h),groups=new Map();
  for(const p of paths){if(!p.length)continue;const id=labels[p[0]]||0;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(p)}
  const componentById=new Map(components.map(c=>[c.id,c]));
  const orderedComponents=[...groups.entries()].map(([id,ps])=>({id,paths:ps,box:componentById.get(id)})).filter(g=>g.box);
- // Reading order: top-to-bottom by text row, then left-to-right within that row.
+ // Left leaf: top-to-bottom and left-to-right. Right leaf: bottom-to-top and right-to-left.
  orderedComponents.sort((a,b)=>{
   const ay=(a.box.cy+raster.offsetY)/raster.scale,by=(b.box.cy+raster.offsetY)/raster.scale;
   const ar=Math.round((ay-model.baseline0+model.lh*.35)/model.pitch),br=Math.round((by-model.baseline0+model.lh*.35)/model.pitch);
-  return ar-br||(reverseRead?b.box.minX-a.box.minX:a.box.minX-b.box.minX);
+  return (reverseRows?br-ar:ar-br)||(reverseRead?b.box.minX-a.box.minX:a.box.minX-b.box.minX);
  });
  const result=[];
  for(const group of orderedComponents){
   let remaining=group.paths.slice(),cur=null;
-  // Finish every stroke belonging to this connected word/mark before moving to the next.
+  // Right leaf starts at its lower-right text component, mapped to the bottom-left mark on the plate.
   while(remaining.length){let best=0,reverse=false,bestD=Infinity;
    remaining.forEach((p,i)=>{
     const a={x:p[0]%raster.w,y:Math.floor(p[0]/raster.w)},z={x:p[p.length-1]%raster.w,y:Math.floor(p[p.length-1]/raster.w)};
-    const candidates=[[false,a],[true,z]];
-    for(const [rev,q] of candidates){const targetX=reverseRead?raster.w-1:0,d=cur?(q.x-cur.x)**2+(q.y-cur.y)**2:(q.x-targetX)**2+q.y*q.y;if(d<bestD){bestD=d;best=i;reverse=rev}}
+    const candidates=[[false,a],[true,z]],targetX=reverseRead?raster.w-1:0,targetY=reverseRows?raster.h-1:0;
+    for(const [rev,q] of candidates){const d=cur?(q.x-cur.x)**2+(q.y-cur.y)**2:(q.x-targetX)**2+(q.y-targetY)**2;if(d<bestD){bestD=d;best=i;reverse=rev}}
    });
    let p=remaining.splice(best,1)[0];if(reverse)p=p.slice().reverse();result.push(p);
    const last=p[p.length-1];cur={x:last%raster.w,y:Math.floor(last/raster.w)};
@@ -1115,7 +1116,6 @@ function orderPathsByComponent(paths,raster,model){
  }
  return result;
 }
-
 function mergeTouchingPaths(paths){
  const merged=[],same=(a,b)=>a&&b&&a.x===b.x&&a.y===b.y;
  for(const source of paths){
@@ -1370,7 +1370,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.6.4`,
+  `; generated by Bambu HandWrite 5.6.5`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1398,8 +1398,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.6.4 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.6.4`,
+  `; Bambu HandWrite 5.6.5 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.6.5`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -1501,7 +1501,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;
- return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.6.4',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:1,appVersion:'5.6.5',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
