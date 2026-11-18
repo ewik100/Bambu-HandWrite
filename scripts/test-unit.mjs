@@ -33,7 +33,11 @@ const routeGuardMatch = html.match(/function validateTextRouteCommands\(commands
 const writingBoundsMatch = html.match(/function getPaperWritingBounds\(width,type,red,cell,flip='right',leftInset=10\)\{[\s\S]*?\n\}/);
 const preflightMatch = html.match(/function validateGeneratedGcode\(file,pauseSeconds,park,placementPark,page,zSettings,expectedDraw\)\{[\s\S]*?\n\}/);
 const routeFunctionMatch = html.match(/function gcodeForPaths\(paths,model,raster\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch) {
+const pageSizeMatch = html.match(/function getPaperPhysicalSize\(w,h,rotation='none'\)\{[\s\S]*?\n\}/);
+const pageToPhysicalMatch = html.match(/function pageToPhysicalPoint\(x,y,w,h,rotation='none'\)\{[\s\S]*?\n\}/);
+const physicalToPageMatch = html.match(/function physicalToPagePoint\(x,y,w,h,rotation='none'\)\{[\s\S]*?\n\}/);
+const mergePathsMatch = html.match(/function mergeTouchingPaths\(paths\)\{[\s\S]*?\n\}/);
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch || !pageSizeMatch || !pageToPhysicalMatch || !physicalToPageMatch || !mergePathsMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -54,7 +58,7 @@ const schoolStart=html.indexOf('function schoolNoise(seed,index,salt)');
 const schoolEnd=html.indexOf('\nfunction schoolConnectorSegments()',schoolStart);
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract whole-word handwriting variation functions.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${pageSizeMatch[0]}\n${pageToPhysicalMatch[0]}\n${physicalToPageMatch[0]}\n${mergePathsMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
 
 const fontMetrics={measureText:(word)=>({width:word.length*8})};
 const evenWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,0,0,'stable-seed','lobster');
@@ -231,7 +235,35 @@ assert(context.getPause2Seconds() === 1, 'Automatic wait is clamped to minimum 1
 pauseInput = '999';
 assert(context.getPause2Seconds() === 600, 'Automatic wait is clamped to maximum 600 seconds');
 
+const normalSize=context.getPaperPhysicalSize(165,203,'none');
+const leftSize=context.getPaperPhysicalSize(165,203,'left-page');
+const rightSize=context.getPaperPhysicalSize(165,203,'right-page');
+assert(normalSize.width===165&&normalSize.height===203,'Normal notebook page keeps 165 × 203 mm physical size');
+assert(leftSize.width===203&&leftSize.height===165,'Sideways left notebook page occupies 203 × 165 mm');
+assert(rightSize.width===203&&rightSize.height===165,'Sideways right notebook page occupies 203 × 165 mm');
+const leftTop=context.pageToPhysicalPoint(165,0,165,203,'left-page');
+const rightTop=context.pageToPhysicalPoint(0,0,165,203,'right-page');
+assert(leftTop.x===0&&leftTop.y===0,'Left leaf right edge maps to the top-left physical corner');
+assert(rightTop.x===203&&rightTop.y===0,'Right leaf left edge maps to the top-left physical corner');
+const leftRound=context.physicalToPagePoint(leftTop.x,leftTop.y,165,203,'left-page');
+const rightRound=context.physicalToPagePoint(rightTop.x,rightTop.y,165,203,'right-page');
+assert(leftRound.x===165&&leftRound.y===0,'Left-page rotation inverse restores original page coordinates');
+assert(rightRound.x===0&&rightRound.y===0,'Right-page rotation inverse restores original page coordinates');
+const joined=context.mergeTouchingPaths([
+ [{x:0,y:0},{x:1,y:0},{x:2,y:0}],
+ [{x:3,y:0},{x:2,y:0}],
+ [{x:2,y:0},{x:2,y:1}]
+]);
+assert(joined.length===1&&joined[0].length===6,'Touching skeleton paths merge, including a branch at an existing junction');
+assert(joined[0][0].x===0&&joined[0][joined[0].length-1].y===1,'Merged path follows original skeleton points only');
+const separate=context.mergeTouchingPaths([
+ [{x:0,y:0},{x:1,y:0}],
+ [{x:5,y:5},{x:6,y:5}]
+]);
+assert(separate.length===2,'Disconnected dots and glyph strokes remain separate and can lift the pen');
+
 const model = {
+  w:100,h:100,rotation:'none',
   pl: { pageX: 10, pageY: 10 },
   rightX: 100,
   bottomY: 100,
@@ -246,5 +278,14 @@ assert(route.commands[0] === 'G1 Z34.000 F1200', 'A stroke begins with the pen-u
 assert(route.commands[1].startsWith('G0 X11.000 Y238.000'), 'The first point converts to machine X/Y coordinates');
 assert(route.commands[2] === 'G1 Z30.000 F1200', 'The pen lowers to the configured writing Z');
 assert(route.commands.at(-1) === 'G1 Z34.000 F1200', 'A stroke ends by raising the pen to travel Z');
+const leftModel={...model,rotation:'left-page'};
+const rightModel={...model,rotation:'right-page'};
+const leftRoute=context.gcodeForPaths([[51,52,53]],leftModel,raster);
+const rightRoute=context.gcodeForPaths([[51,52,53]],rightModel,raster);
+assert(leftRoute.commands[1].startsWith('G0 X15.000 Y144.000'),'Left-page route is rotated onto the sideways plate footprint');
+assert(rightRoute.commands[1].startsWith('G0 X105.000 Y252.000'),'Right-page route is rotated in the opposite direction');
+const connectedRoute=context.gcodeForPaths([[51,52,53],[54,53]],model,raster);
+assert(connectedRoute.strokes.length===1,'G-code emits one continuous stroke when two skeleton branches share a real endpoint');
+assert(connectedRoute.commands.filter(line=>line==='G1 Z34.000 F1200').length===2,'Connected branches require only one pen-up at the end, not a lift between branches');
 
 console.log(`\n${passed} unit checks passed.`);
