@@ -15,7 +15,7 @@
 - Размещать тетрадную страницу боком на пластине A1: для левого листа верхним становится исходный правый край, для правого — исходный левый. На пластине контур занимает 203 × 165 мм вместо 165 × 203 мм; читаемый макет страницы, клетка/линейка и выбранные отступы сохраняются. После печати страницу нужно вернуть в обычное положение в тетради.
 - Убирать лишние подъёмы пера там, где отдельные части скелета буквы действительно сходятся. Для возврата к такой точке используется только уже нарисованная траектория; произвольные соединительные штрихи не добавляются. Отдельные точки и несвязанные части остаются отдельными штрихами.
 
-- Переключать красное поле справа/слева. Для красного поля слева первая строка начинается через 5 мм от него и оставляет 10 мм до противоположного края; для обычной стороны сохраняется раскладка 5.4.2.
+- Выбирать сторону красного поля. Между красной линией со стороны корешка и текстом остаётся две клетки — 10 мм для стандартной клетки 5 мм; внешний край страницы сохраняет отступ 10 мм. Это работает как для левой, так и для правой красной линии.
 - Печатать текст на предпросмотре листа в клетку, линейку или на чистой странице.
 - Работать с русским и английским текстом.
 - Задавать название работы на русском или английском: приложение сразу транслитерирует его в латиницу для имени `.gcode` и комментария G-code; в этих полях не остаётся кириллицы.
@@ -115,4 +115,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 5.4.2 is an independent browser-based handwriting layout and G-code generator. Bambu Lab A1 is the first target model. The release includes automated source validation and regression checks; pen-holder geometry, pen-tip clearance and paper fixing must be calibrated on the user's own setup before a full job. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
+Bambu HandWrite 5.6.2 is an independent browser-based handwriting layout and G-code generator for the Bambu Lab A1. It supports normal, left-leaf and right-leaf page placement, two-cell clearance from the selected binding-side red margin, automated source validation and route regression checks. Pen-holder geometry, pen-tip clearance and paper fixing still require physical calibration on the user's own setup. Other printer models require separate adaptation. The repository currently has no license; public visibility does not grant reuse rights.
