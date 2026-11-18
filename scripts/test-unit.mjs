@@ -91,13 +91,13 @@ assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook star
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
 const normalPage=context.getPaperWritingBounds(165,'math-notebook',20,5,'right',10);
-assert(normalPage.startX===10&&normalPage.rightX===143.5&&normalPage.redLineX===145,'Normal 5.4.4 notebook layout exactly preserves the 5.4.2 margins');
+assert(normalPage.startX===10&&normalPage.rightX===143.5&&normalPage.redLineX===145,'Normal-side page margins remain unchanged');
 const flippedGrid=context.getPaperWritingBounds(165,'math-notebook',20,5,'left',10);
-assert(flippedGrid.startX===25&&flippedGrid.rightX===155&&flippedGrid.redLineX===20,'Flipped grid page starts one cell after the left red line and leaves 10 mm at the far edge');
+assert(flippedGrid.startX===30&&flippedGrid.rightX===155&&flippedGrid.redLineX===20,'Flipped grid page starts two 5 mm cells after the left red line and leaves 10 mm at the far edge');
 const flippedRuled=context.getPaperWritingBounds(165,'russian-notebook',20,8.35,'left',10);
-assert(flippedRuled.startX===25&&flippedRuled.rightX===155,'Flipped ruled paper uses the 5 mm start offset and 10 mm far-edge margin');
+assert(flippedRuled.startX===30&&flippedRuled.rightX===155,'Flipped ruled paper uses a 10 mm start offset and 10 mm far-edge margin');
 const flippedPlain=context.getPaperWritingBounds(210,'a4-plain',20,8.35,'left',10);
-assert(flippedPlain.guideOnly&&flippedPlain.startX===15&&flippedPlain.rightX===200,'Flipped plain A4 has a preview-only guide, 5 mm start offset and 10 mm end margin');
+assert(flippedPlain.guideOnly&&flippedPlain.startX===20&&flippedPlain.rightX===200,'Flipped plain A4 has a preview-only guide, 10 mm start offset and 10 mm end margin');
 const normalPlain=context.getPaperWritingBounds(210,'a4-plain',20,8.35,'right',10);
 assert(normalPlain.startX===10&&normalPlain.rightX===208.5&&normalPlain.redLineX===null,'Normal plain A4 keeps the original 5.4.2 margins');
 assert(context.scaleToLowercaseHeight(4.8, 2.4) === 2, 'A 4.8 mm lowercase target scales the measured x-height to 4.8 mm');
