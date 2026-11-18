@@ -91,7 +91,7 @@ assert(context.getTopMarginMm('math-notebook', 5) === 10, 'Squared notebook star
 assert(context.getTopMarginMm('math-notebook', 4) === 8, 'Top inset follows the configured grid-cell size');
 assert(context.getTopMarginMm('russian-notebook', 8.35) === 0 && context.getTopMarginMm('a4-plain', 8.35) === 0, 'Ruled and plain paper keep no extra top inset');
 const normalPage=context.getPaperWritingBounds(165,'math-notebook',20,5,'right',10);
-assert(normalPage.startX===10&&normalPage.rightX===143.5&&normalPage.redLineX===145,'Normal-side page margins remain unchanged');
+assert(normalPage.startX===10&&normalPage.rightX===135&&normalPage.redLineX===145,'Right red-line side keeps 10 mm clearance from the red line');
 const flippedGrid=context.getPaperWritingBounds(165,'math-notebook',20,5,'left',10);
 assert(flippedGrid.startX===30&&flippedGrid.rightX===155&&flippedGrid.redLineX===20,'Flipped grid page starts two 5 mm cells after the left red line and leaves 10 mm at the far edge');
 const flippedRuled=context.getPaperWritingBounds(165,'russian-notebook',20,8.35,'left',10);
