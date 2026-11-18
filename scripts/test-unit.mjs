@@ -37,7 +37,8 @@ const pageSizeMatch = html.match(/function getPaperPhysicalSize\(w,h,rotation='n
 const pageToPhysicalMatch = html.match(/function pageToPhysicalPoint\(x,y,w,h,rotation='none'\)\{[\s\S]*?\n\}/);
 const physicalToPageMatch = html.match(/function physicalToPagePoint\(x,y,w,h,rotation='none'\)\{[\s\S]*?\n\}/);
 const mergePathsMatch = html.match(/function mergeTouchingPaths\(paths\)\{[\s\S]*?\n\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch || !pageSizeMatch || !pageToPhysicalMatch || !physicalToPageMatch || !mergePathsMatch) {
+const bindingSideMatch = html.match(/function getBindingSideRedLine\(rotation\)\{[^}]+\}/);
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch || !pageSizeMatch || !pageToPhysicalMatch || !physicalToPageMatch || !mergePathsMatch || !bindingSideMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -58,7 +59,7 @@ const schoolStart=html.indexOf('function schoolNoise(seed,index,salt)');
 const schoolEnd=html.indexOf('\nfunction schoolConnectorSegments()',schoolStart);
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract whole-word handwriting variation functions.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${pageSizeMatch[0]}\n${pageToPhysicalMatch[0]}\n${physicalToPageMatch[0]}\n${mergePathsMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${pageSizeMatch[0]}\n${pageToPhysicalMatch[0]}\n${physicalToPageMatch[0]}\n${mergePathsMatch[0]}\n${bindingSideMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
 
 const fontMetrics={measureText:(word)=>({width:word.length*8})};
 const evenWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,0,0,'stable-seed','lobster');
@@ -245,6 +246,18 @@ const leftTop=context.pageToPhysicalPoint(165,0,165,203,'left-page');
 const rightTop=context.pageToPhysicalPoint(0,0,165,203,'right-page');
 assert(leftTop.x===0&&leftTop.y===0,'Left leaf right edge maps to the top-left physical corner');
 assert(rightTop.x===203&&rightTop.y===0,'Right leaf left edge maps to the top-left physical corner');
+assert(context.getBindingSideRedLine('left-page')==='right','Left notebook leaf selects its original right red line, which becomes the top edge');
+assert(context.getBindingSideRedLine('right-page')==='left','Right notebook leaf selects its original left red line, which becomes the top edge');
+const leftRedEnd=context.pageToPhysicalPoint(165,203,165,203,'left-page');
+const rightRedEnd=context.pageToPhysicalPoint(0,203,165,203,'right-page');
+assert(leftTop.x===0&&leftTop.y===0&&leftRedEnd.x===203&&leftRedEnd.y===0,'Left-leaf red line maps horizontally across the physical top edge');
+assert(rightTop.x===203&&rightTop.y===0&&rightRedEnd.x===0&&rightRedEnd.y===0,'Right-leaf red line maps horizontally across the physical top edge');
+const leftWritingStart=context.pageToPhysicalPoint(10,20,165,203,'left-page');
+const leftWritingNext=context.pageToPhysicalPoint(140,20,165,203,'left-page');
+const rightWritingStart=context.pageToPhysicalPoint(30,20,165,203,'right-page');
+const rightWritingNext=context.pageToPhysicalPoint(140,20,165,203,'right-page');
+assert(leftWritingStart.x===20&&leftWritingStart.y===155&&leftWritingNext.y===25,'Left-leaf writing starts at bottom-left and advances upward from the marked corner');
+assert(rightWritingStart.x===183&&rightWritingStart.y===30&&rightWritingNext.y===140,'Right-leaf writing starts at top-right and advances downward from the marked corner');
 const leftRound=context.physicalToPagePoint(leftTop.x,leftTop.y,165,203,'left-page');
 const rightRound=context.physicalToPagePoint(rightTop.x,rightTop.y,165,203,'right-page');
 assert(leftRound.x===165&&leftRound.y===0,'Left-page rotation inverse restores original page coordinates');
