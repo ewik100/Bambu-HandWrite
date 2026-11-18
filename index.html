@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<title>Bambu HandWrite 5.5.1 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.6.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 @font-face{font-family:"Pecita School Local";src:url("./fonts/Pecita.otf") format("opentype");font-style:normal;font-weight:400;font-display:swap}
@@ -218,13 +218,21 @@ Hello, world!</textarea></label>
         <option value="custom-paper">Свой размер обычного листа</option>
       </select>
     </label>
-    <label>Сторона красного поля · переворот листа
+    <label>Сторона красного поля
       <select id="paperFlip">
-        <option value="right" selected>Красное поле справа · обычная сторона</option>
-        <option value="left">Красное поле слева · перевёрнутый лист</option>
+        <option value="right" selected>Красное поле справа на странице</option>
+        <option value="left">Красное поле слева на странице</option>
       </select>
     </label>
-    <p class="tiny wide" id="paperFlipHelp">При выборе левого поля текст начинается примерно через одну клетку (около 5 мм) справа от красной линии и заканчивается примерно за 10 мм до противоположного края. Дополнительный абзацный отступ в этом режиме не добавляется, чтобы начало оставалось ровно в одной клетке от линии. Для чистого A4 красная линия показывается только как ориентир в предпросмотре.</p>
+    <label class="wide">Какой лист тетради положен боком
+      <select id="paperRotation">
+        <option value="none" selected>Обычное положение — 165 × 203 мм</option>
+        <option value="left-page">Левый лист — правый край страницы обращён вверх</option>
+        <option value="right-page">Правый лист — левый край страницы обращён вверх</option>
+      </select>
+    </label>
+    <p class="tiny wide" id="paperRotationHelp">В боковом режиме лист занимает на пластине 203 × 165 мм. Макет страницы остаётся читаемым, а схема пластины и траектория показывают реальный поворот листа.</p>
+    <p class="tiny wide" id="paperFlipHelp">Сторона красного поля задаётся отдельно. Сохраняется выбранный отступ относительно красной линии; для чистого A4 линия служит только ориентиром.</p>
     <div class="paper-gallery wide" aria-label="Визуальный выбор типа бумаги">
       <button class="paper-choice" type="button" data-paper-choice="a4-plain" aria-pressed="false"><div class="paper-thumb"><span>Текст</span></div><b>Чистый A4</b><small>210 × 297 мм · без линий</small></button>
       <button class="paper-choice" type="button" data-paper-choice="math-notebook" aria-pressed="true"><div class="paper-thumb math"><span>Текст</span></div><b>Математика</b><small>165 × 203 мм · клетка 5 мм</small></button>
@@ -449,12 +457,12 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.5.1 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.6.0 · адаптивное разрешение до 22 пикс./мм, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={handwritingRoughness:38,schoolRoughness:50,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={handwritingRoughness:38,schoolRoughness:50,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
@@ -694,24 +702,52 @@ function bedPlacement(w,h){
  const tabOverlap=pageX<tab.x+tab.w && pageRight>tab.x && pageBottom>tabKeepoutTop && pageY<BED.h+tab.depth;
  return {pageX,pageY,support:{left:Math.max(0,-pageX),right:Math.min(w,BED.w-pageX),bottom:Math.min(h,BED.h-pageY)},overLeft:pageX<0,overRight:pageRight>BED.w,overBottom:pageBottom>BED.h,tabOverlap,tab};
 }
-function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch,flip='right'){
- const tab=pl.tab||getPlateTab(),x=pl.pageX,y=pl.pageY,cornerX=x,cornerY=y,tx=x+sx,ty=y+sy;
- const viewX=Math.min(-12,x-12),viewR=Math.max(310,x+w+12),viewBottom=Math.max(300,y+h+14,BED.h+tab.depth+20),viewTop=-8,viewW=viewR-viewX,viewH=viewBottom-viewTop;
- let s=`<defs><clipPath id="bedPaperClip"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#ffe8e5"/><line x1="0" y1="0" x2="0" y2="4" stroke="#d85b55"/></pattern><marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5z" fill="#2770bd"/></marker></defs>`;
+function getPaperPhysicalSize(w,h,rotation='none'){
+ return rotation==='left-page'||rotation==='right-page'?{width:Number(h),height:Number(w)}:{width:Number(w),height:Number(h)};
+}
+function pageToPhysicalPoint(x,y,w,h,rotation='none'){
+ if(rotation==='left-page')return {x:Number(y),y:Number(w)-Number(x)};
+ if(rotation==='right-page')return {x:Number(h)-Number(y),y:Number(x)};
+ return {x:Number(x),y:Number(y)};
+}
+function physicalToPagePoint(x,y,w,h,rotation='none'){
+ if(rotation==='left-page')return {x:Number(w)-Number(y),y:Number(x)};
+ if(rotation==='right-page')return {x:Number(y),y:Number(h)-Number(x)};
+ return {x:Number(x),y:Number(y)};
+}
+function updatePaperRotationHelp(){
+ const mode=$('paperRotation')?.value||'none',help=$('paperRotationHelp');
+ if(!help)return;
+ help.textContent=mode==='left-page'
+  ?'Левый лист: правый край страницы направлен к верхнему краю пластины. После снятия лист возвращается в тетрадь без зеркального отражения текста.'
+  :mode==='right-page'
+   ?'Правый лист: левый край страницы направлен к верхнему краю пластины. После снятия лист возвращается в тетрадь без зеркального отражения текста.'
+   :'Обычное положение: страница лежит вертикально, 165 × 203 мм. В боковых режимах она занимает 203 × 165 мм; предпросмотр текста остаётся читаемым.';
+}
+function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch,flip='right',rotation='none'){
+ const tab=pl.tab||getPlateTab(),size=getPaperPhysicalSize(w,h,rotation),pw=size.width,ph=size.height,x=pl.pageX,y=pl.pageY,cornerX=x,cornerY=y;
+ const start=pageToPhysicalPoint(sx,sy,w,h,rotation),tx=x+start.x,ty=y+start.y;
+ const viewX=Math.min(-12,x-12),viewR=Math.max(310,x+pw+12),viewBottom=Math.max(300,y+ph+14,BED.h+tab.depth+20),viewTop=-8,viewW=viewR-viewX,viewH=viewBottom-viewTop;
+ const pageTransform=rotation==='left-page'?`translate(${x} ${y+w}) rotate(-90)`:rotation==='right-page'?`translate(${x+h} ${y}) rotate(90)`:`translate(${x} ${y})`;
+ let s=`<defs><clipPath id="bedPaperClip"><rect x="${x}" y="${y}" width="${pw}" height="${ph}"/></clipPath><pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="4" fill="#ffe8e5"/><line x1="0" y1="0" x2="0" y2="4" stroke="#d85b55"/></pattern><marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5z" fill="#2770bd"/></marker></defs>`;
  s+=`<rect x="0" y="0" width="256" height="256" rx="2" fill="#cfd6dc" stroke="#53616c"/>`;
- s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="#365a74"/>`;
- s+=`<g clip-path="url(#bedPaperClip)">`;
+ s+=`<rect x="${x}" y="${y}" width="${pw}" height="${ph}" fill="#fff" stroke="#365a74"/>`;
+ s+=`<g clip-path="url(#bedPaperClip)"><g transform="${pageTransform}">`;
  if(type==='math-notebook'){
-  for(let gx=0;gx<=w+.01;gx+=cell){const major=Math.abs(gx/(cell*2)-Math.round(gx/(cell*2)))<.001;s+=`<line x1="${x+gx}" y1="${y}" x2="${x+gx}" y2="${y+h}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.45:.25}"/>`}
-  for(let gy=0;gy<=h+.01;gy+=cell){const major=Math.abs(gy/(cell*2)-Math.round(gy/(cell*2)))<.001;s+=`<line x1="${x}" y1="${y+gy}" x2="${x+w}" y2="${y+gy}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.45:.25}"/>`}
+  for(let gx=0;gx<=w+.01;gx+=cell){const major=Math.abs(gx/(cell*2)-Math.round(gx/(cell*2)))<.001;s+=`<line x1="${gx}" y1="0" x2="${gx}" y2="${h}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.45:.25}"/>`}
+  for(let gy=0;gy<=h+.01;gy+=cell){const major=Math.abs(gy/(cell*2)-Math.round(gy/(cell*2)))<.001;s+=`<line x1="0" y1="${gy}" x2="${w}" y2="${gy}" stroke="${major?'#9fc2df':'#d4e5f1'}" stroke-width="${major?.45:.25}"/>`}
  }
- if(type==='russian-notebook')for(let gy=(sy%pitch);gy<=h+.01;gy+=pitch)s+=`<line x1="${x}" y1="${y+gy}" x2="${x+w}" y2="${y+gy}" stroke="#a9cde5" stroke-width=".35"/>`;
- if(type!=='a4-plain'||flip==='left'){const guideX=flip==='left'?(type==='a4-plain'?10:Math.min(red,w-12)):w-Math.max(2,Math.min(red,w-2));s+=`<line x1="${x+guideX}" y1="${y}" x2="${x+guideX}" y2="${y+h}" stroke="#c63c36" stroke-width=".8"/>`;}
- s+=`</g>`;
- const printableBottom=Math.max(0,Math.min(h,253-y-3));
- if(printableBottom<h){s+=`<rect x="${x}" y="${y+printableBottom}" width="${w}" height="${h-printableBottom}" fill="url(#hatch)"/>`;if(h-printableBottom>12)s+=`<text x="${x+5}" y="${y+printableBottom+8}" font-size="4" fill="#a33d37">ЭТА ЧАСТЬ НЕ ДОСТУПНА ДЛЯ ПИСЬМА</text>`}
- if(x<0)s+=`<rect x="${x}" y="${y}" width="${-x}" height="${Math.max(0,Math.min(h,256-y))}" fill="url(#hatch)"/>`;
- if(x+w>256)s+=`<rect x="256" y="${y}" width="${x+w-256}" height="${Math.max(0,Math.min(h,256-y))}" fill="url(#hatch)"/>`;
+ if(type==='russian-notebook')for(let gy=(sy%pitch);gy<=h+.01;gy+=pitch)s+=`<line x1="0" y1="${gy}" x2="${w}" y2="${gy}" stroke="#a9cde5" stroke-width=".35"/>`;
+ if(type!=='a4-plain'||flip==='left'){
+  const guideX=flip==='left'?(type==='a4-plain'?10:Math.min(red,w-12)):w-Math.max(2,Math.min(red,w-2));
+  s+=`<line x1="${guideX}" y1="0" x2="${guideX}" y2="${h}" stroke="#c63c36" stroke-width=".8"/>`;
+ }
+ s+=`</g></g>`;
+ const printableBottom=Math.max(0,Math.min(ph,253-y-3));
+ if(printableBottom<ph){s+=`<rect x="${x}" y="${y+printableBottom}" width="${pw}" height="${ph-printableBottom}" fill="url(#hatch)"/>`;if(ph-printableBottom>12)s+=`<text x="${x+5}" y="${y+printableBottom+8}" font-size="4" fill="#a33d37">ЭТА ЧАСТЬ НЕ ДОСТУПНА ДЛЯ ПИСЬМА</text>`}
+ if(x<0)s+=`<rect x="${x}" y="${y}" width="${-x}" height="${Math.max(0,Math.min(ph,256-y))}" fill="url(#hatch)"/>`;
+ if(x+pw>256)s+=`<rect x="256" y="${y}" width="${x+pw-256}" height="${Math.max(0,Math.min(ph,256-y))}" fill="url(#hatch)"/>`;
+ if(y+ph>256)s+=`<rect x="${x}" y="256" width="${pw}" height="${y+ph-256}" fill="url(#hatch)"/>`;
  s+=`<path d="M${cornerX} ${cornerY}L${tx} ${ty}" stroke="#2770bd" stroke-width=".8" stroke-dasharray="2 1.5" marker-end="url(#arr)" fill="none"/>`;
  const cc=cornerX>=0&&cornerX<=256&&cornerY>=0&&cornerY<=256?'#23824a':'#c63c36';
  s+=`<circle cx="${cornerX}" cy="${cornerY}" r="3.2" fill="${stage===2?cc:'#fff'}" stroke="${cc}"/><path d="M${cornerX-4} ${cornerY}h8m-4 -4v8" stroke="${cc}"/>`;
@@ -721,9 +757,8 @@ function bedSVG(w,h,sx,sy,red,pl,stage,type,cell,pitch,flip='right'){
  s+=`<rect x="${tab.x}" y="${BED.h}" width="${tab.w}" height="${tab.depth}" rx="2" fill="#aeb8c0" stroke="#53616c" stroke-width=".8"/>`;
  s+=`<rect x="${tab.x}" y="${BED.h-tab.clearance}" width="${tab.w}" height="${tab.clearance+tab.depth}" fill="url(#hatch)" opacity=".9"/>`;
  s+=`<text x="${Math.max(viewX+2,tab.x-8)}" y="${BED.h+tab.depth+7}" font-size="4" fill="#8e3934">ЯЗЫЧОК / РУЧКА ПЛАСТИНЫ · НЕ НАКРЫВАТЬ</text>`;
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewTop} ${viewW} ${viewH}" width="${Math.min(680,viewW*1.55)}" height="${viewH*1.55}">${s}</svg>`
-}
-function getPause2Seconds(){
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewTop} ${viewW} ${viewH}" width="${viewW*2}" height="${viewH*2}">${s}</svg>`;
+}function getPause2Seconds(){
  const el=$('pause2Seconds');const n=Number.parseInt(el?.value??'130',10);return Number.isFinite(n)?Math.max(1,Math.min(600,n)):130;
 }
 function formatDuration(seconds){const m=Math.floor(seconds/60),r=seconds%60;return m?`${m} мин${r?` ${r} сек`:''}`:`${r} сек`;}
@@ -747,7 +782,8 @@ function setRouteInkMode(enabled){
 function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0){
   const rawHeight=heightOverride===null?readEditableDecimal('lh',2,20,lastModel?.lh??DEFAULTS.lh):Number(heightOverride),lh=Number.isFinite(rawHeight)?Math.max(2,Math.min(20,rawHeight)):DEFAULTS.lh;
  const w=clampValue('pw',40,420),h=clampValue('ph',40,420),pitchInput=readEditableDecimal('pitch',2,30,lastModel?.pitch??DEFAULTS.pitch),cell=clampValue('cell',2,15),red=clampValue('margin',2,100),configuredIndent=clampValue('paragraphIndent',0,20),indentEnabled=$('paragraphIndentToggle').checked,paraIndent=indentEnabled?configuredIndent:0,justifyEnabled=$('justifyToggle').checked;
- const mode=$('scriptMode').value,hand=$('handFont').value,profile=FONT_PROFILES[hand]||FONT_PROFILES.neucha,txt=$('txt').value.replace(/\r/g,''),type=$('paperType').value,pl=bedPlacement(w,h),paperFlip=$('paperFlip')?.value==='left'?'left':'right',paperBounds=getPaperWritingBounds(w,type,red,cell,paperFlip,clampValue('left',0,30)),startX=paperBounds.startX,rightX=paperBounds.rightX,redLineX=paperBounds.redLineX,bottomY=Math.min(h,253-pl.pageY-3),topY=clampValue('top',0,30),fontSize=lh*1.28;
+ const mode=$('scriptMode').value,hand=$('handFont').value,profile=FONT_PROFILES[hand]||FONT_PROFILES.neucha,txt=$('txt').value.replace(/\r/g,''),type=$('paperType').value,paperRotation=['left-page','right-page'].includes($('paperRotation')?.value)?$('paperRotation').value:'none',physicalSize=getPaperPhysicalSize(w,h,paperRotation),pl=bedPlacement(physicalSize.width,physicalSize.height),paperFlip=$('paperFlip')?.value==='left'?'left':'right',paperBounds=getPaperWritingBounds(w,type,red,cell,paperFlip,clampValue('left',0,30)),startX=paperBounds.startX,rightX=paperBounds.rightX,redLineX=paperBounds.redLineX,bottomY=paperRotation==='none'?Math.min(h,253-pl.pageY-3):h,topY=clampValue('top',0,30),fontSize=lh*1.28;
+ updatePaperRotationHelp();
  const pitch=type==='math-notebook'?getLinePitchMm(cell):pitchInput;
  $('orientationField').style.display=(type==='math-notebook'||type==='russian-notebook'||type==='custom-paper')?'none':'';updateLineSpacingUI();
  $('justifyHelp').textContent=type==='a4-plain'?'Растягивать пробелы в подходящих промежуточных строках до безопасной правой границы листа. Последняя строка абзаца остаётся обычной.':'Распределять пробелы в промежуточных строках до безопасной правой границы. Последняя строка перед пустой строкой или концом текста остаётся обычной.';
@@ -818,7 +854,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  svg+=`<rect x=".1" y=".1" width="${w-.2}" height="${h-.2}" fill="none" stroke="#9aa6ad" stroke-width=".2"/>`;
  $('paper').setAttribute('viewBox',`0 0 ${w} ${h}`);$('paper').setAttribute('width',w*5);$('paper').setAttribute('height',h*5);$('paper').innerHTML=svg;applyPaperZoom();clearRoutePlaybackUI();
  const firstLine=lines.findIndex(l=>!l.blank),startLine=firstLine<0?0:firstLine,startY=baseline0+startLine*pitch;const textStartX=lines[startLine]?.x??startX;
- const bedMarkup=bedSVG(w,h,textStartX,startY,red,pl,viewStage,type,cell,pitch,paperFlip);const bedNode=new DOMParser().parseFromString(bedMarkup,'image/svg+xml').documentElement;const bed=$('bedPreview');if(!bed||bedNode.nodeName.toLowerCase()==='parsererror')throw Error('Не удалось обновить схему положения листа. Перезагрузи приложение.');for(const attr of ['viewBox','width','height']){const value=bedNode.getAttribute(attr);if(value)bed.setAttribute(attr,value)}bed.innerHTML=bedNode.innerHTML;
+ const bedMarkup=bedSVG(w,h,textStartX,startY,red,pl,viewStage,type,cell,pitch,paperFlip,paperRotation);const bedNode=new DOMParser().parseFromString(bedMarkup,'image/svg+xml').documentElement;const bed=$('bedPreview');if(!bed||bedNode.nodeName.toLowerCase()==='parsererror')throw Error('Не удалось обновить схему положения листа. Перезагрузи приложение.');for(const attr of ['viewBox','width','height']){const value=bedNode.getAttribute(attr);if(value)bed.setAttribute(attr,value)}bed.innerHTML=bedNode.innerHTML;
  const cornerX=pl.pageX,cornerY=pl.pageY,cornerMachineY=253-cornerY;
  const boxesByLine=new Array(lines.length).fill(null);
  [...$('paper').querySelectorAll('text[data-line]')].forEach(el=>{const index=Number(el.getAttribute('data-line'));try{if(Number.isInteger(index)&&index>=0&&index<boxesByLine.length)boxesByLine[index]=el.getBBox()}catch(e){}});
@@ -830,7 +866,8 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  const textBottom=boxes.length?Math.max(...boxes.map(b=>b.y+b.height)):0,textTop=boxes.length?Math.min(...boxes.map(b=>b.y)):0,textLeft=boxes.length?Math.min(...boxes.map(b=>b.x)):0,textRight=boxes.length?Math.max(...boxes.map(b=>b.x+b.width)):0;
  const errors=[];
  if(rightX<=startX+2)errors.push('Нет места между текстом и правой границей.');
- if(cornerX<3||cornerX>253||cornerMachineY<3||cornerMachineY>253)errors.push('Верхний левый угол листа вне безопасной зоны пластины. Измени формат или положение.');
+ if(cornerX<3||cornerX>253||cornerMachineY<3||cornerMachineY>253)errors.push('Угол листа вне безопасной зоны пластины. Измени формат или положение.');
+ if(pl.overLeft||pl.overRight||pl.overBottom)errors.push('Физический контур листа '+physicalSize.width+' × '+physicalSize.height+' мм выходит за рабочую область пластины. Уменьши формат или верни обычное положение.');
  if(pl.tabOverlap)errors.push('Бумага попадает на передний язычок/ручку пластины или его защитную зону. Для записи используй лист, который заканчивается минимум за 18 мм до переднего края пластины.');
  if(boxes.length&&textTop<-.25)errors.push(`Верхние буквы выходят за край листа на ${(-textTop).toFixed(1)} мм.`);
  if(boxes.length&&textLeft<-.25)errors.push(`Левые буквы выходят за край листа на ${(-textLeft).toFixed(1)} мм.`);
@@ -839,18 +876,19 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  if(boxes.length&&textBottom>h+.25)errors.push(`Текст выходит за нижний край листа на ${(textBottom-h).toFixed(1)} мм. Уменьши шаг строк или размер букв.`);
  if(boxes.length&&textBottom>bottomY+.25&&bottomY<h)errors.push(`Нижние буквы заходят в недоступную зону пластины на ${(textBottom-bottomY).toFixed(1)} мм. Уменьши высоту/шаг или количество строк.`);
  const paperName=type==='a4-plain'?'Чистый лист A4 без разметки':type==='math-notebook'?'Тетрадный лист в клетку 5 мм с красным полем':type==='russian-notebook'?'Тетрадный лист в линейку с красным полем':'Пользовательский лист';
- $('paperInfo').textContent=`${paperName} · ${w} × ${h} мм · начало текста ${startX.toFixed(1)} мм от левого края · красное поле ${paperFlip==='left'?'слева (перевёрнутый лист)':type==='a4-plain'?'не печатается':'справа (обычная сторона)'} · абзацный отступ ${paperFlip==='left'?'не добавляется при красном поле слева':indentEnabled?'включён':'выключен'} · заполнение строк ${justifyEnabled?'включено':'выключено'} · траектория ограничена краями листа${(pl.overBottom||pl.overLeft||pl.overRight)?' и реальной рабочей областью пластины':''}.`;
+ const rotationName=paperRotation==='left-page'?'левый лист боком · правый край страницы кверху':paperRotation==='right-page'?'правый лист боком · левый край страницы кверху':'обычное положение';
+ $('paperInfo').textContent=`${paperName} · страница ${w} × ${h} мм · на пластине ${physicalSize.width} × ${physicalSize.height} мм · ${rotationName} · начало ${startX.toFixed(1)} мм от логического левого края · красное поле ${paperFlip==='left'?'слева':'справа'} · заполнение строк ${justifyEnabled?'включено':'выключено'}.`;
  document.querySelectorAll('[data-paper-choice]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.paperChoice===type)));
- $('summary').textContent=`${w} × ${h} мм · ${lines.filter(l=>!l.blank).length} строк`;
+ $('summary').textContent=`${physicalSize.width} × ${physicalSize.height} мм на пластине · ${lines.filter(l=>!l.blank).length} строк`;
  $('layoutStatus').textContent=errors.length?errors.join(' '):`Текст начинается в ${startX.toFixed(1)} мм от левого края (${(startX/cell).toFixed(1)} клетки); красное поле ${paperFlip==='left'?'слева':'справа'}; противоположная граница письма — ${rightX.toFixed(1)} мм от левого края. Абзацный отступ ${paperFlip==='left'?'не добавляется при красном поле слева':indentEnabled?`включён (${paraIndent.toFixed(1)} мм)`:'выключен'}, английские абзацы без отступа. Заполнение строк ${justifyEnabled?'включено для подходящих промежуточных строк':'выключено'}. Верхний отступ — ${topY.toFixed(1)} мм${type==='math-notebook'?' (2 клетки)':''}; дополнительного нижнего отступа нет. Нижний предел — ${bottomY<h?'граница рабочей области пластины':'физический край листа'}.`;
  $('layoutStatus').className='status '+(errors.length?'bad':'ok');
  $('bedStatus').textContent=errors.length?errors.join(' '):`Угол листа: X ${cornerX.toFixed(1)} · Y ${cornerMachineY.toFixed(1)} мм. Головка подходит к нему с поднятой ручкой.`;$('bedStatus').className='bed-status '+(errors.length?'bad':'ok');
  const pauseSecs=getPause2Seconds();$('routeStatus').textContent=viewStage===1?'Этап 1: защитный лист A4 закреплён; первая ручная пауза перед homing.':viewStage===2?`Этап 2: сопло остановлено непосредственно над верхним левым углом будущего листа. Автоматическая выдержка — ${formatDuration(pauseSecs)}.`:'Этап 3: после паузы ручка рисует контур на защитном A4, затем головка отъезжает в сторону и ждёт 50 секунд для укладки рабочего листа.';
  ['stage1','stage2','stage3'].forEach((id,i)=>$(id).setAttribute('aria-pressed',String(viewStage===i+1)));
- const checks=[['Размер бумаги',`${w} × ${h} мм`],['Вид листа',type==='a4-plain'?'чистый A4':type==='math-notebook'?'клетка 5 мм':type==='russian-notebook'?'линейка':'пользовательский'],['Сторона листа',paperFlip==='left'?'красное поле слева · перевёрнутый лист':'красное поле справа · обычная сторона'],['Начало текста',`${startX.toFixed(1)} мм от левого края`],['Абзацный отступ',paperFlip==='left'?'не добавляется · одна клетка уже от красной линии':indentEnabled?`${paraIndent.toFixed(1)} мм у русских абзацев`:'выключен · без абзацного отступа'],['Заполнение строк',justifyEnabled?'до правой границы · промежуточные строки':'выключено · обычный край'],['Нижняя граница',bottomY<h?`предел пластины · ${bottomY.toFixed(1)} мм от верха`:'край самого листа'],['Поддержка пластины',pl.overBottom||pl.overLeft||pl.overRight?'есть неподдерживаемая часть':'лист помещается'],['Передний язычок пластины',pl.tabOverlap?'БУМАГА ПЕРЕКРЫВАЕТ ЗАПРЕТНУЮ ЗОНУ':'зона свободна · запас 18 мм'],['Вторая остановка',`${getPause2Seconds()} секунд · прямо над углом листа · X ${cornerX.toFixed(1)} / Y ${cornerMachineY.toFixed(1)} мм`],['Правая граница',type==='a4-plain'?'край бумаги · резерв 1,5 мм':`${red} мм от края · резерв перед линией 1,5 мм`],['Почерк',profile.title],['Скорость письма',`${profile.drawFeed} мм/мин`],['Текст',`${txt.length} символов`]];
+ const checks=[['Размер страницы',`${w} × ${h} мм`],['На пластине',`${physicalSize.width} × ${physicalSize.height} мм · ${rotationName}`],['Вид листа',type==='a4-plain'?'чистый A4':type==='math-notebook'?'клетка 5 мм':type==='russian-notebook'?'линейка':'пользовательский'],['Красное поле',paperFlip==='left'?'слева на странице':'справа на странице'],['Начало текста',`${startX.toFixed(1)} мм от левого края`],['Абзацный отступ',paperFlip==='left'?'не добавляется · одна клетка уже от красной линии':indentEnabled?`${paraIndent.toFixed(1)} мм у русских абзацев`:'выключен · без абзацного отступа'],['Заполнение строк',justifyEnabled?'до правой границы · промежуточные строки':'выключено · обычный край'],['Нижняя граница',bottomY<h?`предел пластины · ${bottomY.toFixed(1)} мм от верха`:'край самого листа'],['Поддержка пластины',pl.overBottom||pl.overLeft||pl.overRight?'есть неподдерживаемая часть':'лист помещается'],['Передний язычок пластины',pl.tabOverlap?'БУМАГА ПЕРЕКРЫВАЕТ ЗАПРЕТНУЮ ЗОНУ':'зона свободна · запас 18 мм'],['Вторая остановка',`${getPause2Seconds()} секунд · прямо над углом листа · X ${cornerX.toFixed(1)} / Y ${cornerMachineY.toFixed(1)} мм`],['Правая граница',type==='a4-plain'?'край бумаги · резерв 1,5 мм':`${red} мм от края · резерв перед линией 1,5 мм`],['Почерк',profile.title],['Скорость письма',`${profile.drawFeed} мм/мин`],['Текст',`${txt.length} символов`]];
  $('checks').innerHTML=checks.map(([a,b])=>`<div class="check"><b>${a}</b>${b}</div>`).join('');
  updateLiveStats(txt,lines,bottomY,textBottom,h);
- lastModel={w,h,lh,pitch,left:startX,top:topY,rightX,redLineX,paperFlip,bottomY,red,pl,lines,baseline0,fontSize,mode,hand,profile,type,txt,errors,indentEnabled,paraIndent,justifyEnabled,cornerX,cornerY,routeTolerance:profile.routeTolerance||.12,textBounds:{left:textLeft,right:textRight,top:textTop,bottom:textBottom}};
+ lastModel={w,h,physicalW:physicalSize.width,physicalH:physicalSize.height,rotation:paperRotation,lh,pitch,left:startX,top:topY,rightX,redLineX,paperFlip,bottomY,red,pl,lines,baseline0,fontSize,mode,hand,profile,type,txt,errors,indentEnabled,paraIndent,justifyEnabled,cornerX,cornerY,routeTolerance:profile.routeTolerance||.12,textBounds:{left:textLeft,right:textRight,top:textTop,bottom:textBottom}};
  if(!skipFitSuggestion){const clipsText=(m)=>m.errors.some(e=>/Строка выходит|пересекает безопасную|Текст выходит|Верхние буквы|Левые буквы|Нижние буквы/.test(e));const panel=$('fitSuggestion'),label=$('fitSuggestionText'),button=$('applyFitSuggestion');if(clipsText(lastModel)){const original=readEditableDecimal('lh',2,20,lh);const suggested=findLargestFittingTenth(original,value=>!clipsText(build(true,value)));build(true);if(suggested!==null&&suggested<original){panel.hidden=false;label.textContent=`Текст не помещается при ${original.toFixed(1)} мм. Рекомендуем ${suggested.toFixed(1)} мм — это максимальный размер, при котором весь текст помещается с минимальным уменьшением.`;button.hidden=false;button.textContent=`Применить ${suggested.toFixed(1)} мм`;button.dataset.value=suggested.toFixed(1)}else{panel.hidden=false;label.textContent='Текст не помещается даже при минимальной высоте 2 мм. Одного уменьшения букв недостаточно — нужно сократить текст, изменить шаг строк или увеличить лист.';button.hidden=true}}else panel.hidden=true;}
  return lastModel;
 }
@@ -1037,6 +1075,7 @@ function labelComponents(bin,w,h){
  return {labels,components};
 }
 function orderPathsByComponent(paths,raster,model){
+ const reverseRead=model.rotation==='left-page';
  const {labels,components}=labelComponents(raster.bin,raster.w,raster.h),groups=new Map();
  for(const p of paths){if(!p.length)continue;const id=labels[p[0]]||0;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(p)}
  const componentById=new Map(components.map(c=>[c.id,c]));
@@ -1045,7 +1084,7 @@ function orderPathsByComponent(paths,raster,model){
  orderedComponents.sort((a,b)=>{
   const ay=(a.box.cy+raster.offsetY)/raster.scale,by=(b.box.cy+raster.offsetY)/raster.scale;
   const ar=Math.round((ay-model.baseline0+model.lh*.35)/model.pitch),br=Math.round((by-model.baseline0+model.lh*.35)/model.pitch);
-  return ar-br||a.box.minX-b.box.minX;
+  return ar-br||(reverseRead?b.box.minX-a.box.minX:a.box.minX-b.box.minX);
  });
  const result=[];
  for(const group of orderedComponents){
@@ -1055,7 +1094,7 @@ function orderPathsByComponent(paths,raster,model){
    remaining.forEach((p,i)=>{
     const a={x:p[0]%raster.w,y:Math.floor(p[0]/raster.w)},z={x:p[p.length-1]%raster.w,y:Math.floor(p[p.length-1]/raster.w)};
     const candidates=[[false,a],[true,z]];
-    for(const [rev,q] of candidates){const d=cur?(q.x-cur.x)**2+(q.y-cur.y)**2:q.x*q.x+q.y*q.y;if(d<bestD){bestD=d;best=i;reverse=rev}}
+    for(const [rev,q] of candidates){const targetX=reverseRead?raster.w-1:0,d=cur?(q.x-cur.x)**2+(q.y-cur.y)**2:(q.x-targetX)**2+q.y*q.y;if(d<bestD){bestD=d;best=i;reverse=rev}}
    });
    let p=remaining.splice(best,1)[0];if(reverse)p=p.slice().reverse();result.push(p);
    const last=p[p.length-1];cur={x:last%raster.w,y:Math.floor(last/raster.w)};
@@ -1064,31 +1103,52 @@ function orderPathsByComponent(paths,raster,model){
  return result;
 }
 
+function mergeTouchingPaths(paths){
+ const merged=[],same=(a,b)=>a&&b&&a.x===b.x&&a.y===b.y;
+ for(const source of paths){
+  if(!source||source.length<2)continue;
+  const path=source.slice(),previous=merged[merged.length-1];
+  if(previous&&same(previous[previous.length-1],path[0])){previous.push(...path.slice(1));continue}
+  if(previous&&same(previous[previous.length-1],path[path.length-1])){previous.push(...path.slice(0,-1).reverse());continue}
+  merged.push(path);
+ }
+ return merged;
+}
 function gcodeForPaths(paths,model,raster){
- const scale=raster.scale,{pl}=model,pageX=pl.pageX,pageY=pl.pageY;
+ const scale=raster.scale,{pl}=model,pageX=pl.pageX,pageY=pl.pageY,rotation=model.rotation||'none';
  const toPage=p=>({x:(p.x+raster.offsetX)/scale,y:(p.y+raster.offsetY)/scale});
- const toMachine=p=>{const q=toPage(p);return {x:Number((pageX+q.x).toFixed(3)),y:Number((253-(pageY+q.y)).toFixed(3))}};
- const ordered=orderPathsByComponent(paths,raster,model).map(p=>simplify(p.map(i=>({x:i%raster.w,y:Math.floor(i/raster.w)})), model.routeTolerance||.12)).filter(p=>p.length>1);
- const candidateStrokes=ordered.map(p=>p.map(toMachine)).filter(p=>p.length>1);
- const strokes=[];
- for(const path of candidateStrokes){const length=path.reduce((sum,q,i)=>i?sum+Math.hypot(q.x-path[i-1].x,q.y-path[i-1].y):0,0);if(length>=.16)strokes.push(path)}
+ const toMachine=p=>{
+  const q=toPage(p),v=pageToPhysicalPoint(q.x,q.y,model.w,model.h,rotation);
+  return {x:Number((pageX+v.x).toFixed(3)),y:Number((253-(pageY+v.y)).toFixed(3))};
+ };
+ const simplified=orderPathsByComponent(paths,raster,model)
+  .map(p=>simplify(p.map(i=>({x:i%raster.w,y:Math.floor(i/raster.w)})),model.routeTolerance||.12))
+  .filter(p=>p.length>1);
+ const ordered=mergeTouchingPaths(simplified),candidateStrokes=ordered.map(p=>p.map(toMachine)).filter(p=>p.length>1),strokes=[];
+ for(const path of candidateStrokes){
+  const length=path.reduce((sum,q,i)=>i?sum+Math.hypot(q.x-path[i-1].x,q.y-path[i-1].y):0,0);
+  if(length>=.16)strokes.push(path);
+ }
  for(const path of strokes)for(const q of path){
   if(q.x<3||q.x>253||q.y<3||q.y>253)throw Error('Часть траектории находится вне рабочей зоны A1. Перемести лист или уменьши формат.');
-  const pg={x:q.x-pageX,y:253-q.y-pageY};
+  const physical={x:q.x-pageX,y:253-q.y-pageY},pg=physicalToPagePoint(physical.x,physical.y,model.w,model.h,rotation);
   if(pg.x<.25||pg.y<.25||pg.x>model.rightX-.2)throw Error('Фактическая траектория касается края листа или красной границы. Перенеси часть текста на следующую строку.');
   if(pg.y>model.bottomY-.25)throw Error('Фактическая траектория заходит в нижнюю недоступную зону. Уменьши количество строк или размер текста.');
  }
- const sorted=strokes; // Keep component reading order; do not globally jump between letters/words.
  const fmt=n=>Number(n).toFixed(3),z=model.zSettings||getPenZSettingsForPreview();let out=[];
- for(const p of strokes){const a=p[0];out.push(`G1 Z${fmt(z.travel)} F1200`,`G0 X${fmt(a.x)} Y${fmt(a.y)} F${model.profile.rapidFeed}`,`G1 Z${fmt(z.write)} F1200`);for(let i=1;i<p.length;i++){const q=p[i];out.push(`G1 X${fmt(q.x)} Y${fmt(q.y)} F${model.profile.drawFeed}`)}out.push(`G1 Z${fmt(z.travel)} F1200`)}
+ for(const p of strokes){
+  const a=p[0];
+  out.push(`G1 Z${fmt(z.travel)} F1200`,`G0 X${fmt(a.x)} Y${fmt(a.y)} F${model.profile.rapidFeed}`,`G1 Z${fmt(z.write)} F1200`);
+  for(let i=1;i<p.length;i++){const q=p[i];out.push(`G1 X${fmt(q.x)} Y${fmt(q.y)} F${model.profile.drawFeed}`)}
+  out.push(`G1 Z${fmt(z.travel)} F1200`);
+ }
  if(!out.length)throw Error('После обработки не осталось пригодных траекторий. Попробуй другой шрифт или увеличь высоту букв.');
  return {commands:out,strokes};
-}
-let routePlayback={strokes:[],model:null,timer:null,cursor:0,visible:false};
+}let routePlayback={strokes:[],model:null,timer:null,cursor:0,visible:false};
 function updateRouteControls(){const has=routePlayback.strokes.length>0,playing=!!routePlayback.timer;for(const [id,disabled] of [['routePlay',!has],['routePause',!has||!playing],['routeResume',!has||playing],['routeAll',!has],['routeStart',!has],['routeSlider',!has]])$(id).disabled=disabled}
 function stopRoutePlayback(){if(routePlayback.timer){clearInterval(routePlayback.timer);routePlayback.timer=null}updateRouteControls()}
 function clearRoutePlaybackUI(){stopRoutePlayback();const old=$('paper').querySelector('#penRouteLayer');if(old)old.remove();const bedOld=$('bedPreview').querySelector('#bedRouteLayer');if(bedOld)bedOld.remove();routePlayback.strokes=[];routePlayback.model=null;routePlayback.cursor=0;routePlayback.visible=false;$('routeOverlayBtn').hidden=true;$('routeInkModeBtn').hidden=true;$('routeInkModeBtn').disabled=true;setRouteInkMode(false);$('routeOverlayBtn').textContent='Показать траектории';$('routeOverlayBtn').setAttribute('aria-pressed','false');$('routePlayback').hidden=true;$('routeOverlayStatus').textContent='После построения будут показаны те же центральные линии и точки, которые попадут в G-code.';$('routePlaybackStatus').textContent='Траектории ещё не построены.';$('routeProgressBar').style.width='0%';$('routeProgress').setAttribute('aria-valuenow','0');$('routeProgressLabel').textContent='Пройдено 0 из 0 штрихов';updateRouteControls()}
-function routePagePoint(q,m){return {x:q.x-m.pl.pageX,y:253-q.y-m.pl.pageY}}
+function routePagePoint(q,m){const p={x:q.x-m.pl.pageX,y:253-q.y-m.pl.pageY};return physicalToPagePoint(p.x,p.y,m.w,m.h,m.rotation||'none')}
 function setRouteCursor(cursor){
  const n=routePlayback.strokes.length;routePlayback.cursor=Math.max(0,Math.min(n,Math.round(cursor)));
  const layer=$('paper').querySelector('#penRouteLayer');if(layer){[...layer.querySelectorAll('path[data-stroke]')].forEach((el,i)=>{el.setAttribute('stroke',i<routePlayback.cursor?'#2776bd':i===routePlayback.cursor?'#ed922c':'#aeb6be');el.setAttribute('stroke-width',i===routePlayback.cursor?'.34':'.22');el.setAttribute('opacity',i<routePlayback.cursor?'.95':i===routePlayback.cursor?'1':'.8')});const marker=layer.querySelector('#routeCursorDot');if(marker&&n){const path=routePlayback.strokes[Math.min(routePlayback.cursor,n-1)],q=routePlayback.cursor<n?path[0]:routePlayback.strokes[n-1].at(-1),pt=routePagePoint(q,routePlayback.model);marker.setAttribute('cx',pt.x.toFixed(3));marker.setAttribute('cy',pt.y.toFixed(3));marker.setAttribute('opacity',routePlayback.visible?'1':'0')}}
@@ -1097,7 +1157,7 @@ function setRouteCursor(cursor){
  const current=routePlayback.strokes[routePlayback.cursor],done=routePlayback.cursor,remaining=n-done,progress=n?done/n*100:0;$('routeProgressBar').style.width=progress.toFixed(2)+'%';$('routeProgress').setAttribute('aria-valuenow',String(Math.round(progress)));$('routeProgressLabel').textContent=`Пройдено ${done} из ${n} штрихов`
 
  let lineText='—',lineNo='—';
- if(current&&routePlayback.model){const mid=current.reduce((a,q)=>a+q.y,0)/current.length,pageY=253-mid-routePlayback.model.pl.pageY;let best=Infinity,idx=-1;for(let i=0;i<routePlayback.model.lines.length;i++){const row=routePlayback.model.lines[i];if(row.blank)continue;const y=routePlayback.model.baseline0+i*routePlayback.model.pitch,d=Math.abs(y-pageY);if(d<best){best=d;idx=i}}if(idx>=0){lineText=routePlayback.model.lines[idx].text;lineNo=String(idx+1)}}
+ if(current&&routePlayback.model){const midX=current.reduce((a,q)=>a+q.x,0)/current.length,midY=current.reduce((a,q)=>a+q.y,0)/current.length,physical={x:midX-routePlayback.model.pl.pageX,y:253-midY-routePlayback.model.pl.pageY},logical=physicalToPagePoint(physical.x,physical.y,routePlayback.model.w,routePlayback.model.h,routePlayback.model.rotation||'none'),pageY=logical.y;let best=Infinity,idx=-1;for(let i=0;i<routePlayback.model.lines.length;i++){const row=routePlayback.model.lines[i];if(row.blank)continue;const y=routePlayback.model.baseline0+i*routePlayback.model.pitch,d=Math.abs(y-pageY);if(d<best){best=d;idx=i}}if(idx>=0){lineText=routePlayback.model.lines[idx].text;lineNo=String(idx+1)}}
  $('routePlaybackStatus').textContent=n?(done===n?`Готово · пройдено ${done} из ${n} штрихов · осталось 0.`:`Текущий штрих ${done+1} из ${n} · пройдено ${done} · осталось ${remaining} · строка ${lineNo}: ${lineText||'—'} · буква не определяется надёжно.`):'Нет линий для показа.';
 }
 function showPenRoute(strokes,raster,model){
@@ -1280,11 +1340,11 @@ async function generateGcode(){
   setGenerationProgress(78,'Собираю маршрут пера и проверяю штрихи…');const topology=analyzeSkeleton(raster.bin,raster.w,raster.h,paths,raster.scale),result=gcodeForPaths(paths,m,raster),diag=diagnoseRoutes(raster,paths,topology,result,m);
   if(diag.fatal.length){renderQuality(diag);throw Error(diag.fatal.join(' '));}
   if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');
-  const draw=result.commands,x=m.pl.pageX,y=253-m.pl.pageY,page={x,y,w:m.w,h:m.h},park=getCornerPausePosition(x,y),placementPark=getPagePlacementParkPosition(x,y,m.w,m.h,m.pl.tab),pauseSeconds=getPause2Seconds(),right=x+m.w,bottom=y-m.h;
+  const draw=result.commands,x=m.pl.pageX,y=253-m.pl.pageY,page={x,y,w:m.physicalW,h:m.physicalH},park=getCornerPausePosition(x,y),placementPark=getPagePlacementParkPosition(x,y,m.physicalW,m.physicalH,m.pl.tab),pauseSeconds=getPause2Seconds(),right=x+m.physicalW,bottom=y-m.physicalH;
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.5.1`,
+  `; generated by Bambu HandWrite 5.6.0`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1312,10 +1372,10 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.5.0 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.5.0`,
+  `; Bambu HandWrite 5.6.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.6.0`,
   `; Title: ${workTitle}`,
-  `; Page: ${m.w} x ${m.h} mm; paper top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
+  `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
   `; Raster resolution: ${raster.scale.toFixed(1)} px/mm; route simplification: ${m.routeTolerance.toFixed(2)} mm`,
   `; Nozzle Z above build plate while writing: ${fmtZ(zSettings.write)} mm`,
@@ -1465,6 +1525,7 @@ $('draw').addEventListener('click',()=>{invalidateGeneratedGcode();try{build();s
 $('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('scriptMode').value='auto';$('handFont').value='neucha';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('neucha');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
 $('paperType').addEventListener('change',e=>{invalidateGeneratedGcode();setPreset(e.target.value,$('paperOrientation').value,true);save()});
 $('paperFlip').addEventListener('change',()=>{invalidateGeneratedGcode();build();save()});
+$('paperRotation').addEventListener('change',()=>{invalidateGeneratedGcode();build();save()});
 ['customPaperW','customPaperH'].forEach((id)=>$(id).addEventListener('input',()=>{if($('paperType').value!=='custom-paper')return;const key=id==='customPaperW'?'pw':'ph';$(key).value=String(clampValue(id,40,420));invalidateGeneratedGcode();refreshPreviewAndSave()}));$('paperOrientation').addEventListener('change',()=>{invalidateGeneratedGcode();setPreset($('paperType').value,$('paperOrientation').value,false);save()});
 document.querySelectorAll('[data-paper-choice]').forEach(btn=>btn.addEventListener('click',()=>{$('paperType').value=btn.dataset.paperChoice;invalidateGeneratedGcode();setPreset(btn.dataset.paperChoice,$('paperOrientation').value,false);save()}));
 $('svgBtn').addEventListener('click',svgDownload);$('pngBtn').addEventListener('click',pngDownload);$('printBtn').addEventListener('click',()=>window.print());$('gcodeBtn').addEventListener('click',generateGcode);
