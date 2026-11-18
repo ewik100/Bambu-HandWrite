@@ -40,8 +40,8 @@ if (html) {
   else ok('Either binding-side red line keeps a two-cell clearance (10 mm for standard 5 mm grid)');
   if (!html.includes("function getBindingSideRedLine(rotation)") || !html.includes("rotation==='left-page'?'right':rotation==='right-page'?'left':null")) fail('Each sideways notebook leaf must automatically select its binding-side red line.');
   else ok('Left and right leaves automatically select the correct binding-side red line');
-  if (!html.includes('flip.disabled=!!requiredSide') || !html.includes('строка пишется снизу вверх') || !html.includes('строка пишется сверху вниз')) fail('Sideways paper UI must lock the matched margin and show the correct marked start corner and writing direction.');
-  else ok('Both sideways layouts show the red margin at the top and explain the correct start corner/direction');
+  if (!html.includes('flip.disabled=!!requiredSide') || !html.includes('строка пишется снизу вверх') || !html.includes('нижняя строка справа налево') || !html.includes('нижнем левом углу у крестика')) fail('Sideways paper UI must lock the matched margin and show both marked start corners and writing directions.');
+  else ok('Both sideways layouts show the red margin at the top and explain the correct start points/directions');
   if (!html.includes("const rightLeaf=model.rotation==='right-page'") || !html.includes('const reverseRead=rightLeaf,reverseRows=rightLeaf') || !html.includes('const targetX=reverseRead?raster.w-1:0,targetY=reverseRows?raster.h-1:0')) fail('Right leaf must start from the bottom-right text component and traverse rows bottom-to-top, mapping its start to the bottom-left plate mark.');
   else ok('Right leaf route order starts at bottom-left plate mark and proceeds through bottom-up rows');
 
