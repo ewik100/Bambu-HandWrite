@@ -38,7 +38,10 @@ const pageToPhysicalMatch = html.match(/function pageToPhysicalPoint\(x,y,w,h,ro
 const physicalToPageMatch = html.match(/function physicalToPagePoint\(x,y,w,h,rotation='none'\)\{[\s\S]*?\n\}/);
 const mergePathsMatch = html.match(/function mergeTouchingPaths\(paths\)\{[\s\S]*?\n\}/);
 const bindingSideMatch = html.match(/function getBindingSideRedLine\(rotation\)\{[^}]+\}/);
-if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch || !pageSizeMatch || !pageToPhysicalMatch || !physicalToPageMatch || !mergePathsMatch || !bindingSideMatch) {
+const neighborsMatch = html.match(/function neighbors\(bin,w,h,i\)\{[\s\S]*?\n\}/);
+const labelComponentsMatch = html.match(/function labelComponents\(bin,w,h\)\{[\s\S]*?\n\}/);
+const orderPathsMatch = html.match(/function orderPathsByComponent\(paths,raster,model\)\{[\s\S]*?\n\}/);
+if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pauseFunctionMatch || !topMarginMatch || !lowercaseScaleMatch || !cornerPauseMatch || !pagePlacementMatch || !fitSearchMatch || !justifyCorrectionMatch || !lineTransformMatch || !routeGuardMatch || !writingBoundsMatch || !preflightMatch || !routeFunctionMatch || !pageSizeMatch || !pageToPhysicalMatch || !physicalToPageMatch || !mergePathsMatch || !bindingSideMatch || !neighborsMatch || !labelComponentsMatch || !orderPathsMatch) {
   throw new Error('Could not extract one or more safety-critical functions from index.html.');
 }
 
@@ -59,7 +62,7 @@ const schoolStart=html.indexOf('function schoolNoise(seed,index,salt)');
 const schoolEnd=html.indexOf('\nfunction schoolConnectorSegments()',schoolStart);
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract whole-word handwriting variation functions.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${pageSizeMatch[0]}\n${pageToPhysicalMatch[0]}\n${physicalToPageMatch[0]}\n${mergePathsMatch[0]}\n${bindingSideMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
+vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${pageSizeMatch[0]}\n${pageToPhysicalMatch[0]}\n${physicalToPageMatch[0]}\n${mergePathsMatch[0]}\n${bindingSideMatch[0]}\n${neighborsMatch[0]}\n${labelComponentsMatch[0]}\n${orderPathsMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
 
 const fontMetrics={measureText:(word)=>({width:word.length*8})};
 const evenWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,0,0,'stable-seed','lobster');
@@ -258,6 +261,15 @@ const rightWritingStart=context.pageToPhysicalPoint(30,20,165,203,'right-page');
 const rightWritingNext=context.pageToPhysicalPoint(140,20,165,203,'right-page');
 assert(leftWritingStart.x===20&&leftWritingStart.y===155&&leftWritingNext.y===25,'Left-leaf writing starts at bottom-left and advances upward from the marked corner');
 assert(rightWritingStart.x===183&&rightWritingStart.y===30&&rightWritingNext.y===140,'Right-leaf writing starts at top-right and advances downward from the marked corner');
+const routeRaster={w:30,h:10,scale:1,offsetX:0,offsetY:0,bin:new Uint8Array(300)};
+routeRaster.bin[4*30+3]=1;routeRaster.bin[4*30+4]=1;
+routeRaster.bin[4*30+21]=1;routeRaster.bin[4*30+22]=1;
+const pathsInReverseInputOrder=[[4*30+22,4*30+21],[4*30+4,4*30+3]];
+const leftOrdered=context.orderPathsByComponent(pathsInReverseInputOrder,routeRaster,{rotation:'left-page',baseline0:4,lh:1,pitch:10});
+const rightOrdered=context.orderPathsByComponent(pathsInReverseInputOrder,routeRaster,{rotation:'right-page',baseline0:4,lh:1,pitch:10});
+assert(leftOrdered[0][0]===4*30+3&&leftOrdered[1][0]===4*30+21,'Left leaf keeps normal left-to-right character order while physical movement goes upward');
+assert(rightOrdered[0][0]===4*30+3&&rightOrdered[1][0]===4*30+21,'Right leaf keeps normal left-to-right character order while physical movement goes downward');
+
 const leftRound=context.physicalToPagePoint(leftTop.x,leftTop.y,165,203,'left-page');
 const rightRound=context.physicalToPagePoint(rightTop.x,rightTop.y,165,203,'right-page');
 assert(leftRound.x===165&&leftRound.y===0,'Left-page rotation inverse restores original page coordinates');
