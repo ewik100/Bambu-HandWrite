@@ -26,10 +26,10 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.6.5', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'id="paperRotation"', "function getPaperPhysicalSize(w,h,rotation='none')", "function pageToPhysicalPoint(x,y,w,h,rotation='none')", "function physicalToPagePoint(x,y,w,h,rotation='none')", 'function mergeTouchingPaths(paths)', 'physicalW:physicalSize.width', 'page={x,y,w:m.physicalW,h:m.physicalH}', 'function validateTextRouteCommands(commands,zSettings)']) {
+  for (const marker of ['Bambu HandWrite 5.6.6', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'id="paperRotation"', "function getPaperPhysicalSize(w,h,rotation='none')", "function pageToPhysicalPoint(x,y,w,h,rotation='none')", "function physicalToPagePoint(x,y,w,h,rotation='none')", 'function mergeTouchingPaths(paths)', 'physicalW:physicalSize.width', 'page={x,y,w:m.physicalW,h:m.physicalH}', 'function validateTextRouteCommands(commands,zSettings)']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.6.5, restored multi-font selection and existing page-layout features are present');
+  if (!errors.length) ok('Version 5.6.6, restored multi-font selection and existing page-layout features are present');
   if (!['none','left-page','right-page'].every(mode => html.includes('value="'+mode+'"'))) fail('Normal, left-page and right-page placement modes must all be available.');
   else ok('Normal, left-page and right-page placement modes are available');
   if (!html.includes("rotation==='left-page'") || !html.includes("rotation==='right-page'") || !html.includes("physicalToPagePoint(physical.x,physical.y,model.w,model.h,rotation)")) fail('Rotated paper coordinates must be transformed and inverse-checked.');
@@ -57,7 +57,7 @@ if (html) {
   else ok('All nine handwriting profiles are available');
   if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
   else ok('All five language/script modes are available');
-  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт', "drawFeed:900,rapidFeed:1900", 'routeTolerance:1.0', "maxScale=model.hand==='lobster'?28:22"]) {
+  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт', "drawFeed:1250,rapidFeed:1900", 'routeTolerance:.07', "maxScale=22"]) {
     if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
   if (!errors.length) ok('Whole-word variation and exact-font generation guard are present');
@@ -148,7 +148,7 @@ if (html) {
 for (const required of [
   'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'SECURITY.md',
   'docs/USER_GUIDE_RU.md', 'docs/USER_GUIDE_EN.md', 'docs/INSTALLATION.md', 'docs/GCODE_BASELINE_5.4.2.md',
-  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html', 'releases/Bambu-HandWrite-5.4.3.html', 'releases/Bambu-HandWrite-5.4.4.html', 'releases/Bambu-HandWrite-5.5.0.html', 'releases/Bambu-HandWrite-5.6.5.html',
+  'docs/SAFETY.md', 'docs/COMPATIBILITY.md', 'docs/TEST_REPORT.md', 'releases/Bambu-HandWrite-4.8.1.html', 'releases/Bambu-HandWrite-5.0.0.html', 'releases/Bambu-HandWrite-5.2.0.html', 'releases/Bambu-HandWrite-5.3.0.html', 'releases/Bambu-HandWrite-5.4.2.html', 'releases/Bambu-HandWrite-5.4.3.html', 'releases/Bambu-HandWrite-5.4.4.html', 'releases/Bambu-HandWrite-5.5.0.html', 'releases/Bambu-HandWrite-5.6.6.html',
   '.github/ISSUE_TEMPLATE/bug_report.yml',
   '.github/ISSUE_TEMPLATE/feature_request.yml',
   '.github/ISSUE_TEMPLATE/printer_support.yml',
