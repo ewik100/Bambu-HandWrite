@@ -263,14 +263,22 @@ const rightWritingStart=context.pageToPhysicalPoint(30,20,165,203,'right-page');
 const rightWritingNext=context.pageToPhysicalPoint(140,20,165,203,'right-page');
 assert(leftWritingStart.x===20&&leftWritingStart.y===155&&leftWritingNext.y===25,'Left-leaf writing starts at bottom-left and advances upward from the marked corner');
 assert(rightWritingStart.x===183&&rightWritingStart.y===30&&rightWritingNext.y===140,'Right-leaf writing starts at top-right and advances downward from the marked corner');
-const routeRaster={w:30,h:10,scale:1,offsetX:0,offsetY:0,bin:new Uint8Array(300)};
-routeRaster.bin[4*30+3]=1;routeRaster.bin[4*30+4]=1;
-routeRaster.bin[4*30+21]=1;routeRaster.bin[4*30+22]=1;
-const pathsInReverseInputOrder=[[4*30+22,4*30+21],[4*30+4,4*30+3]];
-const leftOrdered=actualOrderPathsByComponent(pathsInReverseInputOrder,routeRaster,{rotation:'left-page',baseline0:4,lh:1,pitch:10});
-const rightOrdered=actualOrderPathsByComponent(pathsInReverseInputOrder,routeRaster,{rotation:'right-page',baseline0:4,lh:1,pitch:10});
-assert(leftOrdered[0][0]===4*30+3&&leftOrdered[1][0]===4*30+21,'Left leaf keeps normal left-to-right character order while physical movement goes upward');
-assert(rightOrdered[0][0]===4*30+3&&rightOrdered[1][0]===4*30+21,'Right leaf keeps normal left-to-right character order while physical movement goes downward');
+const routeRaster={w:30,h:20,scale:1,offsetX:134,offsetY:180,bin:new Uint8Array(600)};
+for(const [x,y] of [[2,2],[21,2],[2,15],[21,15]]){routeRaster.bin[y*30+x]=1;routeRaster.bin[y*30+x+1]=1}
+const pathsInReverseInputOrder=[
+ [15*30+22,15*30+21],
+ [2*30+22,2*30+21],
+ [15*30+3,15*30+2],
+ [2*30+3,2*30+2]
+];
+const orderModel={baseline0:182,lh:1,pitch:13};
+const leftOrdered=actualOrderPathsByComponent(pathsInReverseInputOrder,routeRaster,{...orderModel,rotation:'left-page'});
+const rightOrdered=actualOrderPathsByComponent(pathsInReverseInputOrder,routeRaster,{...orderModel,rotation:'right-page'});
+assert(leftOrdered[0][0]===2*30+2&&leftOrdered[1][0]===2*30+21&&leftOrdered[2][0]===15*30+2&&leftOrdered[3][0]===15*30+21,'Left leaf writes rows top-to-bottom and letters left-to-right');
+assert(rightOrdered[0][0]===15*30+22&&rightOrdered[1][0]===15*30+3&&rightOrdered[2][0]===2*30+22&&rightOrdered[3][0]===2*30+3,'Right leaf starts at bottom-right of the page, writes each row right-to-left, and moves to rows above');
+const rightStartOnPlate=context.pageToPhysicalPoint(routeRaster.offsetX+(rightOrdered[0][0]%routeRaster.w),routeRaster.offsetY+Math.floor(rightOrdered[0][0]/routeRaster.w),165,203,'right-page');
+assert(rightStartOnPlate.x<10&&rightStartOnPlate.y>150,'Right-leaf first writing point maps to the bottom-left start mark on the plate');
+assert(pathsInReverseInputOrder[0][0]!==rightOrdered[0][0],'Right-leaf sorting is independent of incoming skeleton order');
 
 const leftRound=context.physicalToPagePoint(leftTop.x,leftTop.y,165,203,'left-page');
 const rightRound=context.physicalToPagePoint(rightTop.x,rightTop.y,165,203,'right-page');
