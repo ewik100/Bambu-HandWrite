@@ -6,7 +6,6 @@ function schoolNoise(seed,index,salt){
  for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0)/4294967295;
 }
-function lobsterStyleFactor(){return 1}
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
  const metrics=ctx.measureText(word),dom=typeof document!=='undefined'&&kind!=='print';
  const nativeAlternates=dom&&!!document.getElementById('letterVariety')?.checked;
@@ -22,6 +21,8 @@ function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.textBaseline='alphabetic';
  ctx.textAlign='left';
  if('fontKerning' in ctx)ctx.fontKerning='normal';
+ if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1';
+ if('lang' in ctx)ctx.lang='ru';
  if('textRendering' in ctx)ctx.textRendering='optimizeLegibility';
  if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures=layout.nativeAlternates?'common-ligatures contextual':'none';
  ctx.fillText(layout.text,layout.x,layout.y);
