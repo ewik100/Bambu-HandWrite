@@ -727,25 +727,27 @@ function renderVariationDemo(){
  const host=$('variationDemo');if(!host)return;
  const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'school';
  const font=modeFontForScript('cyrl',mode,hand),enabled=$('letterVariety')?.checked!==false;
- const features=enabled?"'ccmp' 1,'liga' 1,'clig' 1,'calt' 1,'dlig' 1":"'ccmp' 1,'liga' 0,'clig' 0,'calt' 0,'dlig' 0";
+ const repeated='ттт · пот · тетрадь · тётя';
  const samples=[
-  {label:'Обычные слова',text:'Мама мыла раму.'},
-  {label:'Буква «т»',text:'ттт · пот · тетрадь · тётя'},
-  {label:'Сложные связки',text:'школьная пропись · письмо · строчка'},
-  {label:'Повтор букв',text:'мили · лили · шиши · минимум'}
+  {label:'Без вариантов',text:repeated,active:false},
+  {label:enabled?'С вариантами':'Варианты выключены',text:repeated,active:enabled},
+  {label:'Обычные слова',text:'Мама мыла раму.',active:enabled},
+  {label:'Сложные связки',text:'школьная пропись · письмо · строчка',active:enabled},
+  {label:'Повтор букв',text:'мили · лили · шиши · минимум',active:enabled}
  ];
  host.replaceChildren();
- const title=document.createElement('b');title.textContent='Проверка настоящих форм букв';host.append(title);
+ const title=document.createElement('b');title.textContent='Сравнение позиционных форм букв';host.append(title);
  for(const item of samples){
   const row=document.createElement('div');row.className='variation-demo-row';
   const label=document.createElement('small');label.textContent=item.label;
   const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
-  sample.style.fontFamily=fontCss(font)+',cursive';sample.style.fontFeatureSettings=features;
-  sample.style.fontVariantLigatures=enabled?'common-ligatures contextual discretionary-ligatures':'none';
+  sample.style.fontFamily=fontCss(font)+',cursive';
+  sample.style.fontFeatureSettings="'ccmp' "+(item.active?1:0)+",'liga' "+(item.active?1:0)+",'clig' "+(item.active?1:0)+",'calt' "+(item.active?1:0)+",'dlig' "+(item.active?1:0);
+  sample.style.fontVariantLigatures=item.active?'common-ligatures contextual discretionary-ligatures':'none';
   sample.style.fontKerning='normal';row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent=enabled?'Контекстные формы включены. Рисунок букв меняется по позиции в слове; случайное искажение отключено.':'Контекстные варианты отключены для сравнения. Обязательная композиция знаков сохранена.';
+ note.textContent=enabled?'Первые две строки показывают один текст без и с позиционными формами FRB. Ниже — дополнительные примеры.':'Позиционные формы сейчас выключены. Включи флажок, чтобы увидеть сравнение.';
  host.append(note);
 }
  const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
