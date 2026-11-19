@@ -520,7 +520,7 @@ Hello, world!</textarea></label>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={handwritingRoughness:38,schoolRoughness:50,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={handwritingRoughness:38,schoolRoughness:28,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
@@ -941,17 +941,10 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
   svg+=`<line x1="${rightX}" y1="0" x2="${rightX}" y2="${h}" stroke="#d65b54" stroke-width=".25" stroke-dasharray="1.4 1.2"/>`;
  }
  if(bottomY<h){svg+=`<rect x="0" y="${bottomY}" width="${w}" height="${h-bottomY}" fill="#fff0ed" opacity=".62"/><line x1="0" y1="${bottomY}" x2="${w}" y2="${bottomY}" stroke="#c65c52" stroke-width=".35" stroke-dasharray="2 1.5"/><text x="3" y="${Math.min(h-2,bottomY+4)}" font-size="3" fill="#a33d37">НИЖЕ ЭТОЙ ЛИНИИ ПЕРО НЕ ПИШЕТ</text>`}
- const variantsOn=document.getElementById("letterVariety")?.checked!==false,useSingleStroke=hand==='school'&&mode!=='print';
+ const variantsOn=document.getElementById("letterVariety")?.checked!==false,schoolPreview=hand==='school'&&mode!=='print';
  lines.forEach((line,i)=>{
   if(line.blank)return;
   const y=baseline0+i*pitch;
-  if(useSingleStroke){
-   const layout=strokeTextLayout(line.text,line.x,y,lh,profile.letterSpacing,profile.wordSpacing,'line:'+i+':'+line.text,variantsOn,line.extraWordSpace||0);
-   svg+='<g data-line="'+i+'" fill="none" stroke="#173b72" stroke-width=".19" stroke-linecap="round" stroke-linejoin="round">';
-   for(const item of layout.items)svg+='<path d="'+esc(item.d)+'" transform="translate('+item.x.toFixed(4)+' '+item.y.toFixed(4)+') scale('+item.sx.toFixed(6)+' '+item.sy.toFixed(6)+')"/>';
-   svg+='</g>';
-   return;
-  }
   const runs=runsFor(line.text,mode,hand);
   let ascent=0,descent=0;
   for(const run of runs){mctx.font=fontSize+'px '+fontCss(run.font);if(CANVAS_SPACING.letter)mctx.letterSpacing=profile.letterSpacing+'px';if(CANVAS_SPACING.word)mctx.wordSpacing=profile.wordSpacing+'px';const mt=mctx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
@@ -959,17 +952,17 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
   const sy=scaleToLowercaseHeight(lh,lowerAscent),capScale=uppercaseVerticalScale(mctx,runs,fontSize,lowerAscent),width=profile.widthScale||1,tx=line.x*(1-width),ty=y*(1-sy);
   const letter=CANVAS_SPACING.letter?profile.letterSpacing:0,word=CANVAS_SPACING.word?profile.wordSpacing:0,schoolTransform='matrix('+width+',0,0,'+sy+','+tx+','+ty+')';
   if(mode!=='print'){
-   svg+='<text data-line="'+i+'" x="0" y="0" transform="'+schoolTransform+'" font-size="'+fontSize+'" fill="#173b72" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">';
-   let cursor=line.x;
+   svg+='<text data-line="'+i+'" x="0" y="0" transform="'+schoolTransform+'" font-size="'+fontSize+'" fill="#173b72" opacity="'+(schoolPreview?'0':'1')+'" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">';
+   let cursor=line.x,wordIndex=0;
    for(const run of runs){
     mctx.font=fontSize+'px '+fontCss(run.font);if(CANVAS_SPACING.letter)mctx.letterSpacing='0px';if(CANVAS_SPACING.word)mctx.wordSpacing='0px';
     for(const part of run.text.split(/(\s+)/u)){
      if(!part)continue;
      if(/^\s+$/u.test(part)){cursor+=mctx.measureText(part).width+(part.match(/ /g)||[]).length*profile.wordSpacing;continue}
-     const layout=schoolWordLayout(mctx,part,cursor,y,fontSize,schoolRoughness(),profile.letterSpacing,line.text+':'+i+':'+cursor,hand);
-     const gx=layout.x,gy=layout.y;
-     svg+='<tspan font-family="'+esc(run.font)+',cursive" font-size="'+fontSize.toFixed(4)+'" x="'+gx.toFixed(4)+'" y="'+gy.toFixed(4)+'" lang="ru" xml:lang="ru">'+esc(layout.text)+'</tspan>';
-     cursor=layout.endX;
+     const layout=schoolWordLayout(mctx,part,cursor,y,fontSize,schoolRoughness(),profile.letterSpacing,'line:'+i+':word:'+wordIndex+':'+part,hand);
+     const gx=layout.x,gy=layout.y,featureStyle=hand==='school'?' style="font-feature-settings:'+esc(schoolFeatureSettings(layout.variantIndex,variantsOn))+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal"':'';
+     svg+='<tspan font-family="'+esc(run.font)+',cursive" font-size="'+fontSize.toFixed(4)+'" x="'+gx.toFixed(4)+'" y="'+gy.toFixed(4)+'" lang="ru" xml:lang="ru"'+featureStyle+'>'+esc(layout.text)+'</tspan>';
+     cursor=layout.endX;wordIndex++;
     }
    }
    svg+='</text>';
@@ -1031,6 +1024,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  updateLiveStats(txt,lines,bottomY,textBottom,h);
  lastModel={w,h,physicalW:physicalSize.width,physicalH:physicalSize.height,rotation:paperRotation,lh,pitch,left:startX,top:topY,rightX,redLineX,paperFlip,bottomY,red,pl,lines,baseline0,fontSize,mode,hand,profile,type,txt,errors,indentEnabled,paraIndent,justifyEnabled,cornerX,cornerY,routeTolerance:profile.routeTolerance||.12,textBounds:{left:textLeft,right:textRight,top:textTop,bottom:textBottom}};
  if(!skipFitSuggestion){const clipsText=(m)=>m.errors.some(e=>/Строка выходит|пересекает безопасную|Текст выходит|Верхние буквы|Левые буквы|Нижние буквы/.test(e));const panel=$('fitSuggestion'),label=$('fitSuggestionText'),button=$('applyFitSuggestion');if(clipsText(lastModel)){const original=readEditableDecimal('lh',2,20,lh);const suggested=findLargestFittingTenth(original,value=>!clipsText(build(true,value)));build(true);if(suggested!==null&&suggested<original){panel.hidden=false;label.textContent=`Текст не помещается при ${original.toFixed(1)} мм. Рекомендуем ${suggested.toFixed(1)} мм — это максимальный размер, при котором весь текст помещается с минимальным уменьшением.`;button.hidden=false;button.textContent=`Применить ${suggested.toFixed(1)} мм`;button.dataset.value=suggested.toFixed(1)}else{panel.hidden=false;label.textContent='Текст не помещается даже при минимальной высоте 2 мм. Одного уменьшения букв недостаточно — нужно сократить текст, изменить шаг строк или увеличить лист.';button.hidden=true}}else panel.hidden=true;}
+ scheduleSchoolStrokePreview(lastModel);
  return lastModel;
 }
 function setStage(n){viewStage=n;build()}
