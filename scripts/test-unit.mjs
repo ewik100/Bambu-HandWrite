@@ -58,6 +58,16 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
+vm.runInContext([
+  limitsMatch[0], pitchCellsMatch[0], pitchMmMatch[0], zFunctionMatch[0],
+  pauseFunctionMatch[0], topMarginMatch[0], lowercaseScaleMatch[0],
+  cornerPauseMatch[0], pagePlacementMatch[0], fitSearchMatch[0],
+  justifyCorrectionMatch[0], lineTransformMatch[0], routeGuardMatch[0],
+  writingBoundsMatch[0], preflightMatch[0], pageSizeMatch[0],
+  pageToPhysicalMatch[0], physicalToPageMatch[0], mergePathsMatch[0],
+  bindingSideMatch[0], neighborsMatch[0], labelComponentsMatch[0],
+  orderPathsMatch[0], routeFunctionMatch[0]
+].join('\n'), context);
 const schoolStart=html.indexOf('function schoolVariation()');
 const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas')",schoolStart);
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Caveat handwriting helpers.');
