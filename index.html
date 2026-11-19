@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.13.0 — браузерный генератор рукописного G-code для Bambu Lab A1 со связным курсивом FRB American Cursive с OpenType-вариантами.">
-<meta property="og:title" content="Bambu HandWrite 5.13.0">
+<meta name="description" content="Bambu HandWrite 5.14.0 — браузерный генератор рукописного G-code для Bambu Lab A1 со связным курсивом FRB American Cursive с OpenType-вариантами.">
+<meta property="og:title" content="Bambu HandWrite 5.14.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.13.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.14.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
 <style>
@@ -221,7 +221,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.13.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.14.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю FRB American Cursive…</span></p>
 </header>
@@ -624,7 +624,7 @@ const FONT_PROFILES={
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
 
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
- frb:{title:'Школьный рукописный — FRB American Cursive',tag:'НЕСКОЛЬКО ФОРМ · КИРИЛЛИЦА',description:'Школьный рукописный шрифт TypeTogether. OpenType автоматически чередует несколько нарисованных вариантов кириллических знаков, не деформируя их контуры.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.54,routeTolerance:.07,character:'разборчивый школьный рукописный',connection:'автоматические контекстные формы и естественные переходы'},
+ frb:{title:'Школьный рукописный — FRB American Cursive',tag:'ПОЗИЦИОННЫЕ ФОРМЫ · КИРИЛЛИЦА',description:'FRB American Cursive использует реальные позиционные формы русских букв через OpenType ccmp: начальные, срединные и конечные соединения. Добавлена очень лёгкая разница наклона и высоты целых слов — без деформации контуров букв.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.54,routeTolerance:.07,character:'разборчивый школьный рукописный',connection:'автоматические контекстные формы и естественные переходы'},
  school:{title:'Связный школьный почерк — Pecita',tag:'НАСТОЯЩИЕ СОЕДИНЕНИЯ · КИРИЛЛИЦА + ЛАТИНИЦА',description:'Встроенный шрифт Pecita: настоящие соединённые формы букв, контекстные варианты и лигатуры самого шрифта. Искусственная деформация отключена, чтобы не разрывать соединения.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'настоящие соединения и OpenType-лигатуры'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
@@ -658,7 +658,7 @@ function refreshFontMetrics(){
   const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
   sample.style.fontFamily=familyCss+',cursive';
-  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1':'"calt" 0,"liga" 0,"clig" 0';
+  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1':'"ccmp" 0,"calt" 0,"liga" 0,"clig" 0';
   sample.style.fontVariantLigatures=$('letterVariety')?.checked?'common-ligatures contextual':'none';
   sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';
   sample.style.fontSynthesis='none';
@@ -696,8 +696,11 @@ function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpac
  const metrics=ctx.measureText(word),dom=typeof document!=='undefined'&&kind!=='print';
  const nativeAlternates=dom&&!!document.getElementById('letterVariety')?.checked;
  const bounceEnabled=dom&&!!document.getElementById('wordBounce')?.checked;
- const bounce=bounceEnabled?(schoolNoise(seed,0,21)-.5)*.70:0;
- return {text:word,x:startX,y:baseline+bounce,metrics,endX:startX+metrics.width+letterSpacing,
+ const bounce=bounceEnabled?(schoolNoise(seed,0,21)-.5)*.90:0;
+ const xJitter=dom?(schoolNoise(seed,0,22)-.5)*.18:0;
+ const rotation=dom?(schoolNoise(seed,0,23)-.5)*.9:0;
+ const x=startX+xJitter;
+ return {text:word,x,y:baseline+bounce,rotation,metrics,endX:x+metrics.width+letterSpacing,
   level:0,spans:[],fontSize,seed,different:nativeAlternates,nativeAlternates,styleFactor:1};
 }
 function drawSchoolWordCanvas(ctx,layout,fontSize){
@@ -707,10 +710,13 @@ function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.textBaseline='alphabetic';
  ctx.textAlign='left';
  if('fontKerning' in ctx)ctx.fontKerning='normal';
- if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1';
+ if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings=layout.nativeAlternates?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1':'"ccmp" 0,"calt" 0,"liga" 0,"clig" 0';
  if('lang' in ctx)ctx.lang='ru';
  if('textRendering' in ctx)ctx.textRendering='optimizeLegibility';
  if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures=layout.nativeAlternates?'common-ligatures contextual':'none';
+ // Keep each word's letterforms intact; a tiny whole-word tilt adds natural handwriting irregularity.
+ const angle=(layout.rotation||0)*Math.PI/180,centerX=layout.x+layout.metrics.width/2;
+ if(angle){ctx.translate(centerX,layout.y);ctx.rotate(angle);ctx.translate(-centerX,-layout.y)}
  ctx.fillText(layout.text,layout.x,layout.y);
  ctx.restore();
 }
@@ -910,7 +916,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
   const letter=CANVAS_SPACING.letter?profile.letterSpacing:0,word=CANVAS_SPACING.word?profile.wordSpacing:0;
   const schoolTransform=`matrix(${width},0,0,${sy},${tx},${ty})`;
    if(mode!=='print'){
-    svg+=`<text data-line="${i}" x="0" y="0" transform="${schoolTransform}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual discretionary-ligatures;font-feature-settings:'liga' 1,'clig' 1,'calt' 1,'dlig' 1;white-space:pre">`;
+    svg+=`<text data-line="${i}" x="0" y="0" transform="${schoolTransform}" font-size="${fontSize}" fill="#173b72" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual discretionary-ligatures;font-feature-settings:'ccmp' 1,'liga' 1,'clig' 1,'calt' 1,'dlig' 1;white-space:pre">`;
     let cursor=line.x,wordIndex=0,imgs='';
     for(const run of runs){
      mctx.font=`${fontSize}px ${fontCss(run.font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing='0px';if(CANVAS_SPACING.word)mctx.wordSpacing='0px';
@@ -922,7 +928,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
       if(layout.glyphs){
        const wordImage=schoolWordPng(mctx,layout,fontSize,'#173b72',3);
        if(wordImage)imgs+=`<image href="${wordImage.href}" x="${wordImage.x.toFixed(4)}" y="${wordImage.y.toFixed(4)}" width="${wordImage.width.toFixed(4)}" height="${wordImage.height.toFixed(4)}" preserveAspectRatio="none"/>`;
-      }else svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}">${esc(layout.text)}</tspan>`;
+      }else svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}" transform="rotate(${(layout.rotation||0).toFixed(3)} ${(gx+layout.metrics.width/2).toFixed(4)} ${gy.toFixed(4)})">${esc(layout.text)}</tspan>`;
       cursor=layout.endX;
      }
     }
@@ -1590,7 +1596,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.13.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.14.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
