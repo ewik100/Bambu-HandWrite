@@ -744,7 +744,7 @@ function renderVariationDemo(){
   const label=document.createElement('small');label.textContent=item.label;
   const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
   sample.style.fontFamily=fontCss(font)+',cursive';
-  sample.style.fontFeatureSettings="'ccmp' "+(item.active?1:0)+",'liga' "+(item.active?1:0)+",'clig' "+(item.active?1:0)+",'calt' "+(item.active?1:0)+",'dlig' "+(item.active?1:0);
+  sample.style.fontFeatureSettings="'ccmp' "+(item.active?1:0)+",'liga' 1,'clig' 1,'calt' 0,'dlig' 0;
   sample.style.fontVariantLigatures='common-ligatures contextual';
   sample.style.fontKerning='normal';row.append(label,sample);host.append(row);
  }
