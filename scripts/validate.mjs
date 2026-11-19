@@ -51,16 +51,16 @@ if (html) {
   const modeEnd=html.indexOf('</select>',modeStart);
   const handSelect=handStart>=0&&handEnd>handStart?html.slice(handStart,handEnd):'';
   const modeSelect=modeStart>=0&&modeEnd>modeStart?html.slice(modeStart,modeEnd):'';
-  const expectedFonts=['school','marck','neucha','badscript','pangolin','lobster','caveat','great','recommended'];
+  const expectedFonts=['school','frb','marck','neucha','badscript','pangolin','great','recommended'];
   const actualFonts=[...handSelect.matchAll(/<option\s+value="([^"]+)"/g)].map(match=>match[1]);
   if (JSON.stringify(actualFonts)!==JSON.stringify(expectedFonts)) fail('All nine handwriting profiles must remain available.');
   else ok('All nine handwriting profiles are available');
   if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
   else ok('All five language/script modes are available');
-  for (const marker of ['function schoolVariation()', "if(hand==='school'||hand==='lobster')", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт', "drawFeed:1250,rapidFeed:1900", 'routeTolerance:.07', "maxScale=22"]) {
+  for (const marker of ['function schoolVariation()', "useSingleStroke=hand==='school'&&mode!=='print'", 'schoolRoughness(),profile.letterSpacing', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22']) {
     if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
-  if (!errors.length) ok('Single-stroke Cyrillic engine, deterministic glyph variation and exact-font generation guard are present');
+  if (!errors.length) ok('Eight handwriting profiles, single-stroke Cyrillic engine, five glyph variations and route generation guard are present');
 
   if (!html.includes("$('layoutStatus').className='status ok'") ||
       !html.includes("$('bedStatus').className='bed-status ok'") ||
