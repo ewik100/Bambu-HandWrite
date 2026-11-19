@@ -716,7 +716,7 @@ function clampValue(id,min,max){const el=$(id);let n=Number(el.value);if(!Number
 function scriptOf(ch,last='latn'){if(/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(ch))return 'cyrl';if(/[A-Za-z\u00C0-\u024F]/u.test(ch))return 'latn';return last}
 function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(hand==='school')return FONT.school;if(hand==='badscript')return FONT.badscript;if(hand==='neucha')return FONT.neucha;if(hand==='pangolin')return FONT.pangolin;if(hand==='frb')return FONT.frb;if(hand==='caveat')return FONT.caveat;if(hand==='marck')return FONT.marck;if(hand==='great')return sc==='cyrl'?FONT.neucha:FONT.great;if(hand==='recommended')return FONT.neucha;if(mode==='ru')return FONT.marck;if(mode==='en')return FONT.dancing;if(mode==='universal')return sc==='cyrl'?FONT.marck:FONT.dancing;return sc==='cyrl'?FONT.marck:FONT.dancing}
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
-function schoolVariation(){return $('letterVariety')?.checked===false?0:100}
+function schoolVariation(){return 0}
 function schoolAccuracy(){return 100}
 function schoolRoughness(){const v=Number($('schoolRoughness')?.value??28);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):28}
 function schoolNoise(seed,index=0,salt=0){
@@ -947,15 +947,15 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
   const y=baseline0+i*pitch;
   const runs=runsFor(line.text,mode,hand);
   let ascent=0,descent=0;
-  for(const run of runs){mctx.font=fontSize+'px '+fontCss(run.font);if(CANVAS_SPACING.letter)mctx.letterSpacing=profile.letterSpacing+'px';if(CANVAS_SPACING.word)mctx.wordSpacing=profile.wordSpacing+'px';const mt=mctx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
-  let lowerAscent=0;for(const run of runs){mctx.font=fontSize+'px '+fontCss(run.font);const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,mctx.measureText(probe).actualBoundingBoxAscent||0)}
+  for(const run of runs){mctx.font=(hand==='school'?'500 ':'')+fontSize+'px '+fontCss(run.font);if(CANVAS_SPACING.letter)mctx.letterSpacing=profile.letterSpacing+'px';if(CANVAS_SPACING.word)mctx.wordSpacing=profile.wordSpacing+'px';const mt=mctx.measureText(run.text);ascent=Math.max(ascent,mt.actualBoundingBoxAscent||0);descent=Math.max(descent,mt.actualBoundingBoxDescent||0)}
+  let lowerAscent=0;for(const run of runs){mctx.font=(hand==='school'?'500 ':'')+fontSize+'px '+fontCss(run.font);const probe=/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(run.text)?'х':'x';lowerAscent=Math.max(lowerAscent,mctx.measureText(probe).actualBoundingBoxAscent||0)}
   const sy=scaleToLowercaseHeight(lh,lowerAscent),capScale=uppercaseVerticalScale(mctx,runs,fontSize,lowerAscent),width=profile.widthScale||1,tx=line.x*(1-width),ty=y*(1-sy);
   const letter=CANVAS_SPACING.letter?profile.letterSpacing:0,word=CANVAS_SPACING.word?profile.wordSpacing:0,schoolTransform='matrix('+width+',0,0,'+sy+','+tx+','+ty+')';
   if(mode!=='print'){
    svg+='<text data-line="'+i+'" x="0" y="0" transform="'+schoolTransform+'" font-size="'+fontSize+'" fill="#173b72" opacity="'+(schoolPreview?'0':'1')+'" font-kerning="normal" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual;white-space:pre">';
    let cursor=line.x,wordIndex=0;
    for(const run of runs){
-    mctx.font=fontSize+'px '+fontCss(run.font);if(CANVAS_SPACING.letter)mctx.letterSpacing='0px';if(CANVAS_SPACING.word)mctx.wordSpacing='0px';
+    mctx.font=(hand==='school'?'500 ':'')+fontSize+'px '+fontCss(run.font);if(CANVAS_SPACING.letter)mctx.letterSpacing='0px';if(CANVAS_SPACING.word)mctx.wordSpacing='0px';
     for(const part of run.text.split(/(\s+)/u)){
      if(!part)continue;
      if(/^\s+$/u.test(part)){cursor+=mctx.measureText(part).width+(part.match(/ /g)||[]).length*profile.wordSpacing;continue}
