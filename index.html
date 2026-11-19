@@ -322,7 +322,7 @@ Hello, world!</textarea></label>
       <div class="school-variation-heading"><b>Естественные формы букв</b></div>
       <p class="tiny">Используются только настоящие контекстные формы и лигатуры, уже нарисованные в выбранном шрифте. Если в шрифте нет пяти вариантов конкретной буквы, программа не подменяет их искусственными искажениями.</p>
       <div id="lobsterExtras" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
-        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Контекстные формы и лигатуры шрифта</label>
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Настоящие альтернативные формы и лигатуры шрифта</label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wordBounce" checked>Небольшое смещение целого слова (до 0,35 мм)</label>
       </div>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
@@ -667,7 +667,7 @@ function refreshFontMetrics(){
   const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
   sample.style.fontFamily=familyCss+',cursive';
-  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1,"dlig" 1':'"calt" 0,"liga" 0,"clig" 0,"dlig" 0';
+  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1,"dlig" 1,"aalt" 1,"salt" 1':'"calt" 0,"liga" 0,"clig" 0,"dlig" 0,"aalt" 0,"salt" 0';
   sample.style.fontVariantLigatures=$('letterVariety')?.checked?'common-ligatures contextual':'none';
   sample.textContent='Красивый почерк — мама мыла раму. 123';
   sample.style.fontSynthesis='none';
