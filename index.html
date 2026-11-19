@@ -309,7 +309,7 @@ Hello, world!</textarea></label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
       <div class="font-profile-head"><b id="fontProfileTitle">Связный школьный почерк — Pecita</b><span class="font-profile-tag" id="fontProfileTag">СВЯЗНЫЙ · ОСНОВНОЙ</span></div>
       <p id="fontProfileDescription">Pecita: соединённые кириллические и латинские буквы с контекстными формами и лигатурами.</p>
-      <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div><button class="btn secondary" id="downloadLobster" type="button" style="margin-top:8px">Скачать Lobster.ttf</button></div>
+      <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div><button class="btn secondary" id="downloadLobster" type="button" style="margin-top:8px">Скачать Lobster.ttf</button><button class="btn secondary" id="downloadLobster" type="button" style="margin-top:8px">Скачать Lobster.ttf</button></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
         <span>Шаг строк: <b>8,35 мм</b></span>
@@ -633,7 +633,7 @@ function setFontStatus(online){
  else{status.textContent='Шрифт не загружен';status.className='pill offline';note.textContent='Выбранный шрифт недоступен. G-code не будет создан с подменённым начертанием.'}
 }
 async function refreshFontAvailability(model=lastModel){
- if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,1800);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build()}return online;
+ if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,1800);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build();renderVariationDemo()}return online;
 }
 const FONT_PROFILES={
  marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
@@ -1731,6 +1731,8 @@ $('gcodeHelpBtn').addEventListener('click',()=>{$('gcodeInstruction').hidden=!$(
 $('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paperZoom+.2)*10)/10);applyPaperZoom()});$('zoomOut').addEventListener('click',()=>{paperZoom=Math.max(1,Math.round((paperZoom-.2)*10)/10);applyPaperZoom()});$('zoomFit').addEventListener('click',()=>{paperZoom=1;applyPaperZoom()});
 $('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
 $('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('lobsterStyle').addEventListener('change',()=>{invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
+ $('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
+ $('downloadLobster')?.addEventListener('click',downloadLobsterFont);
  $('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
  $('downloadLobster')?.addEventListener('click',downloadLobsterFont);
 $('schoolRoughness').addEventListener('input',()=>{const value=schoolAccuracy();$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();renderVariationDemo();refreshFontMetrics();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
