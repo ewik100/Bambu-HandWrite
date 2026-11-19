@@ -212,10 +212,10 @@ textarea{line-height:1.55;resize:vertical}
 /* Calm, consistent controls: remove browser red/blue checkbox defaults. */
 #glyphAlternates label{display:flex!important;align-items:center;gap:10px;padding:9px 12px;margin:0!important;border:1px solid #d7e0e8;border-radius:11px;background:#fff;color:#243447;font-size:13px;line-height:1.35;cursor:pointer}
 #glyphAlternates input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:0 0 19px;width:19px;height:19px;min-width:19px;min-height:19px;margin:0;border:1.6px solid #8293a3;border-radius:5px;background:#fff;display:grid;place-content:center;cursor:pointer}
-#lobsterExtras input[type=checkbox]::before{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .12s}
-#lobsterExtras input[type=checkbox]:checked{background:#315f83;border-color:#315f83}
-#lobsterExtras input[type=checkbox]:checked::before{transform:rotate(-45deg) scale(1)}
-#lobsterExtras input[type=checkbox]:focus-visible{outline:3px solid #9bbbd2;outline-offset:2px}
+#glyphAlternates input[type=checkbox]::before{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .12s}
+#glyphAlternates input[type=checkbox]:checked{background:#315f83;border-color:#315f83}
+#glyphAlternates input[type=checkbox]:checked::before{transform:rotate(-45deg) scale(1)}
+#glyphAlternates input[type=checkbox]:focus-visible{outline:3px solid #9bbbd2;outline-offset:2px}
 
 </style>
 </head>
@@ -661,7 +661,7 @@ function refreshFontMetrics(){
   if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});
  }
  const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=false;
- const lobsterControls=$('lobsterExtras');if(lobsterControls)lobsterControls.style.display='flex';
+ const glyphControls=$('glyphAlternates');if(glyphControls)glyphControls.style.display='flex';
  updateSchoolFontLoader();
 }
 function applyFontProfile(key){
