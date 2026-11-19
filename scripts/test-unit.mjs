@@ -80,11 +80,11 @@ assert(russianAlphabet.length===33,'Single-stroke glyph coverage test uses all 3
 for(const ch of russianAlphabet){
   const key=ch==='ё'?'е':ch==='й'?'и':ch;
   const def=strokeApi.defs[key];
-  assert(!!def&&typeof def.p==='string',\`Glyph definition exists for \${ch}\`);
+  assert(!!def&&typeof def.p==='string','Glyph definition exists for '+ch);
   for(const path of [def.p,...(def.v?[def.v]:[])]){
     const matches=[...path.matchAll(/C\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g)];
     const last=matches.at(-1);
-    assert(path.startsWith('M 0 0')&&last&&Math.abs(Number(last[5])-def.w)<.001&&Math.abs(Number(last[6]))<.001,\`Glyph \${ch} starts and ends at its baseline connection point\`);
+    assert(path.startsWith('M 0 0')&&last&&Math.abs(Number(last[5])-def.w)<.001&&Math.abs(Number(last[6]))<.001,'Glyph '+ch+' starts and ends at its baseline connection point');
   }
 }
 const baseWord=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',false,0);
