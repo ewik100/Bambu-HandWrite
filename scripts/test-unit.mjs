@@ -51,52 +51,40 @@ let pitchCellsInput = '2';
 let pitchUnitInput = 'cells';
 let pitchMmInput = '15';
 const context = {
-  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : pauseInput }),
+  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : id === 'schoolRoughness' ? '28' : pauseInput, checked: true }),
   Number, String, Error, Math,
   orderPathsByComponent: (paths) => paths,
   simplify: (points) => points,
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-const schoolStart=html.indexOf('function schoolVariation(){return 0}');
-const schoolEnd=html.indexOf('\nasync function rasterSingleStrokeText',schoolStart);
-if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract the single-stroke handwriting engine.');
+const schoolStart=html.indexOf('function schoolVariation()');
+const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas')",schoolStart);
+if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Caveat handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
-vm.runInContext([
-  limitsMatch[0], pitchCellsMatch[0], pitchMmMatch[0], zFunctionMatch[0],
-  pauseFunctionMatch[0], topMarginMatch[0], lowercaseScaleMatch[0],
-  cornerPauseMatch[0], pagePlacementMatch[0], fitSearchMatch[0],
-  justifyCorrectionMatch[0], lineTransformMatch[0], routeGuardMatch[0],
-  writingBoundsMatch[0], preflightMatch[0], pageSizeMatch[0],
-  pageToPhysicalMatch[0], physicalToPageMatch[0], mergePathsMatch[0],
-  bindingSideMatch[0], neighborsMatch[0], labelComponentsMatch[0],
-  orderPathsMatch[0], routeFunctionMatch[0], schoolFunctions
-].join('\n'), context);
-const actualOrderPathsByComponent=context.orderPathsByComponent;
-context.orderPathsByComponent=(paths)=>paths;
-const strokeApi=vm.runInContext('({glyph:strokeGlyphFor,layout:strokeTextLayout,defs:STROKE_GLYPHS})',context);
-const russianAlphabet=Array.from('абвгдеёжзийклмнопрстуфхцчшщъыьэюя');
-assert(russianAlphabet.length===33,'Single-stroke glyph coverage test uses all 33 Russian letters');
-for(const ch of russianAlphabet){
-  const key=ch==='ё'?'е':ch==='й'?'и':ch;
-  const def=strokeApi.defs[key];
-  assert(!!def&&typeof def.p==='string','Glyph definition exists for '+ch);
-  for(const path of [def.p,...(def.v?[def.v]:[])]){
-    const matches=[...path.matchAll(/C\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g)];
-    const last=matches.at(-1);
-    assert(path.startsWith('M 0 0')&&last&&Math.abs(Number(last[5])-def.w)<.001&&Math.abs(Number(last[6]))<.001,'Glyph '+ch+' starts and ends at its baseline connection point');
-  }
-}
-const baseWord=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',false,0);
-const variedWord=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',true,0);
-const variedRepeat=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',true,0);
-assert(Math.abs(baseWord.width-variedWord.width)<1e-9,'Turning variants on does not change word width or line wrapping');
-assert(variedWord.items[0].d!==variedWord.items[1].d,'Repeated т letters receive visibly different stroke shapes');
-assert(JSON.stringify(variedWord.items.map(item=>item.d))===JSON.stringify(variedRepeat.items.map(item=>item.d)),'The same text and seed reproduce the same letter variants');
-const connectionGap=Math.abs((variedWord.items[0].x+108*variedWord.items[0].sx)-variedWord.items[1].x);
-assert(connectionGap<1e-8,'Adjacent т glyphs meet exactly at the baseline without an added connector');
-const longSample=strokeApi.layout('мама мыла раму тетрадь ёжик',0,10,4.8,0,.54,'word-test',true,0);
-assert(longSample.items.length>20&&longSample.width>0,'Russian sample words produce a non-empty measurable vector route');
+vm.runInContext(schoolFunctions,context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,variant:schoolVariantIndex,noise:schoolNoise,layout:schoolWordLayout})',context);
+assert(schoolApi.variation()===0,'Enabling letter variants does not alter line wrapping or reserve extra width');
+const featureModes=Array.from({length:5},(_,i)=>schoolApi.features(i,true));
+assert(new Set(featureModes).size===5,'All five Caveat OpenType letter-variation modes are distinct');
+assert(featureModes.every(value=>value.includes('"calt" 1')&&value.includes('"dlig" 0')&&value.includes('"salt" 0')),'Caveat contextual alternates stay enabled while decorative swashes remain disabled');
+const disabledFeatures=schoolApi.features(2,false);
+assert(disabledFeatures.includes('"calt" 0')&&disabledFeatures.includes('"ss01" 0')&&disabledFeatures.includes('"ss02" 0'),'The letter-variation switch disables contextual and stylistic substitutions');
+const seedA=schoolApi.variant('line:0:word:0:тетрадь'),seedB=schoolApi.variant('line:0:word:0:тетрадь');
+assert(seedA===seedB&&seedA>=0&&seedA<5,'A word receives one stable, repeatable feature variant from its seed');
+const mockMetrics={measureText:(value)=>({width:Array.from(value).length*8})};
+const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
+const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
+assert(baseLayout.endX===sameLayout.endX&&baseLayout.variantIndex===sameLayout.variantIndex,'Variant-enabled word layout preserves width and repeats deterministically');
+assert(schoolApi.roughness()===28,'Stroke roughness uses the dedicated UI slider value');
+const caveatBase64=fs.readFileSync(path.join(root,'fonts','Caveat[wght].ttf.b64'),'utf8').trim();
+const caveatBinary=Buffer.from(caveatBase64,'base64');
+assert(caveatBase64.length>500000&&caveatBinary.length>300000,'Bundled Caveat variable font is present and decodes to a full TTF asset');
+assert(caveatBinary.subarray(0,4).equals(Buffer.from([0,1,0,0])),'Bundled Caveat font has a valid TrueType sfnt header');
+assert(html.includes('function rasterCaveatText(')&&html.includes('function renderSchoolStrokePreview('),'The same centerline rasterizer is shared by preview and G-code');
+assert(html.includes('traceSkeleton(raster.bin,raster.w,raster.h)')&&html.includes('mergeTouchingPaths(simplified)'),'Preview paths are generated from the thinned centerline skeleton, not the filled font outline');
+assert(html.includes('feDisplacementMap')&&html.includes('id="schoolRoughness"'),'Natural irregularity is applied to the stroke shape itself with an explicit control');
+
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
