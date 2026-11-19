@@ -692,14 +692,10 @@ function schoolNoise(seed,index,salt){
  return (h>>>0)/4294967295;
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
+ // Keep glyph outlines intact. Natural variety comes from OpenType substitutions, not random word transforms.
  const metrics=ctx.measureText(word),dom=typeof document!=='undefined'&&kind!=='print';
  const nativeAlternates=dom&&!!document.getElementById('letterVariety')?.checked;
- const bounceEnabled=dom&&!!document.getElementById('wordBounce')?.checked;
- const bounce=bounceEnabled?(schoolNoise(seed,0,21)-.5)*.90:0;
- const xJitter=dom?(schoolNoise(seed,0,22)-.5)*.18:0;
- const rotation=dom?(schoolNoise(seed,0,23)-.5)*.9:0;
- const x=startX+xJitter;
- return {text:word,x,y:baseline+bounce,rotation,metrics,endX:x+metrics.width+letterSpacing,
+ return {text:word,x:startX,y:baseline,rotation:0,metrics,endX:startX+metrics.width+letterSpacing,
   level:0,spans:[],fontSize,seed,different:nativeAlternates,nativeAlternates,styleFactor:1};
 }
 function drawSchoolWordCanvas(ctx,layout,fontSize){
@@ -729,9 +725,31 @@ function schoolWordPng(ctx,layout,fontSize,color='#173b72',resolution=3){
  drawSchoolWordCanvas(c,{...layout,x:margin,y:top},fontSize);
  const href=canvas.toDataURL('image/png');const result={href,x:layout.x-margin,y:layout.y-top,width:canvas.width/resolution,height:canvas.height/resolution};canvas.width=canvas.height=1;return result;
 }
-function schoolConnectorSegments(){return []}
-function schoolConnectorsSvg(){return ''}
-function renderVariationDemo(){}
+function renderVariationDemo(){
+ const host=$('variationDemo');if(!host)return;
+ const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'school';
+ const font=modeFontForScript('cyrl',mode,hand),enabled=$('letterVariety')?.checked!==false;
+ const features=enabled?"'ccmp' 1,'liga' 1,'clig' 1,'calt' 1,'dlig' 1":"'ccmp' 1,'liga' 0,'clig' 0,'calt' 0,'dlig' 0";
+ const samples=[
+  {label:'Обычные слова',text:'Мама мыла раму.'},
+  {label:'Буква «т»',text:'тетрадь · тётя · туман · ты'},
+  {label:'Сложные связки',text:'школьная пропись · письмо · строчка'},
+  {label:'Повтор букв',text:'мили · лили · шиши · минимум'}
+ ];
+ host.replaceChildren();
+ const title=document.createElement('b');title.textContent='Проверка настоящих форм букв';host.append(title);
+ for(const item of samples){
+  const row=document.createElement('div');row.className='variation-demo-row';
+  const label=document.createElement('small');label.textContent=item.label;
+  const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
+  sample.style.fontFamily=fontCss(font)+',cursive';sample.style.fontFeatureSettings=features;
+  sample.style.fontVariantLigatures=enabled?'common-ligatures contextual discretionary-ligatures':'none';
+  sample.style.fontKerning='normal';row.append(label,sample);host.append(row);
+ }
+ const note=document.createElement('p');note.className='variation-demo-note';
+ note.textContent=enabled?'Контекстные формы включены. Рисунок букв меняется по позиции в слове; случайное искажение отключено.':'Контекстные варианты отключены для сравнения. Обязательная композиция знаков сохранена.';
+ host.append(note);
+}
  const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
 const CANVAS_SPACING={letter:!!mctx&&'letterSpacing' in mctx,word:!!mctx&&'wordSpacing' in mctx};if(mctx&&'fontKerning' in mctx)mctx.fontKerning='normal';if(mctx&&'textRendering' in mctx)mctx.textRendering='optimizeLegibility';
 function measureText(t,font,size,hand='marck'){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;mctx.font=`${size}px ${fontCss(font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return mctx.measureText(t).width}
