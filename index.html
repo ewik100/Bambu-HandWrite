@@ -318,20 +318,16 @@ Hello, world!</textarea></label>
       <p class="tiny">Используется один основной шрифт Lobster для кириллицы и латиницы. Рекомендуемая высота строчных букв — 5,0 мм, шаг строк — 8,8 мм. Высоту и шаг можно менять вручную.</p>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel" hidden>
-      <div class="school-variation-heading"><b>Вариативность почерка</b><output id="schoolRoughnessValue" for="schoolRoughness">50%</output></div>
-      <label for="lobsterStyle">Вариант написания Lobster
-        <select id="lobsterStyle"><option value="classic">1 · Аккуратный Lobster</option><option value="natural" selected>2 · Естественный Lobster</option><option value="rough">3 · Неровный Lobster</option></select>
-      </label>
-      <p class="tiny" id="lobsterStyleNote">Три характера одного связного шрифта. В каждом — пять чередующихся форм каждой буквы.</p>
-      <label for="schoolRoughness">Сила изменения формы — от слабой к сильной
+      <div class="school-variation-heading"><b>Настройки связного почерка</b><output id="schoolRoughnessValue" for="schoolRoughness">50%</output></div>
+      <p class="tiny" id="lobsterStyleNote">Pecita использует собственные соединённые формы, контекстные варианты и лигатуры. Соединения создаются самим шрифтом, а не искусственной деформацией.</p>
+      <label for="schoolRoughness">Сила смещения целого слова
         <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="50">
       </label>
       <div id="lobsterExtras" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
-        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Индивидуальная форма каждой буквы</label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wordBounce" checked>Небольшое смещение целого слова (до 0,35 мм)</label>
       </div>
-      <div class="school-variation-scale"><span>0 · аккуратно</span><span>50 · заметно</span><span>100 · сильно неровно</span></div>
-      <div class="variation-demo" id="variationDemo" aria-live="polite"><b>Предпросмотр характера почерка</b><div class="variation-demo-row"><small>Слабый</small><span class="variation-demo-text" id="variationDemoLow">мама · рама · мама</span></div><div class="variation-demo-row"><small>Текущий</small><span class="variation-demo-text" id="variationDemoCurrent">мама · рама · мама</span></div><div class="variation-demo-row"><small>Сильный</small><span class="variation-demo-text" id="variationDemoHigh">мама · рама · мама</span></div><p class="tiny">Ползунок меняет очертания штрихов. Пять форм каждой буквы чередуются по порядку появления. Соединения и общая базовая линия сохраняются.</p></div>
+      <div class="school-variation-scale"><span>0 · без смещения</span><span>50 · небольшое</span><span>100 · максимальное</span></div>
+      <div class="variation-demo" id="variationDemo" aria-live="polite"><b>Проверка соединений</b><div class="variation-demo-row"><small>Образец</small><span class="variation-demo-text" id="variationDemoCurrent">мама мыла раму · тетрадь · буквы</span></div><p class="tiny">Ползунок меняет очертания штрихов. Пять форм каждой буквы чередуются по порядку появления. Соединения и общая базовая линия сохраняются.</p></div>
       <p class="tiny">Меняется форма контура связного слова, а не размер буквы целиком. Один растр и одна деформация — без повторных полупрозрачных слоёв. Смещение целого слова остаётся отдельной настройкой.</p>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
     </div>
