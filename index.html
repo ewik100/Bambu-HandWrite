@@ -949,7 +949,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
       if(layout.glyphs){
        const wordImage=schoolWordPng(mctx,layout,fontSize,'#173b72',3);
        if(wordImage)imgs+=`<image href="${wordImage.href}" x="${wordImage.x.toFixed(4)}" y="${wordImage.y.toFixed(4)}" width="${wordImage.width.toFixed(4)}" height="${wordImage.height.toFixed(4)}" preserveAspectRatio="none"/>`;
-      }else svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}" lang="ru" xml:lang="ru" font-feature-settings="&quot;ccmp&quot; ${variantsOn?1:0}, &quot;liga&quot; 1, &quot;clig&quot; 1, &quot;calt&quot; 0, &quot;dlig&quot; 0" font-variant-ligatures="common-ligatures contextual" transform="rotate(${(layout.rotation||0).toFixed(3)} ${(gx+layout.metrics.width/2).toFixed(4)} ${gy.toFixed(4)})">${esc(layout.text)}</tspan>`;
+      }else svg+=`<tspan font-family="${esc(run.font)},cursive" font-size="${fontSize.toFixed(4)}" x="${gx.toFixed(4)}" y="${gy.toFixed(4)}" lang="ru" xml:lang="ru" style="font-feature-settings:&quot;ccmp&quot; ${variantsOn?1:0}, &quot;liga&quot; 1, &quot;clig&quot; 1, &quot;calt&quot; 0, &quot;dlig&quot; 0; font-variant-ligatures:common-ligatures contextual" transform="rotate(${(layout.rotation||0).toFixed(3)} ${(gx+layout.metrics.width/2).toFixed(4)} ${gy.toFixed(4)})">${esc(layout.text)}</tspan>`;
       cursor=layout.endX;
      }
     }
