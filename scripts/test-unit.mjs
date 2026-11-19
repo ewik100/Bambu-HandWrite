@@ -58,23 +58,45 @@ const context = {
   getPenZSettingsForPreview: () => ({ write: 30, travel: 34, safe: 50 })
 };
 vm.createContext(context);
-const schoolStart=html.indexOf('function schoolNoise(seed,index,salt)');
-const schoolEnd=html.indexOf('\nfunction schoolConnectorSegments()',schoolStart);
-if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract whole-word handwriting variation functions.');
+const schoolStart=html.indexOf('function schoolVariation(){return 0}');
+const schoolEnd=html.indexOf('\nasync function rasterSingleStrokeText',schoolStart);
+if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract the single-stroke handwriting engine.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
-vm.runInContext(`${limitsMatch[0]}\n${pitchCellsMatch[0]}\n${pitchMmMatch[0]}\n${zFunctionMatch[0]}\n${pauseFunctionMatch[0]}\n${topMarginMatch[0]}\n${lowercaseScaleMatch[0]}\n${cornerPauseMatch[0]}\n${pagePlacementMatch[0]}\n${fitSearchMatch[0]}\n${justifyCorrectionMatch[0]}\n${lineTransformMatch[0]}\n${routeGuardMatch[0]}\n${writingBoundsMatch[0]}\n${preflightMatch[0]}\n${pageSizeMatch[0]}\n${pageToPhysicalMatch[0]}\n${physicalToPageMatch[0]}\n${mergePathsMatch[0]}\n${bindingSideMatch[0]}\n${neighborsMatch[0]}\n${labelComponentsMatch[0]}\n${orderPathsMatch[0]}\n${routeFunctionMatch[0]}\n${schoolFunctions}`, context);
+vm.runInContext([
+  limitsMatch[0], pitchCellsMatch[0], pitchMmMatch[0], zFunctionMatch[0],
+  pauseFunctionMatch[0], topMarginMatch[0], lowercaseScaleMatch[0],
+  cornerPauseMatch[0], pagePlacementMatch[0], fitSearchMatch[0],
+  justifyCorrectionMatch[0], lineTransformMatch[0], routeGuardMatch[0],
+  writingBoundsMatch[0], preflightMatch[0], pageSizeMatch[0],
+  pageToPhysicalMatch[0], physicalToPageMatch[0], mergePathsMatch[0],
+  bindingSideMatch[0], neighborsMatch[0], labelComponentsMatch[0],
+  orderPathsMatch[0], routeFunctionMatch[0], schoolFunctions
+].join('\n'), context);
 const actualOrderPathsByComponent=context.orderPathsByComponent;
 context.orderPathsByComponent=(paths)=>paths;
-
-const fontMetrics={measureText:(word)=>({width:word.length*8})};
-const evenWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,0,0,'stable-seed','lobster');
-assert(evenWord.text==='связное'&&evenWord.size===1&&evenWord.widthScale===1&&evenWord.rotation===0&&evenWord.y===30,'Lobster at 0% variation preserves the original complete word');
-const middleWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,50,0,'stable-seed','lobster');
-const middleRepeat=context.schoolWordLayout(fontMetrics,'связное',12,30,20,50,0,'stable-seed','lobster');
-assert(middleWord.size>=.96&&middleWord.size<=1.04&&middleWord.widthScale>=.975&&middleWord.widthScale<=1.025&&middleWord.rotation===0&&Math.abs(middleWord.y-30)<=.075,'Lobster at 50% variation stays restrained');
-assert(middleWord.size===middleRepeat.size&&middleWord.widthScale===middleRepeat.widthScale&&middleWord.y===middleRepeat.y,'Word-level variation is deterministic for the same text and position');
-const roughWord=context.schoolWordLayout(fontMetrics,'связное',12,30,20,100,0,'stable-seed','lobster');
-assert(roughWord.size>=.92&&roughWord.size<=1.08&&roughWord.widthScale>=.95&&roughWord.widthScale<=1.05&&roughWord.rotation===0&&Math.abs(roughWord.y-30)<=.15,'Lobster at 100% remains bounded and is never rotated');
+const strokeApi=vm.runInContext('({glyph:strokeGlyphFor,layout:strokeTextLayout,defs:STROKE_GLYPHS})',context);
+const russianAlphabet=Array.from('абвгдеёжзийклмнопрстуфхцчшщъыьэюя');
+assert(russianAlphabet.length===33,'Single-stroke glyph coverage test uses all 33 Russian letters');
+for(const ch of russianAlphabet){
+  const key=ch==='ё'?'е':ch==='й'?'и':ch;
+  const def=strokeApi.defs[key];
+  assert(!!def&&typeof def.p==='string',\`Glyph definition exists for \${ch}\`);
+  for(const path of [def.p,...(def.v?[def.v]:[])]){
+    const matches=[...path.matchAll(/C\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g)];
+    const last=matches.at(-1);
+    assert(path.startsWith('M 0 0')&&last&&Math.abs(Number(last[5])-def.w)<.001&&Math.abs(Number(last[6]))<.001,\`Glyph \${ch} starts and ends at its baseline connection point\`);
+  }
+}
+const baseWord=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',false,0);
+const variedWord=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',true,0);
+const variedRepeat=strokeApi.layout('ттт',0,10,4.8,0,0,'unit-test',true,0);
+assert(Math.abs(baseWord.width-variedWord.width)<1e-9,'Turning variants on does not change word width or line wrapping');
+assert(variedWord.items[0].d!==variedWord.items[1].d,'Repeated т letters receive visibly different stroke shapes');
+assert(JSON.stringify(variedWord.items.map(item=>item.d))===JSON.stringify(variedRepeat.items.map(item=>item.d)),'The same text and seed reproduce the same letter variants');
+const connectionGap=Math.abs((variedWord.items[0].x+108*variedWord.items[0].sx)-variedWord.items[1].x);
+assert(connectionGap<1e-8,'Adjacent т glyphs meet exactly at the baseline without an added connector');
+const longSample=strokeApi.layout('мама мыла раму тетрадь ёжик',0,10,4.8,0,.54,'word-test',true,0);
+assert(longSample.items.length>20&&longSample.width>0,'Russian sample words produce a non-empty measurable vector route');
 
 assert(context.getLinePitchMm(5) === 10, 'Two cells produce a 10 mm baseline step on 5 mm grid');
 pitchCellsInput = '1';
