@@ -660,7 +660,7 @@ const FONT_PROFILES={
 
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
  frb:{title:'Школьный рукописный — FRB American Cursive',tag:'ПОЗИЦИОННЫЕ ФОРМЫ · КИРИЛЛИЦА',description:'FRB American Cursive использует реальные позиционные формы русских букв через OpenType ccmp: начальные, срединные и конечные соединения. Контуры букв сохраняются без случайного наклона и смещения.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.54,routeTolerance:.07,character:'разборчивый школьный рукописный',connection:'автоматические контекстные формы и естественные переходы'},
- school:{title:'Bambu Script — естественная однолинейная пропись',tag:'CAVEAT · ЦЕНТРАЛЬНЫЕ ТРАЕКТОРИИ',description:'Рукописная кириллица Caveat с контекстными формами и стилистическими вариантами. Для ручки контур шрифта истончается до одной центральной траектории; лёгкая неровность меняет сами линии.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:-.05,wordSpacing:.54,routeTolerance:.07,character:'живой рукописный, с лёгкой неровностью',connection:'центральные линии скелетизированы; соединённые участки проходят одним штрихом'},
+ school:{title:'Bambu Script — естественная однолинейная пропись',tag:'АВТОРСКАЯ КИРИЛЛИЦА · OPENType',description:'Собственная гарнитура Bambu HandWrite Original: формы русских букв нарисованы заново, соседние буквы соединяются по общей линии; добавлены стилистические и контекстные альтернативы. Для ручки контур шрифта истончается до одной центральной траектории; лёгкая неровность меняет сами линии.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:-.05,wordSpacing:.54,routeTolerance:.07,character:'живой рукописный, с лёгкой неровностью',connection:'центральные линии скелетизированы; соединённые участки проходят одним штрихом'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
 // Editable decimal fields must not be clamped while the user is midway through typing.
@@ -692,7 +692,7 @@ function refreshFontMetrics(){
  if(sample){
   const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
-  if(hand==='school'&&mode!=='print'){sample.classList.add('single-stroke-font-sample');sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='500';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
+  if(hand==='school'&&mode!=='print'){sample.classList.add('single-stroke-font-sample');sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='400';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
   else{sample.classList.remove('single-stroke-font-sample');sample.style.fontFamily=familyCss+',cursive';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
   if(hand==='school'&&mode!=='print'){sample.style.fontFeatureSettings=schoolFeatureSettings(0,$('letterVariety')?.checked!==false);sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;}
   else{sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1,"dlig" 0':'"ccmp" 0,"calt" 0,"liga" 1,"clig" 1,"dlig" 0';sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});}
@@ -754,7 +754,7 @@ function renderVariationDemo(){
   const row=document.createElement('div');row.className='variation-demo-row';
   const label=document.createElement('small');label.textContent=item.label;
   const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
-  sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='500';
+  sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='400';
   sample.style.fontFeatureSettings=schoolFeatureSettings(0,item.active&&enabled);
   sample.style.fontVariantLigatures=item.active&&enabled?'common-ligatures contextual':'none';
   sample.style.fontKerning='normal';
@@ -1170,7 +1170,7 @@ async function rasterOriginalFontText(model,token){
  let imageData=context.getImageData(0,0,w,h),pixels=imageData.data,minX=w,minY=h,maxX=-1,maxY=-1;
  const threshold=roughness>55?82:92;
  for(let p=3,index=0;p<pixels.length;p+=4,index++)if(pixels[p]>threshold){const px=index%w,py=(index/w)|0;if(px<minX)minX=px;if(px>maxX)maxX=px;if(py<minY)minY=py;if(py>maxY)maxY=py}
- if(maxX<0)throw Error('Не удалось получить изображение шрифта Caveat.');
+ if(maxX<0)throw Error('Не удалось получить изображение шрифта Bambu HandWrite Original.');
  const margin=Math.max(10,Math.ceil(scale*1.15)),x0=Math.max(0,minX-margin),y0=Math.max(0,minY-margin),x1=Math.min(w-1,maxX+margin),y1=Math.min(h-1,maxY+margin),cropW=x1-x0+1,cropH=y1-y0+1;
  const binary=new Uint8Array(cropW*cropH);
  for(let y=0;y<cropH;y++){const src=((y+y0)*w+x0)*4,dst=y*cropW;for(let x=0;x<cropW;x++)binary[dst+x]=pixels[src+x*4+3]>threshold?1:0}
