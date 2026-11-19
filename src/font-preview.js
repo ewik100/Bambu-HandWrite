@@ -8,14 +8,14 @@ function refreshFontMetrics(){
   const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
   sample.style.fontFamily=familyCss+',cursive';
-  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1,"dlig" 1,"aalt" 1,"salt" 1':'"calt" 0,"liga" 0,"clig" 0,"dlig" 0,"aalt" 0,"salt" 0';
+  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1':'"calt" 0,"liga" 0,"clig" 0';
   sample.style.fontVariantLigatures=$('letterVariety')?.checked?'common-ligatures contextual':'none';
-  sample.textContent='Красивый почерк — мама мыла раму. 123';
+  sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';
   sample.style.fontSynthesis='none';
   void sample.offsetWidth;
   if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});
  }
  const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=false;
- const lobsterControls=$('lobsterExtras');if(lobsterControls)lobsterControls.style.display='flex';
+ const glyphControls=$('glyphAlternates');if(glyphControls)glyphControls.style.display='flex';
  updateSchoolFontLoader();
 }
