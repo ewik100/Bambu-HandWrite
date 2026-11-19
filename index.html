@@ -721,7 +721,7 @@ const STROKE_GLYPHS={
  'ь':{w:78,p:'M 0 0 C 10 -12 14 -65 23 -93 C 29 -112 41 -96 38 -74 C 35 -53 29 -47 41 -37 C 57 -23 73 -42 72 -60 C 71 -79 48 -85 39 -67 C 30 -50 41 -18 54 -6 C 62 0 70 0 78 0',v:'M 0 0 C 10 -12 17 -68 26 -96 C 33 -113 43 -92 39 -70 C 35 -50 31 -44 44 -34 C 60 -21 77 -43 74 -63 C 71 -83 47 -80 38 -60 C 31 -43 45 -16 58 -5 C 66 0 72 0 78 0'},
  'э':{w:76,p:'M 0 0 C 12 -4 17 -42 30 -60 C 44 -78 64 -69 59 -49 C 54 -30 35 -29 25 -43 C 16 -56 32 -76 49 -73 C 62 -70 69 -23 76 0',v:'M 0 0 C 12 -7 20 -47 34 -65 C 49 -84 66 -65 58 -45 C 50 -25 33 -33 24 -49 C 18 -64 38 -80 54 -68 C 66 -59 69 -19 76 0'},
  'ю':{w:104,p:'M 0 0 C 9 -10 14 -56 23 -75 C 33 -95 41 -77 42 -54 C 43 -32 47 -11 53 -28 C 60 -48 64 -72 78 -76 C 97 -82 105 -61 99 -42 C 93 -22 70 -25 65 -43 C 60 -62 80 -80 94 -66 C 105 -55 101 -17 104 0',v:'M 0 0 C 9 -12 17 -62 27 -80 C 37 -97 45 -73 45 -49 C 45 -27 50 -11 56 -31 C 64 -54 69 -76 83 -77 C 101 -78 107 -56 98 -38 C 89 -20 68 -30 65 -49 C 62 -67 85 -79 97 -62 C 106 -49 101 -15 104 0'},
- 'я':{w:80,p:'M 0 0 C 11 -5 16 -43 29 -62 C 43 -83 66 -76 64 -55 C 62 -35 43 -31 31 -45 C 20 -59 33 -80 52 -78 C 68 -76 67 -42 62 -23 C 58 -8 53 -1 48 0 C 57 -19 67 -35 80 -48',v:'M 0 0 C 11 -8 18 -50 33 -68 C 48 -87 68 -70 62 -49 C 56 -29 37 -33 29 -51 C 23 -66 41 -82 57 -72 C 72 -62 67 -33 61 -16 C 55 -2 49 0 44 0 C 55 -19 68 -35 80 -48'}
+ 'я':{w:80,p:'M 0 0 C 11 -5 16 -43 29 -62 C 43 -83 66 -76 64 -55 C 62 -35 43 -31 31 -45 C 20 -59 33 -80 52 -78 C 68 -76 67 -42 62 -23 C 58 -8 53 -1 48 0 C 57 -19 67 -35 80 -48 C 84 -35 83 -12 80 0',v:'M 0 0 C 11 -8 18 -50 33 -68 C 48 -87 68 -70 62 -49 C 56 -29 37 -33 29 -51 C 23 -66 41 -82 57 -72 C 72 -62 67 -33 61 -16 C 55 -2 49 0 44 0 C 55 -19 68 -35 80 -48 C 84 -35 83 -12 80 0'}
 };
 const STROKE_LATIN_MAP={a:'а',b:'в',c:'с',e:'е',h:'н',i:'и',k:'к',m:'м',n:'н',o:'о',p:'р',r:'г',s:'с',t:'т',u:'и',v:'л',w:'ш',x:'х',y:'у',z:'з'};
 const STROKE_PUNCT={
@@ -790,7 +790,7 @@ function strokeTextLayout(text,startX,baseline,xHeight,letterSpacing,wordSpacing
   if(/\s/u.test(ch)){cursor+=(ch==='\t'?125:34)*unit+(Number(wordSpacing)||0)+(Number(extraWordSpace)||0);continue}
   const key=(STROKE_LATIN_MAP[ch.toLowerCase()]||ch.toLowerCase()).replace(/[ё]/u,'е').replace(/[й]/u,'и');
   const occurrence=occurrences.get(key)||0;occurrences.set(key,occurrence+1);
-  const glyph=strokeGlyphFor(ch,occurrence,seed+':'+i,variantsOn);
+  const glyph=strokeGlyphFor(ch,occurrence,seed,variantsOn);
   const sx=unit*(glyph.isUpper?1.035:1),sy=unit*(glyph.isUpper?1.22:1);
   for(let p=0;p<glyph.paths.length;p++)items.push({d:glyph.paths[p],x:cursor,y:baseline,sx,sy,character:ch,variant:glyph.variant,secondary:p>0});
   cursor+=glyph.width*sx+(Number(letterSpacing)||0);
