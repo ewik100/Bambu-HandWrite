@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.10.0 — браузерный генератор рукописного G-code для Bambu Lab A1 с тремя вариантами Lobster и вариативностью формы букв.">
-<meta property="og:title" content="Bambu HandWrite 5.10.0">
+<meta name="description" content="Bambu HandWrite 5.11.0 — браузерный генератор рукописного G-code для Bambu Lab A1 с тремя вариантами Lobster и вариативностью формы букв.">
+<meta property="og:title" content="Bambu HandWrite 5.11.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.10.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.11.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
 <style>
@@ -221,7 +221,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.10.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.11.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю Lobster…</span></p>
 </header>
@@ -309,7 +309,7 @@ Hello, world!</textarea></label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
       <div class="font-profile-head"><b id="fontProfileTitle">Связный школьный почерк — Pecita</b><span class="font-profile-tag" id="fontProfileTag">СВЯЗНЫЙ · ОСНОВНОЙ</span></div>
       <p id="fontProfileDescription">Pecita: соединённые кириллические и латинские буквы с контекстными формами и лигатурами.</p>
-      <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div><button class="btn secondary" id="downloadLobster" type="button" style="margin-top:8px">Скачать Lobster.ttf</button><button class="btn secondary" id="downloadLobster" type="button" style="margin-top:8px">Скачать Lobster.ttf</button></div>
+      <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
         <span>Шаг строк: <b>8,35 мм</b></span>
@@ -318,19 +318,13 @@ Hello, world!</textarea></label>
       </div>
       <p class="tiny">Используется один основной шрифт Lobster для кириллицы и латиницы. Рекомендуемая высота строчных букв — 5,0 мм, шаг строк — 8,8 мм. Высоту и шаг можно менять вручную.</p>
     </div>
-    <div class="wide school-variation-panel" id="schoolVariationPanel" hidden>
-      <div class="school-variation-heading"><b>Вариативность букв</b><output id="schoolRoughnessValue" for="schoolRoughness">50%</output></div>
-      <p class="tiny" id="lobsterStyleNote">Pecita использует собственные соединённые формы, контекстные варианты и лигатуры. Соединения создаются самим шрифтом, а не искусственной деформацией.</p>
-      <label for="schoolRoughness">Сила изменения формы букв
-        <input id="schoolRoughness" type="range" min="0" max="100" step="1" value="50">
-      </label>
+    <div class="wide school-variation-panel" id="schoolVariationPanel">
+      <div class="school-variation-heading"><b>Естественные формы букв</b></div>
+      <p class="tiny">Используются только настоящие контекстные формы и лигатуры, уже нарисованные в выбранном шрифте. Если в шрифте нет пяти вариантов конкретной буквы, программа не подменяет их искусственными искажениями.</p>
       <div id="lobsterExtras" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
-        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Разные формы каждой буквы (заглавные и строчные)</label>
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Контекстные формы и лигатуры шрифта</label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wordBounce" checked>Небольшое смещение целого слова (до 0,35 мм)</label>
       </div>
-      <div class="school-variation-scale"><span>0 · аккуратно</span><span>50 · естественно</span><span>100 · немного неровно</span></div>
-      <div class="variation-demo" id="variationDemo" aria-live="polite"><b>Сравнение формы букв</b><div class="variation-demo-row"><small>Аккуратно</small><span class="variation-demo-text" id="variationDemoLow">мама мыла раму · Тетрадь</span></div><div class="variation-demo-row"><small>Естественно</small><span class="variation-demo-text" id="variationDemoCurrent">мама мыла раму · Тетрадь</span></div><div class="variation-demo-row"><small>Неровно</small><span class="variation-demo-text" id="variationDemoHigh">мама мыла раму · Тетрадь</span></div><p class="tiny">Lobster использует встроенные контекстные формы и лигатуры. Ползунок добавляет небольшие изменения контура каждой буквы отдельно.</p></div>
-      <p class="tiny">Для связного профиля используется исходный рисунок Pecita без искусственного изменения контуров. Смещение применяется ко всему слову целиком.</p>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
@@ -578,10 +572,7 @@ async function ensureLocalLobster(){
  })().catch(error=>{lobsterFontPromise=null;throw error});
  return lobsterFontPromise;
 }
-async function downloadLobsterFont(){
- try{await ensureLocalLobster();const binary=atob(lobsterFontBase64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);const url=URL.createObjectURL(new Blob([bytes],{type:'font/ttf'})),a=document.createElement('a');a.href=url;a.download='Lobster-Regular.ttf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch(error){const note=$('fontNote');if(note)note.textContent='Не удалось подготовить файл Lobster: '+(error?.message||error)}
-}
-function startOptionalFontStylesheet(){
+async function startOptionalFontStylesheet(){
  if($('handwritingFontCss'))return;
  const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='all';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Lobster&family=Marck+Script&family=Neucha&family=Pacifico&family=Pangolin&display=swap';
  link.addEventListener('load',()=>{fontStylesheetReady=true;window.dispatchEvent(new Event('handwritingfontsready'))},{once:true});
@@ -671,18 +662,21 @@ function refreshFontMetrics(){
  const fallbackLh=lastModel?.lh??p.lh,fallbackPitch=lastModel?.pitch??p.pitch;
  const lh=readEditableDecimal('lh',2,20,fallbackLh),pitch=readEditableDecimal('pitch',2,30,fallbackPitch);
  if($('fontProfileMetrics'))$('fontProfileMetrics').innerHTML=`<span>Высота / шаг строк: <b>${lh.toFixed(1).replace('.',',')} / ${pitch.toFixed(2).replace('.',',')} мм</b></span><span>Ширина / доп. наклон: <b>${Math.round(p.widthScale*100)}% / ${p.slantDeg}°</b></span><span>Межбуквенное / межсловное: <b>${CANVAS_SPACING.letter?p.letterSpacing.toFixed(2):'0.00'} / ${CANVAS_SPACING.word?p.wordSpacing.toFixed(2):'0.00'} мм</b></span><span>Скорость / детализация: <b>${p.drawFeed} мм/мин / ${p.routeTolerance.toFixed(2)} мм</b></span><span>Соединение: <b>${p.connection}</b></span>`;
- const sample=$('fontSample');if(sample){const family=modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'lobster');sample.style.fontFamily=fontCss(family)+',cursive';sample.style.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1,"dlig" 1';sample.style.fontVariantLigatures='common-ligatures contextual';sample.textContent='Красивый почерк — мама мыла раму. 123';}
+ const sample=$('fontSample');
+ if(sample){
+  const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
+  const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
+  sample.style.fontFamily=familyCss+',cursive';
+  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1,"dlig" 1':'"calt" 0,"liga" 0,"clig" 0,"dlig" 0';
+  sample.style.fontVariantLigatures=$('letterVariety')?.checked?'common-ligatures contextual':'none';
+  sample.textContent='Красивый почерк — мама мыла раму. 123';
+  sample.style.fontSynthesis='none';
+  void sample.offsetWidth;
+  if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});
+ }
  const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=false;
  const lobsterControls=$('lobsterExtras');if(lobsterControls)lobsterControls.style.display='flex';
- const variationNote=schoolPanel?.querySelector('.tiny:last-child');if(variationNote)variationNote.textContent=$('scriptMode')?.value==='print'?'Настройки видны, но в режиме «Упрощённый печатный» рукописный шрифт не используется. Выбери «Авто», «Только русский» или «Только английский».':'Lobster содержит контекстные формы и лигатуры. Переключатель включает до пяти алгоритмических вариантов очертания для каждой заглавной и строчной буквы; ползунок регулирует силу изменения.';
  updateSchoolFontLoader();
- const heading=schoolPanel?.querySelector('.school-variation-heading b'),sliderLabel=schoolPanel?.querySelector('label[for="schoolRoughness"]'),scale=schoolPanel?.querySelectorAll('.school-variation-scale span');
- if(heading)heading.textContent='Вариативность букв';
- if(sliderLabel?.firstChild)sliderLabel.firstChild.textContent='Сила изменения формы букв';
- if(scale?.length===3){scale[0].textContent='0 · аккуратно';scale[1].textContent='50 · естественно';scale[2].textContent='100 · немного неровно'}
- const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolRoughness()+'%';
- const demoLevel=schoolVariation()/100;[['variationDemoLow',0],['variationDemoCurrent',demoLevel],['variationDemoHigh',1]].forEach(([id,v])=>{const el=$(id);if(!el)return;el.style.fontFamily=fontCss(modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'lobster'))+',cursive';el.style.fontVariationSettings='normal';el.style.letterSpacing=(v*.12)+'px';el.style.wordSpacing=(v*.18)+'px';el.style.transform='none';el.style.fontSize=(20+v*2)+'px';el.style.lineHeight='1.55';el.style.opacity='1'});renderVariationDemo();
- if(document.fonts?.ready)document.fonts.ready.then(renderVariationDemo).catch(()=>{});
 }
 function applyFontProfile(key){
  const p=FONT_PROFILES[key]||FONT_PROFILES.neucha;
@@ -699,77 +693,34 @@ function clampValue(id,min,max){const el=$(id);let n=Number(el.value);if(!Number
 function scriptOf(ch,last='latn'){if(/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(ch))return 'cyrl';if(/[A-Za-z\u00C0-\u024F]/u.test(ch))return 'latn';return last}
 function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(hand==='school')return FONT.school;if(hand==='badscript')return FONT.badscript;if(hand==='neucha')return FONT.neucha;if(hand==='pangolin')return FONT.pangolin;if(hand==='lobster')return FONT.lobster;if(hand==='caveat')return FONT.caveat;if(hand==='marck')return FONT.marck;if(hand==='great')return sc==='cyrl'?FONT.neucha:FONT.great;if(hand==='recommended')return FONT.neucha;if(mode==='ru')return FONT.marck;if(mode==='en')return FONT.dancing;if(mode==='universal')return sc==='cyrl'?FONT.marck:FONT.dancing;return sc==='cyrl'?FONT.marck:FONT.dancing}
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
-function schoolVariation(){const value=Number($('schoolRoughness')?.value);return Number.isFinite(value)?Math.max(0,Math.min(100,value)):50}
-function schoolAccuracy(){return schoolVariation()}
-function schoolRoughness(){return schoolVariation()}
+function schoolVariation(){return 0}
+function schoolAccuracy(){return 0}
+function schoolRoughness(){return 0}
 function schoolNoise(seed,index,salt){
  let h=2166136261;const value=String(seed)+'|'+index+'|'+salt;
  for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0)/4294967295;
 }
-function lobsterStyleFactor(){
- const v=$('lobsterStyle')?.value||'natural';
- return v==='classic'?.68:v==='rough'?1.32:1;
-}
+function lobsterStyleFactor(){return 1}
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
- const rawLevel=Math.max(0,Math.min(100,roughness))/100,connectedFont=typeof document!=='undefined'&&['school','lobster'].includes(document.getElementById('handFont')?.value),metrics=ctx.measureText(word);
- const dom=typeof document!=='undefined'&&kind!=='print';
- const different=dom&&!!document.getElementById('letterVariety')?.checked,level=connectedFont?(different?rawLevel:0):rawLevel;
- let bounce=0;
- if(dom&&document.getElementById('wordBounce')?.checked) bounce=(schoolNoise(seed,0,21)-.5)*.70*rawLevel;
- const chars=(typeof Intl!=='undefined'&&Intl.Segmenter)?Array.from(new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(word),x=>x.segment):Array.from(word);
- const spans=[];let prev=0;const occurrence=new Map();
- for(let i=0;i<chars.length;i++){
-  const ch=chars[i],next=ctx.measureText(chars.slice(0,i+1).join('')).width;
-  const a=Math.min(prev,next),b=Math.max(prev,next);prev=next;
-  const key=ch,occ=occurrence.get(key)||0;occurrence.set(key,occ+1);
-  const offset=Math.floor(schoolNoise(`${seed}:${key}`,0,71)*5),variant=different?(occ+offset)%5:0;
-  const n=salt=>(schoolNoise(`${seed}:glyph:${i}:${ch}`,0,salt)*2-1);
-  spans.push({ch,start:a,end:b,phase:n(31)*Math.PI,phase2:n(32)*Math.PI,phase3:n(33)*Math.PI,shape:n(34),variant,active:!/^\s+$/u.test(ch)});
- }
- return {text:word,x:startX,y:baseline+bounce,metrics,endX:startX+metrics.width+letterSpacing,level,spans,fontSize,seed,different,styleFactor:dom?lobsterStyleFactor():1};
+ const metrics=ctx.measureText(word),dom=typeof document!=='undefined'&&kind!=='print';
+ const nativeAlternates=dom&&!!document.getElementById('letterVariety')?.checked;
+ const bounceEnabled=dom&&!!document.getElementById('wordBounce')?.checked;
+ const bounce=bounceEnabled?(schoolNoise(seed,0,21)-.5)*.70:0;
+ return {text:word,x:startX,y:baseline+bounce,metrics,endX:startX+metrics.width+letterSpacing,
+  level:0,spans:[],fontSize,seed,different:nativeAlternates,nativeAlternates,styleFactor:1};
 }
 function drawSchoolWordCanvas(ctx,layout,fontSize){
- const fs=fontSize||layout.fontSize||20,level=Math.max(0,Math.min(1,layout.level||0));
- if(level<.001||!layout.spans?.some(s=>s.active)){
-  ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.textBaseline='alphabetic';ctx.fillText(layout.text,layout.x,layout.y);ctx.restore();return;
- }
- // Rasterize each connected word once; bounded 2-D displacement changes glyph contours
- // and fades to zero at character joins so the cursive word remains connected.
- const res=1,pad=Math.ceil(fs*.46*res),base=Math.ceil(fs*1.48*res),H=Math.max(8,Math.ceil(fs*2.18*res)),W=Math.max(8,Math.ceil(layout.metrics.width*res+pad*2));
- const src=document.createElement('canvas'),dst=document.createElement('canvas');src.width=dst.width=W;src.height=dst.height=H;
- const sc=src.getContext('2d',{willReadFrequently:true,alpha:true}),dc=dst.getContext('2d',{alpha:true});
- if(!sc||!dc){ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.fillText(layout.text,layout.x,layout.y);ctx.restore();return;}
- sc.clearRect(0,0,W,H);sc.font=ctx.font;sc.textBaseline='alphabetic';sc.textAlign='left';sc.fillStyle='#173b72';sc.globalAlpha=1;sc.globalCompositeOperation='source-over';
- if('fontKerning' in sc)sc.fontKerning='normal';if('textRendering' in sc)sc.textRendering='optimizeLegibility';
- if('fontVariantLigatures' in sc)sc.fontVariantLigatures='common-ligatures contextual';
- sc.scale(res,res);sc.fillText(layout.text,pad/res,base/res);
- const input=sc.getImageData(0,0,W,H),output=dc.createImageData(W,H),S=input.data,D=output.data;
- const spans=layout.spans.map(g=>({...g,left:pad+g.start*res,right:pad+g.end*res}));
- const style=Math.max(.55,Math.min(1.5,layout.styleFactor||1)),ampX=fs*res*(.006+.022*level)*style,ampY=fs*res*(.008+.026*level)*style;
- let si=0;
- for(let x=0;x<W;x++){
-  while(si<spans.length-1&&x>spans[si].right)si++;
-  const g=spans[si];
-  if(!g?.active||g.right-g.left<1){for(let y=0;y<H;y++){const o=(y*W+x)*4;D[o]=23;D[o+1]=59;D[o+2]=114;D[o+3]=S[o+3]}continue;}
-  const t=Math.max(0,Math.min(1,(x-g.left)/(g.right-g.left))),edge=Math.pow(Math.max(0,Math.sin(Math.PI*t)),.9),vId=g.variant||0;
-  const phase=g.phase,phase2=g.phase2,phase3=g.phase3,shape=g.shape;
-  const st=Math.sin(2*Math.PI*t+phase),st2=Math.sin(2*Math.PI*t+phase2),st3=Math.sin(2*Math.PI*t+phase3),ct=Math.sin(Math.PI*t),ct2=Math.sin(Math.PI*t+phase);
-  const xFx=vId===0?st*.38+ct*shape*.18:vId===1?ct*.58:vId===2?st*.68:vId===3?ct*.52:Math.sin(2*Math.PI*t+phase2)*.72;
-  const xFy=vId===0?st2*.55:vId===1?st2*.52:vId===2?(t-.5)*.58:vId===3?st3*.66:ct2*.58;
-  for(let y=0;y<H;y++){
-   const v=(y-base)/(fs*res),vertical=Math.max(0,Math.min(1,(v+1.38)/1.78)),envelope=edge*Math.pow(Math.sin(Math.PI*vertical),.55);
-   const sv1=Math.sin(v*1.7),sv2=Math.sin(v*2.1),sv3=Math.sin(v*2.2),sv4=Math.sin(v*2.4),sv5=Math.sin(v*2.6),cv1=Math.cos(v*1.35),cv2=Math.cos(v*1.6),sv6=Math.sin(v*2.8);
-   const fx=vId===0?xFx:vId===1?xFx*Math.cos(v*2.1):vId===2?xFx*sv1:vId===3?xFx*sv5:xFx*sv2;
-   const fy=vId===0?xFy*cv1:vId===1?xFy+sv4*.16:vId===2?xFy*sv3:vId===3?xFy*cv2:xFy*sv6;
-   const sx=Math.max(0,Math.min(W-1,x-fx*ampX*envelope)),sy=Math.max(0,Math.min(H-1,y-fy*ampY*envelope));
-   const x0=Math.floor(sx),x1=Math.min(W-1,x0+1),y0=Math.floor(sy),y1=Math.min(H-1,y0+1),tx=sx-x0,ty=sy-y0;
-   const a=(y0*W+x0)*4,b=(y0*W+x1)*4,c=(y1*W+x0)*4,d=(y1*W+x1)*4,o=(y*W+x)*4;
-   const top=S[a+3]+(S[b+3]-S[a+3])*tx,bot=S[c+3]+(S[d+3]-S[c+3])*tx;
-   D[o]=23;D[o+1]=59;D[o+2]=114;D[o+3]=Math.max(0,Math.min(255,top+(bot-top)*ty));
-  }
- }
- dc.putImageData(output,0,0);ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.drawImage(dst,layout.x-pad/res,layout.y-base/res,W/res,H/res);ctx.restore();src.width=src.height=dst.width=dst.height=1;
+ ctx.save();
+ ctx.globalAlpha=1;
+ ctx.globalCompositeOperation='source-over';
+ ctx.textBaseline='alphabetic';
+ ctx.textAlign='left';
+ if('fontKerning' in ctx)ctx.fontKerning='normal';
+ if('textRendering' in ctx)ctx.textRendering='optimizeLegibility';
+ if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures=layout.nativeAlternates?'common-ligatures contextual':'none';
+ ctx.fillText(layout.text,layout.x,layout.y);
+ ctx.restore();
 }
 function schoolWordPng(ctx,layout,fontSize,color='#173b72',resolution=3){
  const margin=fontSize*.42,top=fontSize*1.38,height=fontSize*2.15;
@@ -783,18 +734,7 @@ function schoolWordPng(ctx,layout,fontSize,color='#173b72',resolution=3){
 }
 function schoolConnectorSegments(){return []}
 function schoolConnectorsSvg(){return ''}
-function renderVariationDemo(){
- const rows=[['variationDemoLow',0],['variationDemoCurrent',schoolVariation()],['variationDemoHigh',100]];
- const family=fontCss(modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'lobster'));
- for(const [id,level] of rows){
-  const host=$(id);if(!host)continue;
-  let canvas=host.querySelector('canvas');if(!canvas){host.textContent='';canvas=document.createElement('canvas');canvas.setAttribute('aria-label','Реальный предпросмотр вариативности букв');canvas.style.display='block';canvas.style.width='100%';canvas.style.height='56px';host.appendChild(canvas)}
-  const width=Math.max(220,Math.floor(host.clientWidth||260)),height=56,dpr=Math.min(2,window.devicePixelRatio||1);
-  canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
-  const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,width,height);c.font=`20px ${family}`;c.textBaseline='alphabetic';c.fillStyle='#173b72';
-  const sample='мама · рама · мама';const layout=schoolWordLayout(c,sample,7,36,20,level,0,`demo:${id}:${sample}`,$('handFont')?.value||'lobster');drawSchoolWordCanvas(c,layout,20);
- }
-}
+function renderVariationDemo(){}
  const measureCanvas=document.createElement('canvas'),mctx=measureCanvas.getContext('2d');
 const CANVAS_SPACING={letter:!!mctx&&'letterSpacing' in mctx,word:!!mctx&&'wordSpacing' in mctx};if(mctx&&'fontKerning' in mctx)mctx.fontKerning='normal';if(mctx&&'textRendering' in mctx)mctx.textRendering='optimizeLegibility';
 function measureText(t,font,size,hand='marck'){const p=FONT_PROFILES[hand]||FONT_PROFILES.neucha;mctx.font=`${size}px ${fontCss(font)}`;if(CANVAS_SPACING.letter)mctx.letterSpacing=`${p.letterSpacing}px`;if(CANVAS_SPACING.word)mctx.wordSpacing=`${p.wordSpacing}px`;return mctx.measureText(t).width}
@@ -1658,7 +1598,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','lobsterStyle','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.10.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.11.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
@@ -1730,12 +1670,8 @@ $('routeStart').addEventListener('click',()=>{stopRoutePlayback();setRouteCursor
 $('gcodeHelpBtn').addEventListener('click',()=>{$('gcodeInstruction').hidden=!$('gcodeInstruction').hidden});['stage1','stage2','stage3'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
 $('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paperZoom+.2)*10)/10);applyPaperZoom()});$('zoomOut').addEventListener('click',()=>{paperZoom=Math.max(1,Math.round((paperZoom-.2)*10)/10);applyPaperZoom()});$('zoomFit').addEventListener('click',()=>{paperZoom=1;applyPaperZoom()});
 $('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
-$('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('lobsterStyle').addEventListener('change',()=>{invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
- $('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
- $('downloadLobster')?.addEventListener('click',downloadLobsterFont);
- $('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
- $('downloadLobster')?.addEventListener('click',downloadLobsterFont);
-$('schoolRoughness').addEventListener('input',()=>{const value=schoolAccuracy();$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();renderVariationDemo();refreshFontMetrics();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
+$('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
+ $('wordBounce')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
 ['lh','pitch','pitchMm'].forEach(id=>$(id).addEventListener('change',()=>{const isHeight=id==='lh',isMm=id==='pitchMm',min=isMm?5:2,max=isMm?60:(isHeight?20:30),fallback=isHeight?(lastModel?.lh??DEFAULTS.lh):(isMm?DEFAULTS.pitchMm:(lastModel?.pitch??DEFAULTS.pitch)),digits=isMm?1:(isHeight?1:2);commitEditableDecimal(id,min,max,fallback,digits);invalidateGeneratedGcode();refreshFontMetrics();try{build();save()}catch(e){$('layoutStatus').textContent='Проверь высоту букв и межстрочный интервал: '+(e?.message||e);$('layoutStatus').className='status bad'}}));
 ['txt','scriptMode','lh','pitch','pitchMm','bedTopGap','plateTabX','plateTabWidth','plateTabClearance','plateTabDepth','paragraphIndent'].forEach(id=>$(id).addEventListener('input',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()}));
 ['paragraphIndentToggle','justifyToggle','pitchCells','pitchUnit'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();updateLineSpacingUI();build();save()}));
