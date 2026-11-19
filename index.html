@@ -655,8 +655,8 @@ function refreshFontMetrics(){
   const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
   sample.style.fontFamily=familyCss+',cursive';
-  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1,"dlig" 1':'"ccmp" 0,"calt" 0,"liga" 0,"clig" 0,"dlig" 0';
-  sample.style.fontVariantLigatures=$('letterVariety')?.checked?'common-ligatures contextual discretionary-ligatures':'none';
+  sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"ccmp" 1,"calt" 0,"liga" 1,"clig" 1,"dlig" 0':'"ccmp" 0,"calt" 0,"liga" 1,"clig" 1,"dlig" 0';
+  sample.style.fontVariantLigatures='common-ligatures contextual';
   sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';
   sample.style.fontSynthesis='none';
   void sample.offsetWidth;
@@ -705,10 +705,10 @@ function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.textBaseline='alphabetic';
  ctx.textAlign='left';
  if('fontKerning' in ctx)ctx.fontKerning='normal';
- if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings=layout.nativeAlternates?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1,"dlig" 1':'"ccmp" 0,"calt" 0,"liga" 0,"clig" 0,"dlig" 0';
+ if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings=layout.nativeAlternates?'"ccmp" 1,"calt" 0,"liga" 1,"clig" 1,"dlig" 0':'"ccmp" 0,"calt" 0,"liga" 1,"clig" 1,"dlig" 0';
  if('lang' in ctx)ctx.lang='ru';
  if('textRendering' in ctx)ctx.textRendering='optimizeLegibility';
- if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures=layout.nativeAlternates?'common-ligatures contextual discretionary-ligatures':'none';
+ if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures='common-ligatures contextual';
  // Keep each word's letterforms intact; a tiny whole-word tilt adds natural handwriting irregularity.
  const angle=(layout.rotation||0)*Math.PI/180,centerX=layout.x+layout.metrics.width/2;
  if(angle){ctx.translate(centerX,layout.y);ctx.rotate(angle);ctx.translate(-centerX,-layout.y)}
@@ -745,7 +745,7 @@ function renderVariationDemo(){
   const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
   sample.style.fontFamily=fontCss(font)+',cursive';
   sample.style.fontFeatureSettings="'ccmp' "+(item.active?1:0)+",'liga' "+(item.active?1:0)+",'clig' "+(item.active?1:0)+",'calt' "+(item.active?1:0)+",'dlig' "+(item.active?1:0);
-  sample.style.fontVariantLigatures=item.active?'common-ligatures contextual discretionary-ligatures':'none';
+  sample.style.fontVariantLigatures='common-ligatures contextual';
   sample.style.fontKerning='normal';row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
@@ -927,7 +927,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  }
  if(bottomY<h){svg+=`<rect x="0" y="${bottomY}" width="${w}" height="${h-bottomY}" fill="#fff0ed" opacity=".62"/><line x1="0" y1="${bottomY}" x2="${w}" y2="${bottomY}" stroke="#c65c52" stroke-width=".35" stroke-dasharray="2 1.5"/><text x="3" y="${Math.min(h-2,bottomY+4)}" font-size="3" fill="#a33d37">НИЖЕ ЭТОЙ ЛИНИИ ПЕРО НЕ ПИШЕТ</text>`}
  const variantsOn=document.getElementById("letterVariety")?.checked!==false;
- const featureStyle="font-variant-ligatures:"+(variantsOn?"common-ligatures contextual discretionary-ligatures":"none")+";font-feature-settings:'ccmp' "+(variantsOn?1:0)+",'liga' "+(variantsOn?1:0)+",'clig' "+(variantsOn?1:0)+",'calt' "+(variantsOn?1:0)+",'dlig' "+(variantsOn?1:0)+";white-space:pre";
+ const featureStyle="font-variant-ligatures:common-ligatures contextual;font-feature-settings:'ccmp' "+(variantsOn?1:0)+",'liga' 1,'clig' 1,'calt' 0,'dlig' 0;white-space:pre";
  lines.forEach((line,i)=>{
   if(line.blank)return;
   const y=baseline0+i*pitch,runs=runsFor(line.text,mode,hand);
