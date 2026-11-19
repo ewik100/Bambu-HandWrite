@@ -21,7 +21,7 @@ function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.textBaseline='alphabetic';
  ctx.textAlign='left';
  if('fontKerning' in ctx)ctx.fontKerning='normal';
- if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1';
+ if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings=layout.nativeAlternates?'"calt" 1,"liga" 1,"clig" 1':'"calt" 0,"liga" 0,"clig" 0';
  if('lang' in ctx)ctx.lang='ru';
  if('textRendering' in ctx)ctx.textRendering='optimizeLegibility';
  if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures=layout.nativeAlternates?'common-ligatures contextual':'none';
