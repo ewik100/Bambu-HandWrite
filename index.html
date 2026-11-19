@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.22.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.22.0">
+<meta name="description" content="Bambu HandWrite 5.23.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.23.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.22.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.23.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -230,16 +230,16 @@ textarea{line-height:1.55;resize:vertical}
 @media(max-width:520px){.single-stroke-demo-row{grid-template-columns:1fr;gap:3px}.single-stroke-demo-art .single-stroke-svg{max-height:42px}}
 
 
-.single-stroke-font-sample{font-family:"Caveat Embedded",cursive!important;font-weight:500;line-height:1.25}
+.single-stroke-font-sample{font-family:"Bambu HandWrite Original",cursive!important;font-weight:500;line-height:1.25}
 .school-roughness-control{display:flex!important;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 4px!important;font-size:13px}
 #schoolRoughness{width:100%;margin:2px 0 6px;accent-color:#315f83}
 .variation-demo-row{grid-template-columns:112px minmax(0,1fr)}
-.variation-demo-text{font-family:"Caveat Embedded",cursive!important;font-size:23px;font-weight:500;white-space:nowrap;overflow:hidden}
+.variation-demo-text{font-family:"Bambu HandWrite Original",cursive!important;font-size:23px;font-weight:500;white-space:nowrap;overflow:hidden}
 </style>
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.22.0 · СВЯЗНАЯ ПРОПИСЬ · КОНТЕКСТНЫЕ ФОРМЫ</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.23.0 · СВЯЗНАЯ ПРОПИСЬ · КОНТЕКСТНЫЕ ФОРМЫ</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю выбранный рукописный шрифт…</span></p>
 </header>
@@ -324,8 +324,8 @@ Hello, world!</textarea></label>
       </select>
     </label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
-      <div class="font-profile-head"><b id="fontProfileTitle">Живой быстрый почерк — Caveat</b><span class="font-profile-tag" id="fontProfileTag">КИРИЛЛИЦА · КОНТЕКСТНЫЕ ФОРМЫ</span></div>
-      <p id="fontProfileDescription">Caveat: неформальный рукописный шрифт с поддержкой русского алфавита и контекстными вариантами букв. Не все буквы соединяются между собой.</p>
+      <div class="font-profile-head"><b id="fontProfileTitle">Bambu HandWrite Original — авторская пропись</b><span class="font-profile-tag" id="fontProfileTag">КИРИЛЛИЦА · КОНТЕКСТНЫЕ ФОРМЫ</span></div>
+      <p id="fontProfileDescription">Авторская однолинейная пропись: собственные формы кириллицы, соединяемые штрихи, позиционные альтернативы.</p>
       <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
@@ -345,7 +345,7 @@ Hello, world!</textarea></label>
       <label class="school-roughness-control" for="schoolRoughness"><span>Неровность самих штрихов</span><b id="schoolRoughnessValue">28%</b></label>
       <input type="range" id="schoolRoughness" min="0" max="100" step="1" value="28" aria-label="Неровность самих штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
-      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu Script использует встроенный Caveat variable с русской кириллицей. Лицензия SIL Open Font License находится в папке fonts.</p></div>
+      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu HandWrite Original — авторская гарнитура проекта с собственными кириллическими формами и контекстными вариантами.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
     <div class="layout-options wide" aria-label="Настройки абзацев и заполнения строк">
@@ -515,7 +515,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.22.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.23.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -576,7 +576,7 @@ function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,ta
  if(!usable.length)throw Error('Не осталось безопасного места сбоку листа для 50-секундной установки. Уменьши размер листа или измени его положение.');
  return {x:Number(usable[0].x.toFixed(3)),y:Number(usable[0].y.toFixed(3))};
 }
-const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Caveat Embedded',neucha:'Neucha',pangolin:'Pangolin',frb:'FRB American Cursive',print:'Arial'};
+const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Bambu HandWrite Original',neucha:'Neucha',pangolin:'Pangolin',frb:'FRB American Cursive',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
 async function startOptionalFontStylesheet(){
  if($('handwritingFontCss'))return;
@@ -600,34 +600,34 @@ function waitForFontStylesheet(timeoutMs=2800){
  });
  return fontStylesheetPromise;
 }
-let caveatFontBase64=null,caveatFontPromise=null;
-async function loadBundledCaveat(){
- if(caveatFontBase64&&document.fonts?.check('500 24px "Caveat Embedded"','мама мыла раму'))return true;
- if(caveatFontPromise)return caveatFontPromise;
- caveatFontPromise=(async()=>{
-  const response=await fetch('./fonts/Caveat%5Bwght%5D.ttf.b64',{cache:'force-cache'});
-  if(!response.ok)throw Error('Не удалось загрузить встроенный шрифт Caveat.');
-  const encoded=(await response.text()).replace(/\s+/g,'');
-  if(!encoded||!/^[A-Za-z0-9+/]+=*$/.test(encoded))throw Error('Файл встроенного шрифта повреждён.');
-  const binary=atob(encoded),bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-  caveatFontBase64=encoded;
-  const face=new FontFace('Caveat Embedded',bytes.buffer,{style:'normal',weight:'400 700'});
+let bambuFontBase64=null,bambuFontPromise=null;
+async function loadBambuOriginalFont(){
+ if(bambuFontBase64&&document.fonts?.check('400 24px "Bambu HandWrite Original"','мама мыла раму'))return true;
+ if(bambuFontPromise)return bambuFontPromise;
+ bambuFontPromise=(async()=>{
+  const response=await fetch('./fonts/BambuHandWriteOriginal.woff2',{cache:'force-cache'});
+  if(!response.ok)throw Error('Не удалось загрузить авторский шрифт Bambu HandWrite Original.');
+  const buffer=await response.arrayBuffer();
+  if(buffer.byteLength<5000)throw Error('Файл авторского шрифта повреждён или неполный.');
+  const bytes=new Uint8Array(buffer);let binary='';
+  for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
+  bambuFontBase64=btoa(binary);
+  const face=new FontFace('Bambu HandWrite Original',buffer,{style:'normal',weight:'400'});
   await face.load();document.fonts.add(face);
-  const loaded=await document.fonts.load('500 24px "Caveat Embedded"','Мама мыла раму. Ёжик съел яблоко.');
-  if(!loaded.length||!document.fonts.check('500 24px "Caveat Embedded"','Мама мыла раму.'))throw Error('Браузер не подтвердил загрузку Caveat.');
+  const loaded=await document.fonts.load('400 24px "Bambu HandWrite Original"','Мама мыла раму. Ёжик съел яблоко. ттт');
+  if(!loaded.length||!document.fonts.check('400 24px "Bambu HandWrite Original"','Мама мыла раму.'))throw Error('Браузер не подтвердил загрузку авторского шрифта.');
   return true;
- })().catch(error=>{caveatFontPromise=null;caveatFontBase64=null;throw error});
- return caveatFontPromise;
+ })().catch(error=>{bambuFontPromise=null;bambuFontBase64=null;throw error});
+ return bambuFontPromise;
 }
 async function ensureFonts(fonts,size,timeoutMs=6000){
  const unique=[...new Set(fonts)].filter(Boolean);if(!unique.length)return true;if(!document.fonts?.load)return false;
- const needsRemote=unique.some(f=>f!=='Pecita'&&f!=='Pecita School Local'&&f!=='FRB American Cursive'&&f!=='Caveat Embedded');
+ const needsRemote=unique.some(f=>f!=='Pecita'&&f!=='Pecita School Local'&&f!=='FRB American Cursive'&&f!=='Bambu HandWrite Original');
  const cssReady=needsRemote?await waitForFontStylesheet(5000):true;if(!cssReady)return false;
  const sample='Мама мыла раму. Ёжик съел яблоко. Hello world.';
  const loading=Promise.all(unique.map(async f=>{
   try{
-   if(f==='Caveat Embedded')return await loadBundledCaveat();
+   if(f==='Bambu HandWrite Original')return await loadBambuOriginalFont();
    if(f==='Pecita School Local'){
     let face=[...document.fonts].find(item=>item.family.replace(/["']/g,'')==='Pecita School Local');
     if(!face){face=new FontFace('Pecita School Local','url("./fonts/Pecita.otf") format("opentype")',{style:'normal',weight:'400',display:'block'});await face.load();document.fonts.add(face)}
@@ -645,7 +645,7 @@ async function ensureFonts(fonts,size,timeoutMs=6000){
 function fontsForModel(model){const fonts=new Set();for(const line of model.lines)if(!line.blank)for(const run of runsFor(line.text,model.mode,model.hand))fonts.add(run.font);return [...fonts]}
 function setFontStatus(online){
  const status=$('fontStatus'),note=$('fontNote');
- if(online){const single=$('handFont')?.value==='school'&&$('scriptMode')?.value!=='print';status.textContent=($('handFont')?.selectedOptions?.[0]?.textContent||'Выбранный шрифт')+(single?' · встроенный Caveat':' · загружен');status.className='pill';note.textContent=single?'Встроенный Caveat загружен. Предпросмотр и G-code строятся по центральной линии букв.':'Выбранный шрифт загружен и используется в предпросмотре и генерации.'}
+ if(online){const single=$('handFont')?.value==='school'&&$('scriptMode')?.value!=='print';status.textContent=($('handFont')?.selectedOptions?.[0]?.textContent||'Выбранный шрифт')+(single?' · авторский Bambu Script':' · загружен');status.className='pill';note.textContent=single?'Авторский Bambu HandWrite Original загружен. Предпросмотр и G-code строятся одним алгоритмом.':'Выбранный шрифт загружен и используется в предпросмотре и генерации.'}
  else{status.textContent='Шрифт не загружен';status.className='pill offline';note.textContent='Выбранный шрифт недоступен. G-code не будет создан с подменённым начертанием.'}
 }
 async function refreshFontAvailability(model=lastModel){
@@ -655,7 +655,7 @@ const FONT_PROFILES={
  marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
  neucha:{title:'Ровный повседневный — Neucha',tag:'ОСНОВНОЙ · БЕЗ ДОП. НАКЛОНА',description:'Спокойные, хорошо читаемые формы. Программный наклон отключён; этот профиль выбран по умолчанию для ровного письма.',lh:4.7,pitch:8.2,drawFeed:1650,rapidFeed:2000,widthScale:.98,slantDeg:0,letterSpacing:.04,wordSpacing:.58,routeTolerance:.08,character:'простой, разборчивый',connection:'слабые/отдельные соединения'},
  badscript:{title:'Естественный реалистичный — Bad Script',tag:'ЖИВОЙ · НЕФОРМАЛЬНЫЙ',description:'Более свободный рисунок букв с заметным наклоном и чуть увеличенной шириной. Выглядит естественно, но отдельные знаки не всегда соединяются.',lh:4.7,pitch:8.4,drawFeed:1500,rapidFeed:2000,widthScale:1.02,slantDeg:0,letterSpacing:.02,wordSpacing:.50,routeTolerance:.09,character:'естественный, свободный',connection:'преимущественно отдельные буквы'},
- caveat:{title:'Живой быстрый почерк — Caveat',tag:'РУССКИЙ · КОНТЕКСТНЫЕ ФОРМЫ',description:'Caveat — свободный, слегка неровный рукописный шрифт с кириллицей. Контекстные формы и лигатуры включаются средствами OpenType; настоящие соединения будут только в тех сочетаниях, для которых они нарисованы автором.',lh:4.7,pitch:8.35,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.01,wordSpacing:.50,routeTolerance:.08,character:'быстрый, живой, немного неровный',connection:'контекстные формы и отдельные OpenType-лигатуры; не сплошная пропись'},
+ caveat:{title:'Bambu HandWrite Original — авторская пропись',tag:'РУССКИЙ · КОНТЕКСТНЫЕ ФОРМЫ',description:'Caveat — свободный, слегка неровный рукописный шрифт с кириллицей. Контекстные формы и лигатуры включаются средствами OpenType; настоящие соединения будут только в тех сочетаниях, для которых они нарисованы автором.',lh:4.7,pitch:8.35,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.01,wordSpacing:.50,routeTolerance:.08,character:'быстрый, живой, немного неровный',connection:'контекстные формы и отдельные OpenType-лигатуры; не сплошная пропись'},
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
 
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
@@ -692,7 +692,7 @@ function refreshFontMetrics(){
  if(sample){
   const mode=$('scriptMode')?.value||'auto',hand=$('handFont')?.value||'neucha';
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
-  if(hand==='school'&&mode!=='print'){sample.classList.add('single-stroke-font-sample');sample.style.fontFamily='"Caveat Embedded",cursive';sample.style.fontWeight='500';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
+  if(hand==='school'&&mode!=='print'){sample.classList.add('single-stroke-font-sample');sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='500';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
   else{sample.classList.remove('single-stroke-font-sample');sample.style.fontFamily=familyCss+',cursive';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
   if(hand==='school'&&mode!=='print'){sample.style.fontFeatureSettings=schoolFeatureSettings(0,$('letterVariety')?.checked!==false);sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;}
   else{sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1,"dlig" 0':'"ccmp" 0,"calt" 0,"liga" 1,"clig" 1,"dlig" 0';sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});}
@@ -726,7 +726,7 @@ function schoolNoise(seed,index=0,salt=0){
 }
 function schoolFeatureSettings(index=0,enabled=true){
  if(!enabled)return '"calt" 0, "liga" 0, "clig" 0, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0';
- return '"calt" 1, "liga" 1, "clig" 1, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0';
+ return '"calt" 1, "liga" 1, "clig" 1, "ss01" 1, "ss02" 0, "salt" 0, "dlig" 0';
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
  const metrics=ctx.measureText(word);
@@ -737,6 +737,7 @@ function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.save();ctx.textBaseline='alphabetic';ctx.textAlign='left';
  if('fontKerning' in ctx)ctx.fontKerning='normal';
  if('fontVariantLigatures' in ctx)ctx.fontVariantLigatures='common-ligatures contextual';
+ if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings=layout.features||schoolFeatureSettings(0,true);
  ctx.fillText(layout.text,layout.x,layout.y);ctx.restore();
 }
 function renderVariationDemo(){
@@ -753,14 +754,14 @@ function renderVariationDemo(){
   const row=document.createElement('div');row.className='variation-demo-row';
   const label=document.createElement('small');label.textContent=item.label;
   const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
-  sample.style.fontFamily='"Caveat Embedded",cursive';sample.style.fontWeight='500';
+  sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='500';
   sample.style.fontFeatureSettings=schoolFeatureSettings(0,item.active&&enabled);
   sample.style.fontVariantLigatures=item.active&&enabled?'common-ligatures contextual':'none';
   sample.style.fontKerning='normal';
   row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent=enabled?'У Caveat три контекстные формы букв; форма выбирается по позиции и соседним буквам. Декоративные завитушки отключены.':'Контекстные формы отключены для сравнения с базовым начертанием.';
+ note.textContent=enabled?'Bambu Script — собственная гарнитура с вариативными формами. Позиционные замены активируются OpenType-функциями.':'Контекстные формы отключены для сравнения с базовым начертанием.';
  host.append(note);
 }
 
@@ -1110,8 +1111,8 @@ function withCanvasLineTransform(cx,x,y,width,heightScale,draw){
   cx.restore();
  }
 }
-async function rasterCaveatText(model,token){
- await loadBundledCaveat();
+async function rasterOriginalFontText(model,token){
+ await loadBambuOriginalFont();
  const bounds=model.textBounds||{};
  if(![bounds.left,bounds.top,bounds.right,bounds.bottom].every(Number.isFinite)||bounds.right<=bounds.left||bounds.bottom<=bounds.top)throw Error('Не удалось определить границы рукописного текста.');
  const dm=Number(navigator.deviceMemory)||0,mobile=!!(navigator.maxTouchPoints>0||/Android|iPhone|iPad/i.test(navigator.userAgent||''));
@@ -1126,7 +1127,7 @@ async function rasterCaveatText(model,token){
  if(w*h>maxPixels||Math.max(w,h)>maxSide)throw Error('Область текста слишком велика для безопасной обработки. Разбей текст на несколько частей.');
  const fontPx=model.fontSize*scale,measureCanvas=document.createElement('canvas'),measure=measureCanvas.getContext('2d');
  if(!measure)throw Error('Браузер не смог создать измерительный canvas.');
- measure.font='500 '+fontPx+'px "Caveat Embedded"';measure.textBaseline='alphabetic';
+ measure.font='400 '+fontPx+'px "Bambu HandWrite Original"';measure.textBaseline='alphabetic';
  const lowerAscent=measure.measureText('х').actualBoundingBoxAscent||fontPx*.52;
  const heightScale=scaleToLowercaseHeight(model.lh*scale,lowerAscent),widthScale=model.profile.widthScale||1;
  const enabled=$('letterVariety')?.checked!==false,roughness=schoolRoughness(),filterScale=roughness*.004*scale;
@@ -1152,11 +1153,11 @@ async function rasterCaveatText(model,token){
    wordIndex++;
   }
   const letterSpacing=model.profile.letterSpacing*scale,wordSpacing=(model.profile.wordSpacing+(line.extraWordSpace||0))*scale;
-  textLines.push('<text x="'+x.toFixed(3)+'" y="'+baseline.toFixed(3)+'" transform="matrix('+widthScale+',0,0,'+heightScale.toFixed(6)+','+tx.toFixed(3)+','+ty.toFixed(3)+')" font-family="Caveat Embedded" font-size="'+fontPx.toFixed(3)+'" font-weight="500" fill="#000" xml:lang="ru" lang="ru" letter-spacing="'+letterSpacing.toFixed(3)+'" word-spacing="'+wordSpacing.toFixed(3)+'" style="font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+content+'</text>');
+  textLines.push('<text x="'+x.toFixed(3)+'" y="'+baseline.toFixed(3)+'" transform="matrix('+widthScale+',0,0,'+heightScale.toFixed(6)+','+tx.toFixed(3)+','+ty.toFixed(3)+')" font-family="Bambu HandWrite Original" font-size="'+fontPx.toFixed(3)+'" font-weight="400" fill="#000" xml:lang="ru" lang="ru" letter-spacing="'+letterSpacing.toFixed(3)+'" word-spacing="'+wordSpacing.toFixed(3)+'" style="font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+content+'</text>');
   if(i%8===0)await new Promise(resolve=>setTimeout(resolve,0));
  }
  if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
- const svg='<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><defs><style>@font-face{font-family:"Caveat Embedded";src:url(data:font/ttf;base64,'+caveatFontBase64+') format("truetype");font-weight:400 700;font-style:normal}</style>'+filterDefs.join('')+'</defs>'+textLines.join('')+'</svg>';
+ const svg='<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><defs><style>@font-face{font-family:"Bambu HandWrite Original";src:url(data:font/woff2;base64,'+bambuFontBase64+') format("woff2");font-weight:400 700;font-style:normal}</style>'+filterDefs.join('')+'</defs>'+textLines.join('')+'</svg>';
  const blob=new Blob([svg],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),image=new Image();
  try{
   image.src=url;
@@ -1178,7 +1179,7 @@ async function rasterCaveatText(model,token){
  return {bin:thin.bin,w:cropW,h:cropH,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
 }
 async function rasterText(model,token){
- if(model.hand==='school'&&model.mode!=='print')return rasterCaveatText(model,token);
+ if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token);
  const dm=Number(navigator.deviceMemory)||0;
  const mobile=!!(navigator.maxTouchPoints>0||/Android|iPhone|iPad/i.test(navigator.userAgent||''));
  // Render only actual text bounds. On phones use a lower memory ceiling so
@@ -1275,7 +1276,7 @@ function scheduleSchoolStrokePreview(model){
  })},360);
 }
 async function renderSchoolStrokePreview(model,seq){
- const raster=await rasterCaveatText(model,generationToken);
+ const raster=await rasterOriginalFontText(model,generationToken);
  if(seq!==schoolPreviewSequence||lastModel!==model)return;
  const skeleton=traceSkeleton(raster.bin,raster.w,raster.h);
  const simplified=orderPathsByComponent(skeleton,raster,model)
@@ -1592,7 +1593,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.22.0`,
+  `; generated by Bambu HandWrite 5.23.0`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1620,8 +1621,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.22.0 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.22.0`,
+  `; Bambu HandWrite 5.23.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.23.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -1723,7 +1724,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.22.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.23.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
