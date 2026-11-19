@@ -7,7 +7,7 @@
 <meta name="description" content="Bambu HandWrite 5.15.0 — генератор рукописного текста для Bambu Lab A1 со шрифтом Caveat, кириллицей и контекстными вариантами букв.">
 <meta property="og:title" content="Bambu HandWrite 5.15.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.14.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.15.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
 <style>
@@ -295,20 +295,20 @@ Hello, world!</textarea></label>
     </label>
     <label>Основной шрифт
       <select id="handFont">
-        <option value="frb" selected>Школьный рукописный — FRB American Cursive (несколько вариантов)</option>
+        <option value="caveat" selected>Живой быстрый почерк — Caveat (русский, контекстные формы)</option>
+        <option value="frb">Школьный рукописный — FRB American Cursive (позиционные формы)</option>
         <option value="school">Связный школьный — Pecita (настоящие соединения)</option>
         <option value="marck">Школьный прописной — Marck Script</option>
         <option value="neucha">Аккуратный повседневный — Neucha</option>
         <option value="badscript">Естественный реалистичный — Bad Script</option>
         <option value="pangolin">Мягкий рукописный — Pangolin</option>
-        <option value="caveat">Быстрый — Caveat</option>
         <option value="great">Каллиграфический — Great Vibes (латиница)</option>
         <option value="recommended">Авто · подбирает почерк под язык</option>
       </select>
     </label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
-      <div class="font-profile-head"><b id="fontProfileTitle">Школьный рукописный почерк — FRB American Cursive</b><span class="font-profile-tag" id="fontProfileTag">СВЯЗНЫЙ · ОСНОВНОЙ</span></div>
-      <p id="fontProfileDescription">FRB American Cursive: школьный рукописный шрифт с несколькими оригинальными формами кириллических букв и автоматической сменой повторяющихся знаков.</p>
+      <div class="font-profile-head"><b id="fontProfileTitle">Живой быстрый почерк — Caveat</b><span class="font-profile-tag" id="fontProfileTag">КИРИЛЛИЦА · КОНТЕКСТНЫЕ ФОРМЫ</span></div>
+      <p id="fontProfileDescription">Caveat: неформальный рукописный шрифт с поддержкой русского алфавита и контекстными вариантами букв. Не все буквы соединяются между собой.</p>
       <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
