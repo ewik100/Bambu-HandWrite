@@ -1,16 +1,16 @@
-# Bambu HandWrite 5.9.1 — исправление загрузки шрифта
+# Bambu HandWrite 5.10.0 — исправление загрузки шрифта
 
-**Bambu HandWrite** — браузерное приложение, которое превращает набранный текст в рукописный макет и строит G-code для перемещения головки 3D-принтера. Актуальная версия проекта — **5.9.1**. В этой версии исправлена предварительная загрузка локального Pecita OTF и проверка кириллических/латинских глифов.
+**Bambu HandWrite** — браузерное приложение, которое превращает набранный текст в рукописный макет и строит G-code для перемещения головки 3D-принтера. Актуальная версия проекта — **5.10.0**. Встроенный Lobster загружается локально, а переключатель вариантов букв и ползунок естественности восстановлены. В этой версии исправлена предварительная загрузка локального Pecita OTF и проверка кириллических/латинских глифов.
 
-> **Важно:** версия 5.4.3 была отозвана после сообщения о преждевременном завершении печати. Версия 5.4.4 возвращает переключение стороны красного поля на основе кода 5.4.2 и добавляет строгую проверку структуры каждого штриха и совпадения G-code с рассчитанными траекториями. Системная последовательность команд 5.4.2 сохранена. Автоматические проверки не заменяют физический тест: сначала проверь короткий текст под наблюдением на Bambu Lab A1.
+> **Важно:** версия 5.10.0 была отозвана после сообщения о преждевременном завершении печати. Версия 5.10.0 возвращает переключение стороны красного поля на основе кода 5.10.0 и добавляет строгую проверку структуры каждого штриха и совпадения G-code с рассчитанными траекториями. Системная последовательность команд 5.10.0 сохранена. Автоматические проверки не заменяют физический тест: сначала проверь короткий текст под наблюдением на Bambu Lab A1.
 
 ## Запустить программу
 
-**Самый простой способ:** откройте [версию 5.9.1](releases/Bambu-HandWrite-5.9.1.html) или [`index.html`](index.html). Установка, сервер и сборка не нужны.
+**Самый простой способ:** откройте [версию 5.10.0](releases/Bambu-HandWrite-5.10.0.html) или [`index.html`](index.html). Установка, сервер и сборка не нужны.
 
-**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . GitHub Pages автоматически публикует текущую версию из ветки `main`; отдельный HTML-снимок 5.9.1 доступен выше.
+**Открыть веб-приложение:** https://ewik100.github.io/Bambu-HandWrite/ . GitHub Pages автоматически публикует текущую версию из ветки `main`; отдельный HTML-снимок 5.10.0 доступен выше.
 
-## Что нового в 5.9.1
+## Что нового в 5.10.0
 
 - Связный шрифт Pecita теперь выбран основным по умолчанию для русского и английского текста.
 - Используются настоящие соединённые формы букв и встроенные в шрифт контекстные варианты/лигатуры.
@@ -123,4 +123,4 @@ Bambu HandWrite — независимый проект сообщества. Ba
 
 ### English
 
-Bambu HandWrite 5.9.1 is an independent browser-based handwriting layout and G-code generator for the Bambu Lab A1. It adds three Lobster writing styles, five alternating glyph variants, a contour-variation control and a live comparison preview. It also supports normal, left-leaf and right-leaf page placement. Pen-holder geometry, pen-tip clearance and paper fixing still require physical calibration. Other printer models require separate adaptation. The project uses a restricted personal-use license; see `LICENSE`.
+Bambu HandWrite 5.10.0 is an independent browser-based handwriting layout and G-code generator for the Bambu Lab A1. It adds three Lobster writing styles, five alternating glyph variants, a contour-variation control and a live comparison preview. It also supports normal, left-leaf and right-leaf page placement. Pen-holder geometry, pen-tip clearance and paper fixing still require physical calibration. Other printer models require separate adaptation. The project uses a restricted personal-use license; see `LICENSE`.
