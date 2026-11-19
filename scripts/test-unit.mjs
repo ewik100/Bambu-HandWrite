@@ -68,6 +68,8 @@ vm.runInContext([
   bindingSideMatch[0], neighborsMatch[0], labelComponentsMatch[0],
   orderPathsMatch[0], routeFunctionMatch[0]
 ].join('\n'), context);
+const actualOrderPathsByComponent=context.orderPathsByComponent;
+context.orderPathsByComponent=(paths)=>paths;
 const schoolStart=html.indexOf('function schoolVariation()');
 const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas')",schoolStart);
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Caveat handwriting helpers.');
