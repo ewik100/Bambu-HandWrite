@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.8.0 — браузерный генератор рукописного G-code для Bambu Lab A1 с тремя вариантами Lobster и вариативностью формы букв.">
+<meta name="description" content="Bambu HandWrite 5.9.0 — браузерный генератор рукописного G-code для Bambu Lab A1 с тремя вариантами Lobster и вариативностью формы букв.">
 <meta property="og:title" content="Bambu HandWrite 5.8.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.8.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.9.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <style>
 @font-face{font-family:"Pecita School Local";src:url("./fonts/Pecita.otf") format("opentype");font-style:normal;font-weight:400;font-display:swap}
@@ -306,8 +306,8 @@ Hello, world!</textarea></label>
       </select>
     </label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
-      <div class="font-profile-head"><b id="fontProfileTitle">Школьный почерк — Marck Script</b><span class="font-profile-tag" id="fontProfileTag">ОСНОВНОЙ</span></div>
-      <p id="fontProfileDescription">Аккуратный школьный курсив. Рекомендуемый баланс разборчивости и скорости; это базовый вариант для обычных заданий.</p>
+      <div class="font-profile-head"><b id="fontProfileTitle">Связный школьный почерк — Pecita</b><span class="font-profile-tag" id="fontProfileTag">СВЯЗНЫЙ · ОСНОВНОЙ</span></div>
+      <p id="fontProfileDescription">Pecita: соединённые кириллические и латинские буквы с контекстными формами и лигатурами.</p>
       <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
@@ -1657,7 +1657,7 @@ function importProjectBackup(file){
 }
 
 function restore(){
- try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','lobsterStyle','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=!!v.justifyLines;if($('letterVariety'))$('letterVariety').checked=typeof v.letterVariety==='boolean'?v.letterVariety:true;if($('wordBounce'))$('wordBounce').checked=typeof v.wordBounce==='boolean'?v.wordBounce:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';return true}}
+ try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','lobsterStyle','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=!!v.justifyLines;if($('letterVariety'))$('letterVariety').checked=typeof v.letterVariety==='boolean'?v.letterVariety:true;if($('wordBounce'))$('wordBounce').checked=typeof v.wordBounce==='boolean'?v.wordBounce:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';if(!localStorage.getItem('bhwConnectedFontDefaultV1')){$('handFont').value='school';localStorage.setItem('bhwConnectedFontDefaultV1','1')}return true}}
  catch(e){}return false
 }
 function save(){const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','lobsterStyle','documentTitle']).forEach(k=>{if($(k))v[k]=$(k).value});
