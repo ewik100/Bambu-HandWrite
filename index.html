@@ -294,9 +294,9 @@ Hello, world!</textarea></label>
     </label>
     <label>Основной шрифт
       <select id="handFont">
-        <option value="school">Обычный школьный — связный, неидеальный</option>
+        <option value="school" selected>Связный школьный — Pecita (настоящие соединения)</option>
         <option value="marck">Школьный прописной — Marck Script</option>
-        <option value="neucha" selected>Аккуратный повседневный — Neucha</option>
+        <option value="neucha">Аккуратный повседневный — Neucha</option>
         <option value="badscript">Естественный реалистичный — Bad Script</option>
         <option value="pangolin">Мягкий рукописный — Pangolin</option>
         <option value="lobster">Связный красивый — Lobster</option>
@@ -327,8 +327,8 @@ Hello, world!</textarea></label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wordBounce" checked>Небольшое смещение целого слова (до 0,35 мм)</label>
       </div>
       <div class="school-variation-scale"><span>0 · без смещения</span><span>50 · небольшое</span><span>100 · максимальное</span></div>
-      <div class="variation-demo" id="variationDemo" aria-live="polite"><b>Проверка соединений</b><div class="variation-demo-row"><small>Образец</small><span class="variation-demo-text" id="variationDemoCurrent">мама мыла раму · тетрадь · буквы</span></div><p class="tiny">Ползунок меняет очертания штрихов. Пять форм каждой буквы чередуются по порядку появления. Соединения и общая базовая линия сохраняются.</p></div>
-      <p class="tiny">Меняется форма контура связного слова, а не размер буквы целиком. Один растр и одна деформация — без повторных полупрозрачных слоёв. Смещение целого слова остаётся отдельной настройкой.</p>
+      <div class="variation-demo" id="variationDemo" aria-live="polite"><b>Проверка соединений</b><div class="variation-demo-row"><small>Образец</small><span class="variation-demo-text" id="variationDemoCurrent">мама мыла раму · тетрадь · буквы</span></div><p class="tiny">Формы и соединения букв задаются самим шрифтом Pecita. Контуры не деформируются, чтобы стыки штрихов оставались цельными.</p></div>
+      <p class="tiny">Для связного профиля используется исходный рисунок Pecita без искусственного изменения контуров. Смещение применяется ко всему слову целиком.</p>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
@@ -608,7 +608,7 @@ const FONT_PROFILES={
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
  lobster:{title:'Lobster — основной связный шрифт',tag:'ОСНОВНОЙ · СВЯЗНЫЙ',description:'Основной шрифт проекта для русского и английского. Сохранена исходная точность построения штрихов и исходная скорость письма.',lh:5.0,pitch:8.8,drawFeed:1250,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.62,routeTolerance:.07,character:'плавный, выразительный',connection:'связные буквы'},
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
- school:{title:'Школьный почерк — Pecita',tag:'ЖИВОЙ · ЕСТЕСТВЕННЫЙ',description:'Основа — встроенный Pecita с поддержкой кириллицы и связными формами. Ползунок регулирует только мягкую вариативность целых слов: буквы не разъединяются, а строка остаётся спокойной и читаемой.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'естественные соединения Pecita'},
+ school:{title:'Связный школьный почерк — Pecita',tag:'НАСТОЯЩИЕ СОЕДИНЕНИЯ · КИРИЛЛИЦА + ЛАТИНИЦА',description:'Встроенный шрифт Pecita: настоящие соединённые формы букв, контекстные варианты и лигатуры самого шрифта. Искусственная деформация отключена, чтобы не разрывать соединения.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'настоящие соединения и OpenType-лигатуры'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
 // Editable decimal fields must not be clamped while the user is midway through typing.
@@ -639,12 +639,12 @@ function refreshFontMetrics(){
  const sample=$('fontSample');if(sample){const family=modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'neucha');sample.style.fontFamily=fontCss(family)+',cursive';sample.style.fontFeatureSettings='"calt" 1,"liga" 1,"clig" 1,"dlig" 1';sample.style.fontVariantLigatures='common-ligatures contextual';sample.textContent='Красивый почерк — мама мыла раму. 123';}
  const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=false;
  const lobsterControls=$('lobsterExtras');if(lobsterControls)lobsterControls.style.display='flex';
- const variationNote=schoolPanel?.querySelector('.tiny:last-child');if(variationNote)variationNote.textContent=$('scriptMode')?.value==='print'?'Настройки видны, но в режиме «Упрощённый печатный» рукописный шрифт Lobster не используется. Выбери «Авто», «Только русский» или «Только английский», чтобы вариативность применялась к рукописному тексту.':'Ползунок управляет деформацией букв; флажок включает отдельные варианты повторяющихся букв. Подпрыгивание применяется только ко всему слову. Соединения сохраняются насколько позволяет выбранный шрифт.';
+ const variationNote=schoolPanel?.querySelector('.tiny:last-child');if(variationNote)variationNote.textContent=$('scriptMode')?.value==='print'?'Настройки видны, но в режиме «Упрощённый печатный» рукописный шрифт Lobster не используется. Выбери «Авто», «Только русский» или «Только английский», чтобы вариативность применялась к рукописному тексту.':'У Pecita и Lobster сохраняются настоящие соединения букв. Деформация контуров отключена, чтобы не разрывать штрихи. Ползунок управляет только небольшим смещением целого слова.';
  updateSchoolFontLoader();
  const heading=schoolPanel?.querySelector('.school-variation-heading b'),sliderLabel=schoolPanel?.querySelector('label[for="schoolRoughness"]'),scale=schoolPanel?.querySelectorAll('.school-variation-scale span');
- if(heading)heading.textContent='Вариативность букв и почерка';
- if(sliderLabel?.firstChild)sliderLabel.firstChild.textContent='Сила неровности — от аккуратной к сильной';
- if(scale?.length===3){scale[0].textContent='0 · ровно';scale[1].textContent='50 · заметно';scale[2].textContent='100 · сильно неровно'}
+ if(heading)heading.textContent='Настройки связного почерка';
+ if(sliderLabel?.firstChild)sliderLabel.firstChild.textContent='Сила смещения целого слова';
+ if(scale?.length===3){scale[0].textContent='0 · без смещения';scale[1].textContent='50 · небольшое';scale[2].textContent='100 · максимальное'}
  const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolRoughness()+'%';
  const demoLevel=schoolVariation()/100;[['variationDemoLow',0],['variationDemoCurrent',demoLevel],['variationDemoHigh',1]].forEach(([id,v])=>{const el=$(id);if(!el)return;el.style.fontFamily=fontCss(modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'lobster'))+',cursive';el.style.fontVariationSettings='normal';el.style.letterSpacing=(v*.12)+'px';el.style.wordSpacing=(v*.18)+'px';el.style.transform='none';el.style.fontSize=(20+v*2)+'px';el.style.lineHeight='1.55';el.style.opacity='1'});renderVariationDemo();
  if(document.fonts?.ready)document.fonts.ready.then(renderVariationDemo).catch(()=>{});
@@ -677,11 +677,11 @@ function lobsterStyleFactor(){
  return v==='classic'?.68:v==='rough'?1.32:1;
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
- const level=Math.max(0,Math.min(100,roughness))/100,metrics=ctx.measureText(word);
+ const rawLevel=Math.max(0,Math.min(100,roughness))/100,connectedFont=typeof document!=='undefined'&&['school','lobster'].includes(document.getElementById('handFont')?.value),level=connectedFont?0:rawLevel,metrics=ctx.measureText(word);
  const dom=typeof document!=='undefined'&&kind!=='print';
  const different=dom&&!!document.getElementById('letterVariety')?.checked;
  let bounce=0;
- if(dom&&document.getElementById('wordBounce')?.checked) bounce=(schoolNoise(seed,0,21)-.5)*.70*level;
+ if(dom&&document.getElementById('wordBounce')?.checked) bounce=(schoolNoise(seed,0,21)-.5)*.70*rawLevel;
  const chars=(typeof Intl!=='undefined'&&Intl.Segmenter)?Array.from(new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(word),x=>x.segment):Array.from(word);
  const spans=[];let prev=0;const occurrence=new Map();
  for(let i=0;i<chars.length;i++){
