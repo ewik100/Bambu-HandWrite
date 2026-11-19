@@ -210,7 +210,7 @@ textarea{line-height:1.55;resize:vertical}
 .variation-demo{margin-top:12px;padding:12px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;color:#1e293b}.variation-demo> b{display:block;margin-bottom:8px}.variation-demo-row{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #e2e8f0}.variation-demo-row small{color:#64748b}.variation-demo-text{display:block;white-space:nowrap;overflow:hidden;color:#173b72;font-family:cursive;font-size:21px;font-feature-settings:'liga' 1,'clig' 1,'calt' 1,'dlig' 1}
 
 /* Calm, consistent controls: remove browser red/blue checkbox defaults. */
-#lobsterExtras label{display:flex!important;align-items:center;gap:10px;padding:9px 12px;margin:0!important;border:1px solid #d7e0e8;border-radius:11px;background:#fff;color:#243447;font-size:13px;line-height:1.35;cursor:pointer}
+#glyphAlternates label{display:flex!important;align-items:center;gap:10px;padding:9px 12px;margin:0!important;border:1px solid #d7e0e8;border-radius:11px;background:#fff;color:#243447;font-size:13px;line-height:1.35;cursor:pointer}
 #lobsterExtras input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:0 0 19px;width:19px;height:19px;min-width:19px;min-height:19px;margin:0;border:1.6px solid #8293a3;border-radius:5px;background:#fff;display:grid;place-content:center;cursor:pointer}
 #lobsterExtras input[type=checkbox]::before{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) scale(0);transform-origin:center;transition:transform .12s}
 #lobsterExtras input[type=checkbox]:checked{background:#315f83;border-color:#315f83}
@@ -669,7 +669,7 @@ function refreshFontMetrics(){
   sample.style.fontFamily=familyCss+',cursive';
   sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"calt" 1,"liga" 1,"clig" 1,"dlig" 1,"aalt" 1,"salt" 1':'"calt" 0,"liga" 0,"clig" 0,"dlig" 0,"aalt" 0,"salt" 0';
   sample.style.fontVariantLigatures=$('letterVariety')?.checked?'common-ligatures contextual':'none';
-  sample.textContent='Красивый почерк — мама мыла раму. 123';
+  sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';
   sample.style.fontSynthesis='none';
   void sample.offsetWidth;
   if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});
