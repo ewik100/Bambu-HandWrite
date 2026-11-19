@@ -925,7 +925,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
  }
  if(bottomY<h){svg+=`<rect x="0" y="${bottomY}" width="${w}" height="${h-bottomY}" fill="#fff0ed" opacity=".62"/><line x1="0" y1="${bottomY}" x2="${w}" y2="${bottomY}" stroke="#c65c52" stroke-width=".35" stroke-dasharray="2 1.5"/><text x="3" y="${Math.min(h-2,bottomY+4)}" font-size="3" fill="#a33d37">НИЖЕ ЭТОЙ ЛИНИИ ПЕРО НЕ ПИШЕТ</text>`}
  const variantsOn=document.getElementById("letterVariety")?.checked!==false;
- const featureStyle="font-variant-ligatures:"+(variantsOn?"common-ligatures contextual discretionary-ligatures":"none")+";font-feature-settings:'ccmp' 1,'liga' "+(variantsOn?1:0)+",'clig' "+(variantsOn?1:0)+",'calt' "+(variantsOn?1:0)+",'dlig' "+(variantsOn?1:0)+";white-space:pre";
+ const featureStyle="font-variant-ligatures:"+(variantsOn?"common-ligatures contextual discretionary-ligatures":"none")+";font-feature-settings:'ccmp' "+(variantsOn?1:0)+",'liga' "+(variantsOn?1:0)+",'clig' "+(variantsOn?1:0)+",'calt' "+(variantsOn?1:0)+",'dlig' "+(variantsOn?1:0)+";white-space:pre";
  lines.forEach((line,i)=>{
   if(line.blank)return;
   const y=baseline0+i*pitch,runs=runsFor(line.text,mode,hand);
