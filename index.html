@@ -584,7 +584,7 @@ function waitForFontStylesheet(timeoutMs=2800){
  });
  return fontStylesheetPromise;
 }
-async async function ensureFonts(fonts,size,timeoutMs=6000){
+async function ensureFonts(fonts,size,timeoutMs=6000){
  const unique=[...new Set(fonts)].filter(Boolean);if(!unique.length)return true;if(!document.fonts?.load)return false;
  const needsRemote=unique.some(f=>f!=='Pecita'&&f!=='Pecita School Local');
  const cssReady=needsRemote?await waitForFontStylesheet(5000):true;if(!cssReady)return false;
