@@ -339,7 +339,7 @@ Hello, world!</textarea></label>
       <div class="school-variation-heading"><b>Естественные формы букв</b></div>
       <p class="tiny">Caveat использует настоящие контекстные формы. Предпросмотр и G-code строятся по одной центральной траектории вместо двух сторон контура.</p>
       <div id="glyphAlternates" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
-        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Использовать варианты букв</label>
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Использовать контекстные формы русских букв</label>
         <input type="checkbox" id="wordBounce" checked hidden aria-hidden="true">
       </div>
       <label class="school-roughness-control" for="schoolRoughness"><span>Неровность самих штрихов</span><b id="schoolRoughnessValue">28%</b></label>
@@ -694,7 +694,7 @@ function refreshFontMetrics(){
   const family=modeFontForScript('cyrl',mode,hand),familyCss=fontCss(family);
   if(hand==='school'&&mode!=='print'){sample.classList.add('single-stroke-font-sample');sample.style.fontFamily='"Caveat Embedded",cursive';sample.style.fontWeight='500';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
   else{sample.classList.remove('single-stroke-font-sample');sample.style.fontFamily=familyCss+',cursive';sample.textContent='Мама мыла раму. Саша шёл по шоссе. Школьная тетрадь.';}
-  if(hand==='school'&&mode!=='print'){sample.style.fontFeatureSettings=schoolFeatureSettings(2,$('letterVariety')?.checked!==false);sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;}
+  if(hand==='school'&&mode!=='print'){sample.style.fontFeatureSettings=schoolFeatureSettings(0,$('letterVariety')?.checked!==false);sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;}
   else{sample.style.fontFeatureSettings=$('letterVariety')?.checked?'"ccmp" 1,"calt" 1,"liga" 1,"clig" 1,"dlig" 0':'"ccmp" 0,"calt" 0,"liga" 1,"clig" 1,"dlig" 0';sample.style.fontVariantLigatures='common-ligatures contextual';sample.style.fontSynthesis='none';void sample.offsetWidth;if(document.fonts?.load)document.fonts.load('24px '+familyCss,sample.textContent).then(()=>{void sample.offsetWidth}).catch(()=>{});}
  }
  const schoolPanel=$('schoolVariationPanel');if(schoolPanel)schoolPanel.hidden=false;
@@ -727,14 +727,7 @@ function schoolNoise(seed,index=0,salt=0){
 function schoolVariantIndex(seed){return Math.floor(schoolNoise(seed,0,43)*5)%5}
 function schoolFeatureSettings(index=0,enabled=true){
  if(!enabled)return '"calt" 0, "liga" 0, "clig" 0, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0';
- const modes=[
-  '"calt" 1, "liga" 1, "clig" 1, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0',
-  '"calt" 1, "liga" 1, "clig" 1, "ss01" 1, "ss02" 0, "salt" 0, "dlig" 0',
-  '"calt" 1, "liga" 1, "clig" 1, "ss01" 0, "ss02" 1, "salt" 0, "dlig" 0',
-  '"calt" 1, "liga" 1, "clig" 1, "ss01" 1, "ss02" 1, "salt" 0, "dlig" 0',
-  '"calt" 1, "liga" 0, "clig" 0, "ss01" 1, "ss02" 0, "salt" 0, "dlig" 0'
- ];
- return modes[Math.max(0,Math.min(4,index|0))];
+ return '"calt" 1, "liga" 1, "clig" 1, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0';
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
  const metrics=ctx.measureText(word),variantIndex=schoolVariantIndex(seed);
@@ -751,19 +744,24 @@ function renderVariationDemo(){
  const host=$('variationDemo');if(!host)return;host.replaceChildren();
  const enabled=$('letterVariety')?.checked!==false;
  const textSample='ттт · пот · тетрадь · тётя · мама мыла раму';
- const title=document.createElement('b');title.textContent=enabled?'Пять настоящих режимов форм букв':'Варианты выключены';host.append(title);
- const samples=[{label:'Основа',variant:0},{label:'Начертание 1',variant:1},{label:'Начертание 2',variant:2},{label:'Начертание 3',variant:3},{label:'Начертание 4',variant:4}];
+ const title=document.createElement('b');title.textContent=enabled?'Контекстные формы кириллицы':'Варианты выключены';host.append(title);
+ const samples=[
+  {label:'Без вариантов',text:textSample,active:false},
+  {label:'С вариантами',text:textSample,active:true},
+  {label:'Разные позиции букв',text:'та · ат · тата · ттт · тетрадь · школа',active:true}
+ ];
  for(const item of samples){
   const row=document.createElement('div');row.className='variation-demo-row';
   const label=document.createElement('small');label.textContent=item.label;
-  const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=textSample;sample.lang='ru';
+  const sample=document.createElement('span');sample.className='variation-demo-text';sample.textContent=item.text;sample.lang='ru';
   sample.style.fontFamily='"Caveat Embedded",cursive';sample.style.fontWeight='500';
-  sample.style.fontFeatureSettings=schoolFeatureSettings(item.variant,enabled);
-  sample.style.fontVariantLigatures=enabled?'common-ligatures contextual':'none';sample.style.fontKerning='normal';
+  sample.style.fontFeatureSettings=schoolFeatureSettings(0,item.active&&enabled);
+  sample.style.fontVariantLigatures=item.active&&enabled?'common-ligatures contextual':'none';
+  sample.style.fontKerning='normal';
   row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent=enabled?'Контекстные формы и наборы 01/02 включены. Декоративные лигатуры и завитушки отключены.':'Показывается базовая форма без контекстных и стилистических замен.';
+ note.textContent=enabled?'У Caveat три контекстные формы букв; форма выбирается по позиции и соседним буквам. Декоративные завитушки отключены.':'Контекстные формы отключены для сравнения с базовым начертанием.';
  host.append(note);
 }
 
