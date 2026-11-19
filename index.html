@@ -565,7 +565,7 @@ async function startOptionalFontStylesheet(){
  const frbStyle=document.createElement('style');frbStyle.id='frbAmericanCursiveFace';
  frbStyle.textContent='@font-face{font-family:"FRB American Cursive";src:url("https://raw.githubusercontent.com/ctrlcctrlv/FRBAmericanCursive/main/dist/FRBAmericanCursive-400-Regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:block}';
  document.head.appendChild(frbStyle);
- const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='all';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pacifico&family=Pangolin&family=FRB American Cursive+Sans:wght@100..800&display=swap';
+ const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='all';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pacifico&family=Pangolin&display=swap';
  link.addEventListener('load',()=>{fontStylesheetReady=true;window.dispatchEvent(new Event('handwritingfontsready'))},{once:true});
  link.addEventListener('error',()=>window.dispatchEvent(new Event('handwritingfontserror')),{once:true});
  document.head.appendChild(link);
