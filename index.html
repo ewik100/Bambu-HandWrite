@@ -724,15 +724,14 @@ function schoolNoise(seed,index=0,salt=0){
  for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0)/4294967295;
 }
-function schoolVariantIndex(seed){return Math.floor(schoolNoise(seed,0,43)*5)%5}
 function schoolFeatureSettings(index=0,enabled=true){
  if(!enabled)return '"calt" 0, "liga" 0, "clig" 0, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0';
  return '"calt" 1, "liga" 1, "clig" 1, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0';
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
- const metrics=ctx.measureText(word),variantIndex=schoolVariantIndex(seed);
- return {text:word,x:startX,y:baseline,metrics,endX:startX+metrics.width+letterSpacing,seed,variantIndex,
-  features:schoolFeatureSettings(variantIndex,$('letterVariety')?.checked!==false),fontSize,kind};
+ const metrics=ctx.measureText(word);
+ return {text:word,x:startX,y:baseline,metrics,endX:startX+metrics.width+letterSpacing,seed,
+  features:schoolFeatureSettings(0,$('letterVariety')?.checked!==false),fontSize,kind};
 }
 function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.save();ctx.textBaseline='alphabetic';ctx.textAlign='left';
@@ -958,7 +957,7 @@ function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justif
      if(!part)continue;
      if(/^\s+$/u.test(part)){cursor+=mctx.measureText(part).width+(part.match(/ /g)||[]).length*profile.wordSpacing;continue}
      const layout=schoolWordLayout(mctx,part,cursor,y,fontSize,schoolRoughness(),profile.letterSpacing,'line:'+i+':word:'+wordIndex+':'+part,hand);
-     const gx=layout.x,gy=layout.y,featureStyle=hand==='school'?' style="font-feature-settings:'+esc(schoolFeatureSettings(layout.variantIndex,variantsOn))+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal"':'';
+     const gx=layout.x,gy=layout.y,featureStyle=hand==='school'?' style="font-feature-settings:'+esc(schoolFeatureSettings(0,variantsOn))+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal"':'';
      svg+='<tspan font-family="'+esc(run.font)+',cursive" font-size="'+fontSize.toFixed(4)+'" x="'+gx.toFixed(4)+'" y="'+gy.toFixed(4)+'" lang="ru" xml:lang="ru"'+featureStyle+'>'+esc(layout.text)+'</tspan>';
      cursor=layout.endX;wordIndex++;
     }
@@ -1142,7 +1141,7 @@ async function rasterCaveatText(model,token){
    const part=parts[j];if(!part)continue;
    if(/^\s+$/u.test(part)){content+='<tspan>'+esc(part)+'</tspan>';continue}
    const seed='line:'+i+':word:'+wordIndex+':'+part;
-   const features=schoolFeatureSettings(schoolVariantIndex(seed),enabled);
+   const features=schoolFeatureSettings(0,enabled);
    let filter='';
    if(filterScale>.02){
     const id='schoolRough'+i+'_'+wordIndex,noiseSeed=Math.floor(schoolNoise(seed,0,11)*10000)+1;
