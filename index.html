@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.12.0 — браузерный генератор рукописного G-code для Bambu Lab A1 со школьным рукописным шрифтом Playpen Sans Cyrillic и семью настоящими формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.12.0">
+<meta name="description" content="Bambu HandWrite 5.13.0 — браузерный генератор рукописного G-code для Bambu Lab A1 со связным курсивом FRB American Cursive с OpenType-вариантами.">
+<meta property="og:title" content="Bambu HandWrite 5.13.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.12.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.13.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
 <style>
@@ -221,9 +221,9 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.12.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.13.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
-  <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю Playpen Sans…</span></p>
+  <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю FRB American Cursive…</span></p>
 </header>
 <section class="paper-safety" role="alert" aria-labelledby="paperSafetyTitle">
   <div class="paper-safety-icon" aria-hidden="true">⚠️</div>
@@ -295,7 +295,7 @@ Hello, world!</textarea></label>
     </label>
     <label>Основной шрифт
       <select id="handFont">
-        <option value="playpen" selected>Школьный рукописный — Playpen Sans Cyrillic (несколько вариантов)</option>
+        <option value="frb" selected>Школьный рукописный — FRB American Cursive (несколько вариантов)</option>
         <option value="school">Связный школьный — Pecita (настоящие соединения)</option>
         <option value="marck">Школьный прописной — Marck Script</option>
         <option value="neucha">Аккуратный повседневный — Neucha</option>
@@ -307,8 +307,8 @@ Hello, world!</textarea></label>
       </select>
     </label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
-      <div class="font-profile-head"><b id="fontProfileTitle">Школьный рукописный почерк — Playpen Sans Cyrillic</b><span class="font-profile-tag" id="fontProfileTag">СВЯЗНЫЙ · ОСНОВНОЙ</span></div>
-      <p id="fontProfileDescription">Playpen Sans Cyrillic: школьный рукописный шрифт с несколькими оригинальными формами кириллических букв и автоматической сменой повторяющихся знаков.</p>
+      <div class="font-profile-head"><b id="fontProfileTitle">Школьный рукописный почерк — FRB American Cursive</b><span class="font-profile-tag" id="fontProfileTag">СВЯЗНЫЙ · ОСНОВНОЙ</span></div>
+      <p id="fontProfileDescription">FRB American Cursive: школьный рукописный шрифт с несколькими оригинальными формами кириллических букв и автоматической сменой повторяющихся знаков.</p>
       <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
@@ -316,13 +316,13 @@ Hello, world!</textarea></label>
         <span>Скорость письма: <b>1600 мм/мин</b></span>
         <span>Характер: <b>ровный, школьный</b></span>
       </div>
-      <p class="tiny">Playpen Sans Cyrillic автоматически чередует настоящие варианты букв. Рекомендуемая высота строчных букв — 4,8 мм, шаг строк — 8,4 мм. Высоту и шаг можно менять вручную.</p>
+      <p class="tiny">FRB American Cursive автоматически применяет позиционные и контекстные формы букв средствами OpenType. Рекомендуемая высота строчных букв — 4,8 мм, шаг строк — 8,4 мм. Высоту и шаг можно менять вручную.</p>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel">
       <div class="school-variation-heading"><b>Естественные формы букв</b></div>
       <p class="tiny">Используются только настоящие контекстные формы и лигатуры, уже нарисованные в выбранном шрифте. Если в шрифте нет пяти вариантов конкретной буквы, программа не подменяет их искусственными искажениями.</p>
       <div id="glyphAlternates" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
-        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Автоматическая смена настоящих форм букв Playpen Sans</label>
+        <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Автоматическая смена контекстных форм FRB American Cursive</label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wordBounce" checked>Небольшое смещение целого слова (до 0,35 мм)</label>
       </div>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
@@ -556,11 +556,16 @@ function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,ta
  if(!usable.length)throw Error('Не осталось безопасного места сбоку листа для 50-секундной установки. Уменьши размер листа или измени его положение.');
  return {x:Number(usable[0].x.toFixed(3)),y:Number(usable[0].y.toFixed(3))};
 }
-const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Pecita School Local',neucha:'Neucha',pangolin:'Pangolin',playpen:'Playpen Sans',print:'Arial'};
+const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Pecita School Local',neucha:'Neucha',pangolin:'Pangolin',frb:'FRB American Cursive',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
 async function startOptionalFontStylesheet(){
  if($('handwritingFontCss'))return;
- const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='all';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pacifico&family=Pangolin&family=Playpen+Sans:wght@100..800&display=swap';
+ // FRB American Cursive WOFF2 from the author's public repository.
+ // License and attribution: fonts/FRB-AMERICAN-CURSIVE-LICENSE.txt (GPL-3.0).
+ const frbStyle=document.createElement('style');frbStyle.id='frbAmericanCursiveFace';
+ frbStyle.textContent='@font-face{font-family:"FRB American Cursive";src:url("https://raw.githubusercontent.com/ctrlcctrlv/FRBAmericanCursive/main/dist/FRBAmericanCursive-400-Regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:block}';
+ document.head.appendChild(frbStyle);
+ const link=document.createElement('link');link.id='handwritingFontCss';link.rel='stylesheet';link.media='all';link.href='https://fonts.googleapis.com/css2?family=Bad+Script&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Neucha&family=Pacifico&family=Pangolin&family=FRB American Cursive+Sans:wght@100..800&display=swap';
  link.addEventListener('load',()=>{fontStylesheetReady=true;window.dispatchEvent(new Event('handwritingfontsready'))},{once:true});
  link.addEventListener('error',()=>window.dispatchEvent(new Event('handwritingfontserror')),{once:true});
  document.head.appendChild(link);
@@ -619,7 +624,7 @@ const FONT_PROFILES={
  pangolin:{title:'Мягкий рукописный — Pangolin',tag:'МЯГКИЙ · РАЗБОРЧИВЫЙ',description:'Округлый рукописный рисунок с дружелюбными формами. Более печатный, чем школьный курсив, зато хорошо читается в небольших записях.',lh:4.7,pitch:8.25,drawFeed:1650,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:.02,wordSpacing:.56,routeTolerance:.09,character:'мягкий, округлый',connection:'отдельные формы'},
 
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
- playpen:{title:'Школьный рукописный — Playpen Sans Cyrillic',tag:'НЕСКОЛЬКО ФОРМ · КИРИЛЛИЦА',description:'Школьный рукописный шрифт TypeTogether. OpenType автоматически чередует несколько нарисованных вариантов кириллических знаков, не деформируя их контуры.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.54,routeTolerance:.07,character:'разборчивый школьный рукописный',connection:'автоматические контекстные формы и естественные переходы'},
+ frb:{title:'Школьный рукописный — FRB American Cursive',tag:'НЕСКОЛЬКО ФОРМ · КИРИЛЛИЦА',description:'Школьный рукописный шрифт TypeTogether. OpenType автоматически чередует несколько нарисованных вариантов кириллических знаков, не деформируя их контуры.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.54,routeTolerance:.07,character:'разборчивый школьный рукописный',connection:'автоматические контекстные формы и естественные переходы'},
  school:{title:'Связный школьный почерк — Pecita',tag:'НАСТОЯЩИЕ СОЕДИНЕНИЯ · КИРИЛЛИЦА + ЛАТИНИЦА',description:'Встроенный шрифт Pecita: настоящие соединённые формы букв, контекстные варианты и лигатуры самого шрифта. Искусственная деформация отключена, чтобы не разрывать соединения.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'настоящие соединения и OpenType-лигатуры'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
@@ -677,7 +682,7 @@ let lastModel=null,viewStage=2,paperZoom=1;
 function applyPaperZoom(){const paper=$('paper'),wrap=paper?.closest('.paper-wrap');if(!paper||!wrap)return;const vb=paper.getAttribute('viewBox')||'0 0 165 203',parts=vb.split(/\s+/).map(Number),w=parts[2]||165,h=parts[3]||203;paper.setAttribute('width',String(Math.round(w*5*paperZoom)));paper.setAttribute('height',String(Math.round(h*5*paperZoom)));wrap.classList.toggle('zoomed',paperZoom>1.01);$('zoomValue').textContent=paperZoom<=1.01?'По ширине':`${Math.round(paperZoom*100)}%`;}
 function clampValue(id,min,max){const el=$(id);let n=Number(el.value);if(!Number.isFinite(n))n=min;n=Math.max(min,Math.min(max,n));el.value=String(n);return n}
 function scriptOf(ch,last='latn'){if(/[\u0400-\u052F\u2DE0-\u2DFF\uA640-\uA69F]/u.test(ch))return 'cyrl';if(/[A-Za-z\u00C0-\u024F]/u.test(ch))return 'latn';return last}
-function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(hand==='school')return FONT.school;if(hand==='badscript')return FONT.badscript;if(hand==='neucha')return FONT.neucha;if(hand==='pangolin')return FONT.pangolin;if(hand==='playpen')return FONT.playpen;if(hand==='caveat')return FONT.caveat;if(hand==='marck')return FONT.marck;if(hand==='great')return sc==='cyrl'?FONT.neucha:FONT.great;if(hand==='recommended')return FONT.neucha;if(mode==='ru')return FONT.marck;if(mode==='en')return FONT.dancing;if(mode==='universal')return sc==='cyrl'?FONT.marck:FONT.dancing;return sc==='cyrl'?FONT.marck:FONT.dancing}
+function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(hand==='school')return FONT.school;if(hand==='badscript')return FONT.badscript;if(hand==='neucha')return FONT.neucha;if(hand==='pangolin')return FONT.pangolin;if(hand==='frb')return FONT.frb;if(hand==='caveat')return FONT.caveat;if(hand==='marck')return FONT.marck;if(hand==='great')return sc==='cyrl'?FONT.neucha:FONT.great;if(hand==='recommended')return FONT.neucha;if(mode==='ru')return FONT.marck;if(mode==='en')return FONT.dancing;if(mode==='universal')return sc==='cyrl'?FONT.marck:FONT.dancing;return sc==='cyrl'?FONT.marck:FONT.dancing}
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
 function schoolVariation(){return 0}
 function schoolAccuracy(){return 0}
@@ -1585,7 +1590,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.12.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.13.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
@@ -1619,7 +1624,7 @@ function importProjectBackup(file){
 }
 
 function restore(){
- try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(!$('handFont').value)$('handFont').value='playpen';if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=!!v.justifyLines;if($('letterVariety'))$('letterVariety').checked=typeof v.letterVariety==='boolean'?v.letterVariety:true;if($('wordBounce'))$('wordBounce').checked=typeof v.wordBounce==='boolean'?v.wordBounce:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';if(!localStorage.getItem('bhwPlaypenDefaultV1')){$('handFont').value='playpen';localStorage.setItem('bhwPlaypenDefaultV1','1')}return true}}
+ try{let raw=null,sourceKey='';for(const key of ['bhw35','bhw34','bhw33','bhw32','bhw30','bhw21','bhw19','bhw18','bhw17','bhw16','bhw15','bhw14','bhw13','bhw12','bhw10']){raw=localStorage.getItem(key);if(raw){sourceKey=key;break}}const v=JSON.parse(raw||'null');if(v){for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if(v[k]!==undefined&&$(k))$(k).value=v[k];if(!$('handFont').value)$('handFont').value='frb';if(!v.heightScaleV2&&['neucha','marck','badscript','recommended'].includes(v.handFont)&&Number(v.lh)===4.8)$('lh').value='4.7';if($('paragraphIndentToggle'))$('paragraphIndentToggle').checked=v.paragraphIndentEnabled!==undefined?!!v.paragraphIndentEnabled:Number(v.paragraphIndent??5)>0;if($('justifyToggle'))$('justifyToggle').checked=!!v.justifyLines;if($('letterVariety'))$('letterVariety').checked=typeof v.letterVariety==='boolean'?v.letterVariety:true;if($('wordBounce'))$('wordBounce').checked=typeof v.wordBounce==='boolean'?v.wordBounce:true;if(!['a4-plain','math-notebook','russian-notebook','custom-paper'].includes($('paperType').value))$('paperType').value='math-notebook';if(!localStorage.getItem('bhwFRBDefaultV1')){$('handFont').value='frb';localStorage.setItem('bhwFRBDefaultV1','1')}return true}}
  catch(e){}return false
 }
 function save(){const v={};Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']).forEach(k=>{if($(k))v[k]=$(k).value});
@@ -1632,7 +1637,7 @@ let previewDebounce=null,generationToken=0,isGenerating=false;
 function refreshPreviewAndSave(){if(previewDebounce)clearTimeout(previewDebounce);previewDebounce=setTimeout(()=>{try{build();save()}catch(e){$('layoutStatus').textContent='Не удалось обновить предпросмотр: '+(e?.message||e);$('layoutStatus').className='status bad'}},180)}
 $('applyFitSuggestion').addEventListener('click',()=>{const value=Number($('applyFitSuggestion').dataset.value);if(!Number.isFinite(value)||value<2||value>20)return;invalidateGeneratedGcode();$('lh').value=value.toFixed(1);refreshPreviewAndSave()});
 $('draw').addEventListener('click',()=>{invalidateGeneratedGcode();try{build();save()}catch(e){$('layoutStatus').textContent='Ошибка предпросмотра: '+(e?.message||e);$('layoutStatus').className='status bad'}});
-$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('letterVariety').checked=true;$('wordBounce').checked=true;$('scriptMode').value='auto';$('handFont').value='playpen';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('playpen');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
+$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('letterVariety').checked=true;$('wordBounce').checked=true;$('scriptMode').value='auto';$('handFont').value='frb';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('frb');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
 $('paperType').addEventListener('change',e=>{invalidateGeneratedGcode();setPreset(e.target.value,$('paperOrientation').value,true);save()});
 $('paperFlip').addEventListener('change',()=>{invalidateGeneratedGcode();build();save()});
 $('paperRotation').addEventListener('change',()=>{syncPaperFlipToRotation();invalidateGeneratedGcode();build();save()});
@@ -1664,7 +1669,7 @@ $('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFon
 ['paragraphIndentToggle','justifyToggle','pitchCells','pitchUnit'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();updateLineSpacingUI();build();save()}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRoutePlayback()});window.addEventListener('pagehide',()=>{stopRoutePlayback();if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}});
 
-const hadSavedSettings=restore();try{localStorage.setItem('bhwPlaypenDefaultV1','1');if(localStorage.getItem('bhw-glyph-mesh-v1')!=='1'){$('letterVariety').checked=true;localStorage.setItem('bhw-glyph-mesh-v1','1')}}catch(e){$('letterVariety').checked=true}if(hadSavedSettings)save();updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
+const hadSavedSettings=restore();try{localStorage.setItem('bhwFRBDefaultV1','1');if(localStorage.getItem('bhw-glyph-mesh-v1')!=='1'){$('letterVariety').checked=true;localStorage.setItem('bhw-glyph-mesh-v1','1')}}catch(e){$('letterVariety').checked=true}if(hadSavedSettings)save();updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
 
 /* UI v2: тема и кнопка «наверх» (не влияет на генерацию G-code) */
 try{(function(){var r=document.documentElement,k='bhw-theme',s=null;try{s=localStorage.getItem(k)}catch(e){}
