@@ -75,7 +75,7 @@ const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Caveat handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
 vm.runInContext(schoolFunctions,context);
-const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,variant:schoolVariantIndex,noise:schoolNoise,layout:schoolWordLayout})',context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,noise:schoolNoise,layout:schoolWordLayout})',context);
 assert(schoolApi.variation()===0,'Enabling letter variants does not alter line wrapping or reserve extra width');
 const featureModes=Array.from({length:5},(_,i)=>schoolApi.features(i,true));
 assert(new Set(featureModes).size===1,'Russian letters use the same real contextual-alternate feature set, not ineffective Latin-only style presets');
@@ -83,12 +83,10 @@ assert(featureModes[0].includes('"calt" 1')&&featureModes[0].includes('"dlig" 0'
 assert(featureModes[0].includes('"ss01" 0')&&featureModes[0].includes('"ss02" 0'),'Latin-only stylistic sets are not falsely advertised as Russian-letter variants');
 const disabledFeatures=schoolApi.features(2,false);
 assert(disabledFeatures.includes('"calt" 0')&&disabledFeatures.includes('"ss01" 0')&&disabledFeatures.includes('"ss02" 0'),'The letter-variation switch disables contextual and stylistic substitutions');
-const seedA=schoolApi.variant('line:0:word:0:тетрадь'),seedB=schoolApi.variant('line:0:word:0:тетрадь');
-assert(seedA===seedB&&seedA>=0&&seedA<5,'A word receives one stable, repeatable feature variant from its seed');
 const mockMetrics={measureText:(value)=>({width:Array.from(value).length*8})};
 const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
-assert(baseLayout.endX===sameLayout.endX&&baseLayout.variantIndex===sameLayout.variantIndex,'Variant-enabled word layout preserves width and repeats deterministically');
+assert(baseLayout.endX===sameLayout.endX&&baseLayout.features===sameLayout.features,'Contextual shaping preserves word width and uses a stable OpenType feature set');
 assert(schoolApi.roughness()===28,'Stroke roughness uses the dedicated UI slider value');
 const caveatBase64=fs.readFileSync(path.join(root,'fonts','Caveat[wght].ttf.b64'),'utf8').trim();
 const caveatBinary=Buffer.from(caveatBase64,'base64');
