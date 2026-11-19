@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.16.0 — генератор рукописного текста для Bambu Lab A1 со шрифтом Caveat, кириллицей и контекстными вариантами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.16.0">
+<meta name="description" content="Bambu HandWrite 5.17.0 — генератор рукописного текста для Bambu Lab A1 со шрифтом Caveat, кириллицей и контекстными вариантами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.17.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.16.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.17.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
 <style>
@@ -221,7 +221,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.16.0 · ЖИВОЙ ПОЧЕРК · КОНТЕКСТНЫЕ ФОРМЫ</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.17.0 · ЖИВОЙ ПОЧЕРК · КОНТЕКСТНЫЕ ФОРМЫ</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю выбранный рукописный шрифт…</span></p>
 </header>
@@ -325,7 +325,7 @@ Hello, world!</textarea></label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Включать контекстные варианты и лигатуры шрифта (если они есть)</label>
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="wordBounce" checked>Небольшое смещение целого слова (до 0,35 мм)</label>
       </div>
-      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Для школьного профиля используется встроенный Pecita с поддержкой кириллицы.</p></div>
+      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu Script пока использует встроенную связную основу Pecita. Загрузка локального файла проверяется отдельно до построения G-code.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
     <div class="layout-options wide" aria-label="Настройки абзацев и заполнения строк">
@@ -584,24 +584,22 @@ function waitForFontStylesheet(timeoutMs=2800){
  });
  return fontStylesheetPromise;
 }
-async function ensureFonts(fonts,size,timeoutMs=6000){
+async async function ensureFonts(fonts,size,timeoutMs=6000){
  const unique=[...new Set(fonts)].filter(Boolean);if(!unique.length)return true;if(!document.fonts?.load)return false;
- const local=unique.includes('Pecita School Local');
  const needsRemote=unique.some(f=>f!=='Pecita'&&f!=='Pecita School Local');
  const cssReady=needsRemote?await waitForFontStylesheet(5000):true;if(!cssReady)return false;
- // Include both scripts in the load request: an empty/Latin-only load can falsely
- // report readiness before the Cyrillic glyphs needed by the preview are available.
  const sample='Мама мыла раму. Ёжик съел яблоко. Hello world.';
  const loading=Promise.all(unique.map(async f=>{
   try{
-   const loaded=await document.fonts.load(`${size}px "${f}"`,sample);
-   if(loaded.length)return true;
-   if(f==='Pecita School Local'&&local){
-    const face=new FontFace('Pecita School Local','url("./fonts/Pecita.otf") format("opentype")',{style:'normal',weight:'400'});
-    await face.load();document.fonts.add(face);
-    return document.fonts.load(`${size}px "Pecita School Local"`,sample).then(x=>x.length>0);
+   if(f==='Pecita School Local'){
+    let face=[...document.fonts].find(item=>item.family.replace(/["']/g,'')==='Pecita School Local');
+    if(!face){face=new FontFace('Pecita School Local','url("./fonts/Pecita.otf") format("opentype")',{style:'normal',weight:'400',display:'block'});await face.load();document.fonts.add(face)}
+    else if(face.status!=='loaded')await face.load();
+    const loaded=await document.fonts.load(`${size}px "Pecita School Local"`,sample);
+    return loaded.some(item=>item.family.replace(/["']/g,'')==='Pecita School Local')&&document.fonts.check(`${size}px "Pecita School Local"`,sample);
    }
-   return false;
+   const loaded=await document.fonts.load(`${size}px "${f}"`,sample);
+   return loaded.length>0&&document.fonts.check(`${size}px "${f}"`,sample);
   }catch(e){return false}
  })).then(results=>results.every(Boolean)).catch(()=>false);
  let timer;const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve(false),timeoutMs)});
@@ -625,7 +623,7 @@ const FONT_PROFILES={
 
  great:{title:'Каллиграфия — Great Vibes',tag:'ДЕКОРАТИВНЫЙ · МЕДЛЕННЫЙ',description:'Декоративная латиница с более широкими элементами и медленной подачей. Кириллица автоматически заменяется школьным Marck Script.',lh:5.0,pitch:9.1,drawFeed:1100,rapidFeed:1800,widthScale:1.04,slantDeg:0,letterSpacing:.03,wordSpacing:.68,routeTolerance:.08,character:'каллиграфический, плавный',connection:'выраженные связки'},
  frb:{title:'Школьный рукописный — FRB American Cursive',tag:'ПОЗИЦИОННЫЕ ФОРМЫ · КИРИЛЛИЦА',description:'FRB American Cursive использует реальные позиционные формы русских букв через OpenType ccmp: начальные, срединные и конечные соединения. Добавлена очень лёгкая разница наклона и высоты целых слов — без деформации контуров букв.',lh:4.8,pitch:8.4,drawFeed:1450,rapidFeed:1900,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.54,routeTolerance:.07,character:'разборчивый школьный рукописный',connection:'автоматические контекстные формы и естественные переходы'},
- school:{title:'Bambu Script — связный рукописный',tag:'СВЯЗНАЯ БАЗА · КИРИЛЛИЦА',description:'Первый базовый вариант Bambu Script на встроенном Pecita: реальные соединённые формы там, где они предусмотрены рисунком шрифта. Это рабочая основа для дальнейшей разработки собственного набора букв и дополнительных вариантов.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'настоящие соединения и OpenType-лигатуры'},
+ school:{title:'Bambu Script — связный рукописный',tag:'СВЯЗНАЯ БАЗА · КИРИЛЛИЦА',description:'Bambu Script — экспериментальная связная основа на встроенном Pecita. Реальные соединения зависят от нарисованных в шрифте форм; собственные дополнительные кириллические глифы ещё разрабатываются.',lh:4.7,pitch:8.25,drawFeed:1500,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.52,routeTolerance:.07,character:'связный школьный курсив с живыми вариациями',connection:'настоящие соединения и OpenType-лигатуры'},
  recommended:{title:'Автоматический подбор',tag:'АВТО · ПО ЯЗЫКУ',description:'Школьный Marck Script для русского и Dancing Script для английского. Нейтральные параметры размеров и траекторий.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.12,character:'смешанный, по языку',connection:'связное письмо'}
 };
 // Editable decimal fields must not be clamped while the user is midway through typing.
@@ -1596,7 +1594,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.16.0',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.17.0',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
