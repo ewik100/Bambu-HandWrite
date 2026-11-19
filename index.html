@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.9.1 — браузерный генератор рукописного G-code для Bambu Lab A1 с тремя вариантами Lobster и вариативностью формы букв.">
-<meta property="og:title" content="Bambu HandWrite 5.9.1">
+<meta name="description" content="Bambu HandWrite 5.10.0 — браузерный генератор рукописного G-code для Bambu Lab A1 с тремя вариантами Lobster и вариативностью формы букв.">
+<meta property="og:title" content="Bambu HandWrite 5.10.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.9.1 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.10.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
 <style>
@@ -221,7 +221,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header>
-  <h1>✍️ Bambu HandWrite <span class="tiny">5.8.0 · LOBSTER · ВАРИАТИВНЫЕ БУКВЫ</span></h1>
+  <h1>✍️ Bambu HandWrite <span class="tiny">5.10.0 · СВЯЗНЫЙ ПОЧЕРК · ВАРИАТИВНОСТЬ</span></h1>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю Lobster…</span></p>
 </header>
@@ -564,17 +564,17 @@ function getPagePlacementParkPosition(pageX,pageMachineY,pageWidth,pageHeight,ta
 }
 const FONT={caveat:'Caveat',great:'Great Vibes',marck:'Marck Script',dancing:'Dancing Script',badscript:'Bad Script',school:'Pecita School Local',neucha:'Neucha',pangolin:'Pangolin',lobster:'Lobster',print:'Arial'};
 function fontCss(font){return `"${font}", cursive`}
-let lobsterFontPromise=null,lobsterFontBase64='';
+let lobsterFontPromise=null,lobsterFontBase64='',lobsterFontLoaded=false;
 async function ensureLocalLobster(){
- if(document.fonts.check('16px "Lobster"','Мама мыла раму Hello'))return true;
+ if(lobsterFontLoaded)return true;
  if(lobsterFontPromise)return lobsterFontPromise;
  lobsterFontPromise=(async()=>{
   const response=await fetch('./fonts/Lobster-Regular.ttf.b64',{cache:'force-cache'});
   if(!response.ok)throw new Error('Не удалось загрузить встроенный Lobster.');
   lobsterFontBase64=(await response.text()).trim();
   const face=new FontFace('Lobster','url(data:font/ttf;base64,'+lobsterFontBase64+')',{style:'normal',weight:'400'});
-  await face.load();document.fonts.add(face);
-  return document.fonts.check('16px "Lobster"','Мама мыла раму Hello');
+  await face.load();document.fonts.add(face);lobsterFontLoaded=true;
+  return true;
  })().catch(error=>{lobsterFontPromise=null;throw error});
  return lobsterFontPromise;
 }
@@ -633,7 +633,7 @@ function setFontStatus(online){
  else{status.textContent='Шрифт не загружен';status.className='pill offline';note.textContent='Выбранный шрифт недоступен. G-code не будет создан с подменённым начертанием.'}
 }
 async function refreshFontAvailability(model=lastModel){
- if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,1800);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build();renderVariationDemo()}return online;
+ if(!model)return false;const seq=++fontCheckSequence;const online=await ensureFonts(fontsForModel(model),model.fontSize,8000);if(seq!==fontCheckSequence)return online;setFontStatus(online);if(!isGenerating){if(generatedGcodeUrl)invalidateGeneratedGcode();build();renderVariationDemo()}return online;
 }
 const FONT_PROFILES={
  marck:{title:'Школьный прописной — Marck Script',tag:'ШКОЛЬНЫЙ',description:'Школьная рукописная гарнитура. Дополнительный наклон приложения отключён; естественная форма самих знаков зависит от шрифта.',lh:4.7,pitch:8.35,drawFeed:1600,rapidFeed:2000,widthScale:1.00,slantDeg:0,letterSpacing:0,wordSpacing:.48,routeTolerance:.08,character:'ровный школьный курсив',connection:'буквы преимущественно отдельные'},
@@ -677,9 +677,9 @@ function refreshFontMetrics(){
  const variationNote=schoolPanel?.querySelector('.tiny:last-child');if(variationNote)variationNote.textContent=$('scriptMode')?.value==='print'?'Настройки видны, но в режиме «Упрощённый печатный» рукописный шрифт не используется. Выбери «Авто», «Только русский» или «Только английский».':'Lobster содержит контекстные формы и лигатуры. Переключатель включает до пяти алгоритмических вариантов очертания для каждой заглавной и строчной буквы; ползунок регулирует силу изменения.';
  updateSchoolFontLoader();
  const heading=schoolPanel?.querySelector('.school-variation-heading b'),sliderLabel=schoolPanel?.querySelector('label[for="schoolRoughness"]'),scale=schoolPanel?.querySelectorAll('.school-variation-scale span');
- if(heading)heading.textContent='Настройки связного почерка';
- if(sliderLabel?.firstChild)sliderLabel.firstChild.textContent='Сила смещения целого слова';
- if(scale?.length===3){scale[0].textContent='0 · без смещения';scale[1].textContent='50 · небольшое';scale[2].textContent='100 · максимальное'}
+ if(heading)heading.textContent='Вариативность букв';
+ if(sliderLabel?.firstChild)sliderLabel.firstChild.textContent='Сила изменения формы букв';
+ if(scale?.length===3){scale[0].textContent='0 · аккуратно';scale[1].textContent='50 · естественно';scale[2].textContent='100 · немного неровно'}
  const roughness=$('schoolRoughness'),roughnessValue=$('schoolRoughnessValue');if(roughness&&roughnessValue)roughnessValue.textContent=schoolRoughness()+'%';
  const demoLevel=schoolVariation()/100;[['variationDemoLow',0],['variationDemoCurrent',demoLevel],['variationDemoHigh',1]].forEach(([id,v])=>{const el=$(id);if(!el)return;el.style.fontFamily=fontCss(modeFontForScript('cyrl',$('scriptMode')?.value||'auto',$('handFont')?.value||'lobster'))+',cursive';el.style.fontVariationSettings='normal';el.style.letterSpacing=(v*.12)+'px';el.style.wordSpacing=(v*.18)+'px';el.style.transform='none';el.style.fontSize=(20+v*2)+'px';el.style.lineHeight='1.55';el.style.opacity='1'});renderVariationDemo();
  if(document.fonts?.ready)document.fonts.ready.then(renderVariationDemo).catch(()=>{});
@@ -1508,7 +1508,7 @@ async function generateGcode(){
   const zSettings=getPenZSettings();
   let m=build();m.zSettings=zSettings;if(!m.txt.trim())throw Error('Сначала введи текст.');
   if(m.pl.tabOverlap)throw Error('Лист перекрывает настраиваемую защитную зону переднего язычка/ручки пластины A1. G-code не создан. Измерь свою пластину или измени формат/положение бумаги.');
-  setGenerationProgress(10,'Подготавливаю шрифты…');const fontReady=await ensureFonts(fontsForModel(m),m.fontSize,2200);if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');setFontStatus(fontReady);if(!fontReady)throw Error('Не удалось загрузить выбранный шрифт. Проверь подключение к интернету и повтори попытку: G-code с подменённым шрифтом не создаётся.');m=build();m.zSettings=zSettings;
+  setGenerationProgress(10,'Подготавливаю шрифты…');const fontReady=await ensureFonts(fontsForModel(m),m.fontSize,8000);if(token!==generationToken)throw new DOMException('Генерация отменена.','AbortError');setFontStatus(fontReady);if(!fontReady)throw Error('Не удалось загрузить выбранный шрифт. Проверь подключение к интернету и повтори попытку: G-code с подменённым шрифтом не создаётся.');m=build();m.zSettings=zSettings;
   if(m.errors.length)throw Error('Сначала исправь размещение листа: '+m.errors.join(' '));
   if(m.rightX<=m.left+2)throw Error('Между началом текста и правой границей недостаточно места.');
   const cx=m.pl.pageX,cy=253-m.pl.pageY;if(cx<3||cx>253||cy<3||cy>253)throw Error('Физический верхний левый угол листа вне безопасной области пластины.');
@@ -1705,7 +1705,7 @@ let previewDebounce=null,generationToken=0,isGenerating=false;
 function refreshPreviewAndSave(){if(previewDebounce)clearTimeout(previewDebounce);previewDebounce=setTimeout(()=>{try{build();save()}catch(e){$('layoutStatus').textContent='Не удалось обновить предпросмотр: '+(e?.message||e);$('layoutStatus').className='status bad'}},180)}
 $('applyFitSuggestion').addEventListener('click',()=>{const value=Number($('applyFitSuggestion').dataset.value);if(!Number.isFinite(value)||value<2||value>20)return;invalidateGeneratedGcode();$('lh').value=value.toFixed(1);refreshPreviewAndSave()});
 $('draw').addEventListener('click',()=>{invalidateGeneratedGcode();try{build();save()}catch(e){$('layoutStatus').textContent='Ошибка предпросмотра: '+(e?.message||e);$('layoutStatus').className='status bad'}});
-$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('letterVariety').checked=true;$('wordBounce').checked=true;$('schoolRoughness').value=50;$('lobsterStyle').value='natural';$('scriptMode').value='auto';$('handFont').value='neucha';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('neucha');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
+$('reset').addEventListener('click',()=>{invalidateGeneratedGcode();for(const [k,v] of Object.entries(DEFAULTS))if($(k))$(k).value=v;$('txt').value='Мама мыла раму.\nHello, world!';$('paragraphIndentToggle').checked=true;$('justifyToggle').checked=true;$('letterVariety').checked=true;$('wordBounce').checked=true;$('schoolRoughness').value=50;$('lobsterStyle').value='natural';$('scriptMode').value='auto';$('handFont').value='lobster';paperZoom=1;applyPaperZoom();$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;$('dockStatus').textContent='Настройки сброшены';applyFontProfile('lobster');setPreset(DEFAULTS.paperType,DEFAULTS.paperOrientation,false);updatePenZUI();build();save();initTextHistory()});
 $('paperType').addEventListener('change',e=>{invalidateGeneratedGcode();setPreset(e.target.value,$('paperOrientation').value,true);save()});
 $('paperFlip').addEventListener('change',()=>{invalidateGeneratedGcode();build();save()});
 $('paperRotation').addEventListener('change',()=>{syncPaperFlipToRotation();invalidateGeneratedGcode();build();save()});
