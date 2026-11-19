@@ -1119,8 +1119,75 @@ function withCanvasLineTransform(cx,x,y,width,heightScale,draw){
   cx.restore();
  }
 }
+async function rasterCaveatText(model,token){
+ await loadBundledCaveat();
+ const bounds=model.textBounds||{};
+ if(![bounds.left,bounds.top,bounds.right,bounds.bottom].every(Number.isFinite)||bounds.right<=bounds.left||bounds.bottom<=bounds.top)throw Error('Не удалось определить границы рукописного текста.');
+ const dm=Number(navigator.deviceMemory)||0,mobile=!!(navigator.maxTouchPoints>0||/Android|iPhone|iPad/i.test(navigator.userAgent||''));
+ const budget=mobile?650000:(dm>0&&dm<=2?3000000:dm>=8?11000000:dm>=6?9200000:dm>=4?7600000:6200000);
+ const maxSide=mobile?2400:9216,maxPixels=mobile?900000:12000000,maxScale=mobile?7:22,pad=Math.max(2.2,Math.min(4,model.lh*.65));
+ const leftMM=Math.max(0,bounds.left-pad),topMM=Math.max(0,bounds.top-pad),rightMM=Math.min(model.w,bounds.right+pad),bottomMM=Math.min(model.h,bounds.bottom+pad);
+ const roiW=Math.max(1,rightMM-leftMM),roiH=Math.max(1,bottomMM-topMM);
+ const scale=Math.max(2,Math.floor(Math.min(maxScale,Math.sqrt(budget/(roiW*roiH)),maxSide/Math.max(roiW,roiH))*10)/10);
+ const originX=Math.max(0,Math.floor(leftMM*scale)),originY=Math.max(0,Math.floor(topMM*scale));
+ const endX=Math.min(Math.ceil(model.w*scale),Math.ceil(rightMM*scale)),endY=Math.min(Math.ceil(model.h*scale),Math.ceil(bottomMM*scale));
+ const w=Math.max(1,endX-originX),h=Math.max(1,endY-originY);
+ if(w*h>maxPixels||Math.max(w,h)>maxSide)throw Error('Область текста слишком велика для безопасной обработки. Разбей текст на несколько частей.');
+ const fontPx=model.fontSize*scale,measureCanvas=document.createElement('canvas'),measure=measureCanvas.getContext('2d');
+ if(!measure)throw Error('Браузер не смог создать измерительный canvas.');
+ measure.font='500 '+fontPx+'px "Caveat Embedded"';measure.textBaseline='alphabetic';
+ const lowerAscent=measure.measureText('х').actualBoundingBoxAscent||fontPx*.52;
+ const heightScale=scaleToLowercaseHeight(model.lh*scale,lowerAscent),widthScale=model.profile.widthScale||1;
+ const enabled=$('letterVariety')?.checked!==false,roughness=schoolRoughness(),filterScale=roughness*.004*scale;
+ const filterDefs=[],textLines=[];
+ for(let i=0;i<model.lines.length;i++){
+  if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
+  const line=model.lines[i];if(line.blank)continue;
+  const baseline=(model.baseline0+i*model.pitch)*scale,x=line.x*scale;
+  const tx=x*(1-widthScale)-originX,ty=baseline*(1-heightScale)-originY;
+  const parts=line.text.split(/(\s+)/u);let wordIndex=0,content='';
+  for(let j=0;j<parts.length;j++){
+   const part=parts[j];if(!part)continue;
+   if(/^\s+$/u.test(part)){content+='<tspan>'+esc(part)+'</tspan>';continue}
+   const seed='line:'+i+':word:'+wordIndex+':'+part;
+   const features=schoolFeatureSettings(schoolVariantIndex(seed),enabled);
+   let filter='';
+   if(filterScale>.02){
+    const id='schoolRough'+i+'_'+wordIndex,noiseSeed=Math.floor(schoolNoise(seed,0,11)*10000)+1;
+    filterDefs.push('<filter id="'+id+'" x="-10%" y="-16%" width="120%" height="132%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".025 .012" numOctaves="1" seed="'+noiseSeed+'" result="roughNoise"/><feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="'+filterScale.toFixed(3)+'" xChannelSelector="R" yChannelSelector="G"/></filter>');
+    filter=' filter="url(#'+id+')"';
+   }
+   content+='<tspan'+filter+' style="font-feature-settings:'+esc(features)+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+esc(part)+'</tspan>';
+   wordIndex++;
+  }
+  const letterSpacing=model.profile.letterSpacing*scale,wordSpacing=(model.profile.wordSpacing+(line.extraWordSpace||0))*scale;
+  textLines.push('<text x="'+x.toFixed(3)+'" y="'+baseline.toFixed(3)+'" transform="matrix('+widthScale+',0,0,'+heightScale.toFixed(6)+','+tx.toFixed(3)+','+ty.toFixed(3)+')" font-family="Caveat Embedded" font-size="'+fontPx.toFixed(3)+'" font-weight="500" fill="#000" xml:lang="ru" lang="ru" letter-spacing="'+letterSpacing.toFixed(3)+'" word-spacing="'+wordSpacing.toFixed(3)+'" style="font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+content+'</text>');
+  if(i%8===0)await new Promise(resolve=>setTimeout(resolve,0));
+ }
+ if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
+ const svg='<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><defs><style>@font-face{font-family:"Caveat Embedded";src:url(data:font/ttf;base64,'+caveatFontBase64+') format("truetype");font-weight:400 700;font-style:normal}</style>'+filterDefs.join('')+'</defs>'+textLines.join('')+'</svg>';
+ const blob=new Blob([svg],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),image=new Image();
+ try{
+  image.src=url;
+  if(image.decode)await image.decode();else await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(Error('Не удалось отобразить рукописный SVG для центральной линии.'))});
+ }finally{URL.revokeObjectURL(url)}
+ if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+ const context=canvas.getContext('2d',{willReadFrequently:true});if(!context)throw Error('Браузер не смог создать рабочий canvas.');
+ context.clearRect(0,0,w,h);context.drawImage(image,0,0,w,h);
+ let imageData=context.getImageData(0,0,w,h),pixels=imageData.data,minX=w,minY=h,maxX=-1,maxY=-1;
+ const threshold=roughness>55?82:92;
+ for(let p=3,index=0;p<pixels.length;p+=4,index++)if(pixels[p]>threshold){const px=index%w,py=(index/w)|0;if(px<minX)minX=px;if(px>maxX)maxX=px;if(py<minY)minY=py;if(py>maxY)maxY=py}
+ if(maxX<0)throw Error('Не удалось получить изображение шрифта Caveat.');
+ const margin=Math.max(10,Math.ceil(scale*1.15)),x0=Math.max(0,minX-margin),y0=Math.max(0,minY-margin),x1=Math.min(w-1,maxX+margin),y1=Math.min(h-1,maxY+margin),cropW=x1-x0+1,cropH=y1-y0+1;
+ const binary=new Uint8Array(cropW*cropH);
+ for(let y=0;y<cropH;y++){const src=((y+y0)*w+x0)*4,dst=y*cropW;for(let x=0;x<cropW;x++)binary[dst+x]=pixels[src+x*4+3]>threshold?1:0}
+ imageData=null;pixels=null;canvas.width=1;canvas.height=1;measureCanvas.width=1;measureCanvas.height=1;
+ const thin=await skeletonizeAsync(binary,cropW,cropH,token);
+ return {bin:thin.bin,w:cropW,h:cropH,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
+}
 async function rasterText(model,token){
- if(model.hand==='school'&&model.mode!=='print')return rasterSingleStrokeText(model,token);
+ if(model.hand==='school'&&model.mode!=='print')return rasterCaveatText(model,token);
  const dm=Number(navigator.deviceMemory)||0;
  const mobile=!!(navigator.maxTouchPoints>0||/Android|iPhone|iPad/i.test(navigator.userAgent||''));
  // Render only actual text bounds. On phones use a lower memory ceiling so
@@ -1204,6 +1271,40 @@ async function rasterText(model,token){
  pixels=null;imageData=null;c.width=1;c.height=1;
  const thin=await skeletonizeAsync(binary,cw,ch,token);
  return {bin:thin.bin,w:cw,h:ch,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
+}
+let schoolPreviewTimer=null,schoolPreviewSequence=0;
+function scheduleSchoolStrokePreview(model){
+ const seq=++schoolPreviewSequence;
+ if(schoolPreviewTimer){clearTimeout(schoolPreviewTimer);schoolPreviewTimer=null}
+ if(!model||model.hand!=='school'||model.mode==='print')return;
+ schoolPreviewTimer=setTimeout(()=>{schoolPreviewTimer=null;renderSchoolStrokePreview(model,seq).catch(error=>{
+  if(seq!==schoolPreviewSequence)return;
+  $('paper')?.querySelectorAll('text[data-line]').forEach(node=>node.setAttribute('opacity','1'));
+  const note=$('fontNote');if(note)note.textContent='Однолинейный предпросмотр не построен: '+(error?.message||error);
+ })},360);
+}
+async function renderSchoolStrokePreview(model,seq){
+ const raster=await rasterCaveatText(model,generationToken);
+ if(seq!==schoolPreviewSequence||lastModel!==model)return;
+ const skeleton=traceSkeleton(raster.bin,raster.w,raster.h);
+ const simplified=orderPathsByComponent(skeleton,raster,model)
+  .map(path=>simplify(path.map(index=>({x:index%raster.w,y:Math.floor(index/raster.w)})),model.routeTolerance||.12))
+  .filter(path=>path.length>1);
+ const ordered=mergeTouchingPaths(simplified),ns='http://www.w3.org/2000/svg',group=document.createElementNS(ns,'g');
+ group.setAttribute('id','schoolStrokePreview');group.setAttribute('fill','none');group.setAttribute('stroke','#173b72');
+ group.setAttribute('stroke-width','.19');group.setAttribute('stroke-linecap','round');group.setAttribute('stroke-linejoin','round');
+ for(const points of ordered){
+  let d='';
+  for(let i=0;i<points.length;i++){
+   const x=(points[i].x+raster.offsetX)/raster.scale,y=(points[i].y+raster.offsetY)/raster.scale;
+   d+=(i?'L':'M')+x.toFixed(3)+' '+y.toFixed(3)+' ';
+  }
+  const path=document.createElementNS(ns,'path');path.setAttribute('d',d.trim());group.appendChild(path);
+ }
+ if(seq!==schoolPreviewSequence||lastModel!==model)return;
+ const paper=$('paper');paper.querySelector('#schoolStrokePreview')?.remove();
+ paper.querySelectorAll('text[data-line]').forEach(node=>node.remove());
+ const border=paper.lastElementChild;if(border)paper.insertBefore(group,border);else paper.appendChild(group);
 }
 function labelComponents(bin,w,h){
  const labels=new Int32Array(w*h),queue=new Int32Array(w*h),components=[];let id=0;
