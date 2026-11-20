@@ -324,8 +324,8 @@ Hello, world!</textarea></label>
       </select>
     </label>
     <div class="wide recommended-settings font-profile" id="fontProfile" aria-live="polite">
-      <div class="font-profile-head"><b id="fontProfileTitle">Bambu HandWrite Original — авторская пропись</b><span class="font-profile-tag" id="fontProfileTag">КИРИЛЛИЦА · КОНТЕКСТНЫЕ ФОРМЫ</span></div>
-      <p id="fontProfileDescription">Авторская однолинейная пропись: собственные формы кириллицы, соединяемые штрихи, позиционные альтернативы.</p>
+      <div class="font-profile-head"><b id="fontProfileTitle">Bambu HandWrite School — школьная пропись</b><span class="font-profile-tag" id="fontProfileTag">КИРИЛЛИЦА · КОНТЕКСТНЫЕ ФОРМЫ</span></div>
+      <p id="fontProfileDescription">Школьная рукописная основа с контекстными вариантами русских букв и плавными соединениями центральных траекторий.</p>
       <div class="font-sample-wrap"><span class="font-sample-caption">Пример выбранного почерка</span><div id="fontSample" class="font-sample">Красивый почерк — мама мыла раму. 123</div></div>
       <div class="recommended-grid" id="fontProfileMetrics">
         <span>Высота букв: <b>4,8 мм</b></span>
@@ -333,11 +333,11 @@ Hello, world!</textarea></label>
         <span>Скорость письма: <b>1600 мм/мин</b></span>
         <span>Характер: <b>ровный, школьный</b></span>
       </div>
-      <p class="tiny">Caveat поддерживает контекстные формы и OpenType-лигатуры. Приложение включает их в предпросмотре и G-code, если они предусмотрены шрифтом. Отдельные буквы могут оставаться несоединёнными.</p>
+      <p class="tiny">Bambu HandWrite School меняет формы букв по соседним символам внутри слова. В генераторе соседние центральные линии соединяются плавным переходом, если их окончания находятся достаточно близко.</p>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel">
-      <div class="school-variation-heading"><b>Естественные формы букв</b></div>
-      <p class="tiny">Собственная гарнитура проекта: заново нарисованные формы букв, позиционные замены calt и альтернативные начертания ss01. Все варианты применяются и в предпросмотре, и в G-code.</p>
+      <div class="school-variation-heading"><b>Вариативность букв и соединения</b></div>
+      <p class="tiny">Внутри слова буквы автоматически получают контекстные формы. При подготовке письма близкие окончания соседних центральных траекторий соединяются; слишком длинные переходы пропускаются, чтобы сохранить читаемость.</p>
       <div id="glyphAlternates" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Использовать контекстные формы русских букв</label>
         <input type="checkbox" id="wordBounce" checked hidden aria-hidden="true">
@@ -345,7 +345,7 @@ Hello, world!</textarea></label>
       <label class="school-roughness-control" for="schoolRoughness"><span>Неровность самих штрихов</span><b id="schoolRoughnessValue">28%</b></label>
       <input type="range" id="schoolRoughness" min="0" max="100" step="1" value="28" aria-label="Неровность самих штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
-      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu HandWrite Original — оригинальные контуры проекта, преобразуемые в одну центральную траекторию для письма ручкой.</p></div>
+      <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu HandWrite School — рукописный шрифт с контекстными формами кириллицы; траектории письма автоматически соединяются в местах, где это выглядит естественно.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
     <div class="layout-options wide" aria-label="Настройки абзацев и заполнения строк">
@@ -763,7 +763,7 @@ function renderVariationDemo(){
   row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent=enabled?'Варианты чередуются по словам детерминированно. Предпросмотр и G-code используют одинаковый выбор OpenType-форм.':'Контекстные и альтернативные формы отключены для сравнения с базовым начертанием.';
+ note.textContent=enabled?'Русские буквы меняют начертание в зависимости от соседних букв внутри слова. Предпросмотр и G-code получают одинаковые соединённые центральные траектории.':'Контекстные и альтернативные формы отключены для сравнения с базовым начертанием.';
  host.append(note);
 }
 
