@@ -77,7 +77,7 @@ jobs:
               fea.append("  sub @CYR_SS01 " + name + "' by " + name + ".ss02;")
               fea.append("  sub @CYR_SS02 " + name + "' by " + name + ".ss01;")
           fea.append("} calt;")
-          addOpenTypeFeaturesFromString(temp_font, "\\n".join(fea))
+          addOpenTypeFeaturesFromString(temp_font, "\n".join(fea))
           original_gsub = source_font["GSUB"].table
           added_gsub = temp_font["GSUB"].table
           calt_index = next(i for i, record in enumerate(original_gsub.FeatureList.FeatureRecord) if record.FeatureTag == "calt")
