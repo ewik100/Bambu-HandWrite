@@ -6,7 +6,7 @@ on:
       - "fonts/Caveat[wght].ttf.b64"
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build-font:
     runs-on: ubuntu-latest
@@ -45,6 +45,93 @@ jobs:
               font["name"].setName(value, name_id, 1, 0, 0)
           font["head"].fontRevision = 1.0
           font["OS/2"].usWeightClass = 400
+          from copy import deepcopy
+          from fontTools.feaLib.builder import addOpenTypeFeaturesFromString
+          pre_path = "dist/BambuHandWriteSchool-pre-calt.ttf"
+          font.save(pre_path)
+          source_font = TTFont(pre_path)
+          temp_font = TTFont(pre_path)
+          cmap = source_font.getBestCmap()
+          glyph_order = set(source_font.getGlyphOrder())
+          codepoints = list(range(0x410, 0x430)) + [0x401] + list(range(0x430, 0x450)) + [0x451]
+          base_names = []
+          for cp in codepoints:
+              name = cmap.get(cp)
+              if name and name not in base_names:
+                  base_names.append(name)
+          varied_names = [name for name in base_names if name + ".ss01" in glyph_order and name + ".ss02" in glyph_order]
+          previous_names = []
+          for name in base_names:
+              for candidate in (name, name + ".ss01", name + ".ss02"):
+                  if candidate in glyph_order and candidate not in previous_names:
+                      previous_names.append(candidate)
+          if len(varied_names) < 20:
+              raise SystemExit("Not enough Cyrillic alternate glyph pairs: " + str(len(varied_names)))
+          fea = ["languagesystem cyrl dflt;",
+                 "@CYR_PREV = [" + " ".join(previous_names) + "];",
+                 "@CYR_SS01 = [" + " ".join(name + ".ss01" for name in varied_names) + "];",
+                 "@CYR_SS02 = [" + " ".join(name + ".ss02" for name in varied_names) + "];",
+                 "feature calt {"]
+          for name in varied_names:
+              fea.append("  sub @CYR_PREV " + name + "' by " + name + ".ss01;")
+              fea.append("  sub @CYR_SS01 " + name + "' by " + name + ".ss02;")
+              fea.append("  sub @CYR_SS02 " + name + "' by " + name + ".ss01;")
+          fea.append("} calt;")
+          addOpenTypeFeaturesFromString(temp_font, "\\n".join(fea))
+          original_gsub = source_font["GSUB"].table
+          added_gsub = temp_font["GSUB"].table
+          calt_index = next(i for i, record in enumerate(original_gsub.FeatureList.FeatureRecord) if record.FeatureTag == "calt")
+          added_calt_index = next(i for i, record in enumerate(added_gsub.FeatureList.FeatureRecord) if record.FeatureTag == "calt")
+          target_calt = original_gsub.FeatureList.FeatureRecord[calt_index].Feature
+          lookup_offset = len(original_gsub.LookupList.Lookup)
+          def shift_lookup_refs(obj, offset, seen=None):
+              if seen is None: seen = set()
+              if obj is None or id(obj) in seen: return
+              if isinstance(obj, list):
+                  seen.add(id(obj))
+                  for item in obj: shift_lookup_refs(item, offset, seen)
+                  return
+              if not hasattr(obj, "__dict__"): return
+              seen.add(id(obj))
+              records = getattr(obj, "SubstLookupRecord", None)
+              if records:
+                  for record in records: record.LookupListIndex += offset
+              for key, value in obj.__dict__.items():
+                  if key != "SubstLookupRecord" and (isinstance(value, list) or hasattr(value, "__dict__")):
+                      shift_lookup_refs(value, offset, seen)
+          for lookup in added_gsub.LookupList.Lookup:
+              copied = deepcopy(lookup)
+              shift_lookup_refs(copied, lookup_offset)
+              original_gsub.LookupList.Lookup.append(copied)
+              target_calt.LookupListIndex.append(lookup_offset)
+              lookup_offset += 1
+          original_gsub.LookupList.LookupCount = len(original_gsub.LookupList.Lookup)
+          target_calt.LookupCount = len(target_calt.LookupListIndex)
+          from fontTools.ttLib.tables import otTables
+          scripts = original_gsub.ScriptList.ScriptRecord
+          dflt_record = next((record for record in scripts if record.ScriptTag == "DFLT"), None)
+          defaults = list(dflt_record.Script.DefaultLangSys.FeatureIndex) if dflt_record and dflt_record.Script.DefaultLangSys else []
+          cyrl_record = next((record for record in scripts if record.ScriptTag == "cyrl"), None)
+          if cyrl_record is None:
+              script = otTables.Script()
+              script.LangSysRecord = []
+              script.LangSysCount = 0
+              cyrl_record = otTables.ScriptRecord()
+              cyrl_record.ScriptTag = "cyrl"
+              cyrl_record.Script = script
+              scripts.append(cyrl_record)
+          lang = otTables.LangSys()
+          lang.LookupOrder = None
+          lang.ReqFeatureIndex = 0xFFFF
+          lang.FeatureIndex = sorted(set(defaults + [calt_index]))
+          lang.FeatureCount = len(lang.FeatureIndex)
+          cyrl_record.Script.DefaultLangSys = lang
+          cyrl_record.Script.LangSysRecord = cyrl_record.Script.LangSysRecord or []
+          cyrl_record.Script.LangSysCount = len(cyrl_record.Script.LangSysRecord)
+          scripts.sort(key=lambda record: record.ScriptTag)
+          original_gsub.ScriptList.ScriptCount = len(scripts)
+          source_font["GSUB"].table = original_gsub
+          font = source_font
           ttf_path = "dist/BambuHandWriteSchool-Regular.ttf"
           font.save(ttf_path)
           webfont = TTFont(ttf_path)
@@ -55,10 +142,19 @@ jobs:
           required = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
           missing = [c for c in required if ord(c) not in cmap]
           features = sorted({r.FeatureTag for r in check["GSUB"].table.FeatureList.FeatureRecord}) if "GSUB" in check else []
+          script_tags = {r.ScriptTag for r in check["GSUB"].table.ScriptList.ScriptRecord} if "GSUB" in check else set()
           if missing:
               raise SystemExit("Missing Cyrillic: " + repr(missing))
-          if not {"ss01", "ss02", "calt"}.issubset(features):
-              raise SystemExit("Expected real alternates not present: " + repr(features))
+          if not {"ss01", "ss02", "calt"}.issubset(features) or "cyrl" not in script_tags:
+              raise SystemExit("Expected Cyrillic contextual alternates not present: " + repr(features) + " scripts=" + repr(script_tags))
+          from PIL import ImageChops
+          sample = "Мама мыла раму. Тетрадь и ручка. Машина летит высоко."
+          sample_a = Image.new("L", (1800, 180), 255)
+          sample_b = Image.new("L", (1800, 180), 255)
+          ImageDraw.Draw(sample_a).text((12, 12), sample, font=ImageFont.truetype(ttf_path, 68, layout_engine=ImageFont.Layout.RAQM), fill=0, features=["calt"])
+          ImageDraw.Draw(sample_b).text((12, 12), sample, font=ImageFont.truetype(ttf_path, 68, layout_engine=ImageFont.Layout.RAQM), fill=0, features=["-calt"])
+          if ImageChops.difference(sample_a, sample_b).getbbox() is None:
+              raise SystemExit("Cyrillic calt did not create visible glyph changes")
           specimen = Image.new("RGB", (1900, 780), "white")
           draw = ImageDraw.Draw(specimen)
           sample_font = ImageFont.truetype(ttf_path, 62)
@@ -72,13 +168,13 @@ jobs:
           ]
           for i, line in enumerate(lines):
               draw.text((30, 20 + i*122), line, font=sample_font, fill="black")
-          specimen.save("dist/BambuHandWriteSchool-specimen.png")
+          specimen.save("dist/BambuHandWriteSchool-1.1-specimen.png")
           notes = [
-              "Bambu HandWrite School 1.0 — installable TTF and browser WOFF2.",
+              "Bambu HandWrite School 1.1 — installable TTF and browser WOFF2.",
               "Base design: Caveat by The Caveat Project Authors (Pablo Impallari).",
-              "Build: static Regular weight (400), renamed derivative; original OpenType calt, ss01 and ss02 features retained.",
+              "Build: static Regular weight (400), Caveat-based derivative; original ss01/ss02 retained and Cyrillic contextual calt added.",
               "Coverage: all 33 Russian uppercase and lowercase letters including Ё/ё; Latin A-Z/a-z; digits and common punctuation.",
-              "This is a Caveat-based derivative, not a from-scratch redrawing of every glyph.",
+              "Cyrillic calt alternates letters inside words. Universal joining is handled by the Bambu HandWrite app stroke-processing step, not by standalone font shaping.",
               "License: SIL Open Font License 1.1. See OFL.txt."
           ]
           Path("dist/ABOUT.txt").write_text("\n".join(notes) + "\n", encoding="utf-8")
@@ -91,7 +187,18 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: Bambu-HandWrite-School-1.0
+          name: Bambu-HandWrite-School-1.1
           path: dist/
           if-no-files-found: error
           retention-days: 7
+
+      - name: Publish browser font into the app
+        run: |
+          cp dist/BambuHandWriteSchool-Regular.woff2 fonts/BambuHandWriteSchool-Regular.woff2
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add fonts/BambuHandWriteSchool-Regular.woff2
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish Bambu HandWrite School 1.1 web font"
+            git push
+          fi
