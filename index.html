@@ -646,7 +646,7 @@ async function ensureFonts(fonts,size,timeoutMs=6000){
 function fontsForModel(model){const fonts=new Set();for(const line of model.lines)if(!line.blank)for(const run of runsFor(line.text,model.mode,model.hand))fonts.add(run.font);return [...fonts]}
 function setFontStatus(online){
  const status=$('fontStatus'),note=$('fontNote');
- if(online){const single=$('handFont')?.value==='school'&&$('scriptMode')?.value!=='print';status.textContent=($('handFont')?.selectedOptions?.[0]?.textContent||'Выбранный шрифт')+(single?' · авторский Bambu Script':' · загружен');status.className='pill';note.textContent=single?'Авторский FRB American Cursive загружен. Предпросмотр и G-code используют один шрифт и одинаковые позиционные формы.':'Выбранный шрифт загружен и используется в предпросмотре и генерации.'}
+ if(online){const single=$('handFont')?.value==='school'&&$('scriptMode')?.value!=='print';status.textContent=($('handFont')?.selectedOptions?.[0]?.textContent||'Выбранный шрифт')+(single?' · однолинейная пропись':' · загружен');status.className='pill';note.textContent=single?'Локальный FRB American Cursive загружен. Предпросмотр и G-code используют один шрифт и одинаковые позиционные формы.':'Выбранный шрифт загружен и используется в предпросмотре и генерации.'}
  else{status.textContent='Шрифт не загружен';status.className='pill offline';note.textContent='Выбранный шрифт недоступен. G-code не будет создан с подменённым начертанием.'}
 }
 async function refreshFontAvailability(model=lastModel){
