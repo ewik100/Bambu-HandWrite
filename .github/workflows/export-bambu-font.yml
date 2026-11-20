@@ -1,73 +1,97 @@
-name: Export Bambu HandWrite font specimens
+name: Build Bambu HandWrite School font
 on:
   push:
     paths:
       - ".github/workflows/export-bambu-font.yml"
-      - "fonts/BambuHandWriteOriginal.woff2"
-      - "fonts/Pecita.otf"
-      - "fonts/Tedeev.otf.b64"
       - "fonts/Caveat[wght].ttf.b64"
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  export-fonts:
+  build-font:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Export and inspect
+      - name: Build installable and web fonts
         run: |
           python -m pip install --upgrade fonttools brotli pillow
           mkdir -p dist
+          curl -fsSL https://raw.githubusercontent.com/googlefonts/caveat/main/OFL.txt -o dist/OFL.txt
           python - <<'PY'
-          from fontTools.ttLib import TTFont
-          from fontTools.ttLib.woff2 import decompress
-          from PIL import Image, ImageDraw, ImageFont
-          from shutil import copyfile
           import base64
+          from fontTools.ttLib import TTFont
+          from fontTools.varLib.instancer import instantiateVariableFont
+          from PIL import Image, ImageDraw, ImageFont
+          from pathlib import Path
+          source = Path("fonts/Caveat[wght].ttf.b64").read_bytes()
+          Path("dist/source-variable.ttf").write_bytes(base64.b64decode(source))
+          variable = TTFont("dist/source-variable.ttf")
+          font = instantiateVariableFont(variable, {"wght": 400}, inplace=False)
+          replacements = {
+              1: "Bambu HandWrite School",
+              2: "Regular",
+              3: "BambuHandWriteSchool-Regular-1.0",
+              4: "Bambu HandWrite School Regular",
+              6: "BambuHandWriteSchool-Regular",
+              16: "Bambu HandWrite School",
+              17: "Regular",
+              18: "Bambu HandWrite School Regular",
+          }
+          for name_id, value in replacements.items():
+              font["name"].setName(value, name_id, 3, 1, 0x409)
+              font["name"].setName(value, name_id, 1, 0, 0)
+          font["head"].fontRevision = 1.0
+          font["OS/2"].usWeightClass = 400
+          ttf_path = "dist/BambuHandWriteSchool-Regular.ttf"
+          font.save(ttf_path)
+          webfont = TTFont(ttf_path)
+          webfont.flavor = "woff2"
+          webfont.save("dist/BambuHandWriteSchool-Regular.woff2")
+          check = TTFont(ttf_path)
+          cmap = set().union(*(set(t.cmap) for t in check["cmap"].tables if t.isUnicode()))
           required = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-          def specimen(font_path, title, out):
-              f = ImageFont.truetype(font_path, 60)
-              img = Image.new("RGB", (1900, 760), "white")
-              d = ImageDraw.Draw(img)
-              lines = [
-                  title,
-                  "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
-                  "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
-                  "Мама мыла раму. Самолёт летит высоко.",
-                  "Тетрадь, ручка, авиация, скорость и техника."
-              ]
-              for i, line in enumerate(lines):
-                  d.text((30, 20 + i*135), line, font=f, fill="black")
-              img.save(out)
-          files = []
-          decompress("fonts/BambuHandWriteOriginal.woff2", "dist/BambuHandWriteOriginal.ttf")
-          copyfile("fonts/Pecita.otf", "dist/PecitaSchool.otf")
-          with open("fonts/Tedeev.otf.b64", "rb") as f:
-              open("dist/Tedeev.otf", "wb").write(base64.b64decode(f.read()))
-          with open("fonts/Caveat[wght].ttf.b64", "rb") as f:
-              open("dist/Caveat.ttf", "wb").write(base64.b64decode(f.read()))
-          for name, path in [
-              ("Original", "dist/BambuHandWriteOriginal.ttf"),
-              ("PecitaSchool", "dist/PecitaSchool.otf"),
-              ("Tedeev", "dist/Tedeev.otf"),
-              ("Caveat", "dist/Caveat.ttf")
-          ]:
-              ft = TTFont(path)
-              cmap = set().union(*(set(t.cmap) for t in ft["cmap"].tables if t.isUnicode()))
-              missing = [c for c in required if ord(c) not in cmap]
-              report = f"{name}: glyphs={len(ft.getGlyphOrder())}, missing Cyrillic={missing}"
-              print(report)
-              specimen(path, name + " — проверка кириллицы", "dist/" + name + "-specimen.png")
-              files.append(report)
-          open("dist/coverage.txt", "w", encoding="utf-8").write("\n".join(files) + "\n")
+          missing = [c for c in required if ord(c) not in cmap]
+          features = sorted({r.FeatureTag for r in check["GSUB"].table.FeatureList.FeatureRecord}) if "GSUB" in check else []
+          if missing:
+              raise SystemExit("Missing Cyrillic: " + repr(missing))
+          if not {"ss01", "ss02", "calt"}.issubset(features):
+              raise SystemExit("Expected real alternates not present: " + repr(features))
+          specimen = Image.new("RGB", (1900, 780), "white")
+          draw = ImageDraw.Draw(specimen)
+          sample_font = ImageFont.truetype(ttf_path, 62)
+          lines = [
+              "Bambu HandWrite School — проверка",
+              "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+              "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
+              "Мама мыла раму. Самолёт летит высоко.",
+              "Тетрадь, ручка, авиация, скорость и техника.",
+              "The quick brown fox jumps over the lazy dog 0123456789."
+          ]
+          for i, line in enumerate(lines):
+              draw.text((30, 20 + i*122), line, font=sample_font, fill="black")
+          specimen.save("dist/BambuHandWriteSchool-specimen.png")
+          notes = [
+              "Bambu HandWrite School 1.0 — installable TTF and browser WOFF2.",
+              "Base design: Caveat by The Caveat Project Authors (Pablo Impallari).",
+              "Build: static Regular weight (400), renamed derivative; original OpenType calt, ss01 and ss02 features retained.",
+              "Coverage: all 33 Russian uppercase and lowercase letters including Ё/ё; Latin A-Z/a-z; digits and common punctuation.",
+              "This is a Caveat-based derivative, not a from-scratch redrawing of every glyph.",
+              "License: SIL Open Font License 1.1. See OFL.txt."
+          ]
+          Path("dist/ABOUT.txt").write_text("\n".join(notes) + "\n", encoding="utf-8")
+          Path("dist/COVERAGE.txt").write_text(
+              "Cyrillic missing: " + repr(missing) + "\n" +
+              "Glyph count: " + str(len(check.getGlyphOrder())) + "\n" +
+              "OpenType features: " + ", ".join(features) + "\n", encoding="utf-8"
+          )
+          print("Built", ttf_path, "glyphs", len(check.getGlyphOrder()), "features", features)
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: bambu-font-export
+          name: Bambu-HandWrite-School-1.0
           path: dist/
           if-no-files-found: error
           retention-days: 7
