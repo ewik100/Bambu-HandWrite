@@ -725,8 +725,8 @@ function schoolNoise(seed,index=0,salt=0){
  return (h>>>0)/4294967295;
 }
 function schoolFeatureSettings(index=0,enabled=true){
- if(!enabled)return '"calt" 0, "ss01" 0, "liga" 1, "clig" 1';
- return '"calt" 1, "ss01" 1, "liga" 1, "clig" 1';
+ if(!enabled)return '"calt" 0, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0, "liga" 0, "clig" 0';
+ return '"calt" 1, "ss01" 1, "ss02" 0, "salt" 0, "dlig" 0, "liga" 1, "clig" 1';
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
  const metrics=ctx.measureText(word);
