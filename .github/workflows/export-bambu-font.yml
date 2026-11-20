@@ -5,6 +5,8 @@ on:
       - ".github/workflows/export-bambu-font.yml"
       - "fonts/BambuHandWriteOriginal.woff2"
       - "fonts/Pecita.otf"
+      - "fonts/Tedeev.otf.b64"
+      - "fonts/Caveat[wght].ttf.b64"
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +27,7 @@ jobs:
           from fontTools.ttLib.woff2 import decompress
           from PIL import Image, ImageDraw, ImageFont
           from shutil import copyfile
+          import base64
           required = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
           def specimen(font_path, title, out):
               f = ImageFont.truetype(font_path, 60)
@@ -40,17 +43,27 @@ jobs:
               for i, line in enumerate(lines):
                   d.text((30, 20 + i*135), line, font=f, fill="black")
               img.save(out)
+          files = []
           decompress("fonts/BambuHandWriteOriginal.woff2", "dist/BambuHandWriteOriginal.ttf")
           copyfile("fonts/Pecita.otf", "dist/PecitaSchool.otf")
-          report = []
-          for name, path in [("Original", "dist/BambuHandWriteOriginal.ttf"), ("PecitaSchool", "dist/PecitaSchool.otf")]:
+          with open("fonts/Tedeev.otf.b64", "rb") as f:
+              open("dist/Tedeev.otf", "wb").write(base64.b64decode(f.read()))
+          with open("fonts/Caveat[wght].ttf.b64", "rb") as f:
+              open("dist/Caveat.ttf", "wb").write(base64.b64decode(f.read()))
+          for name, path in [
+              ("Original", "dist/BambuHandWriteOriginal.ttf"),
+              ("PecitaSchool", "dist/PecitaSchool.otf"),
+              ("Tedeev", "dist/Tedeev.otf"),
+              ("Caveat", "dist/Caveat.ttf")
+          ]:
               ft = TTFont(path)
               cmap = set().union(*(set(t.cmap) for t in ft["cmap"].tables if t.isUnicode()))
               missing = [c for c in required if ord(c) not in cmap]
-              report.append(f"{name}: glyphs={len(ft.getGlyphOrder())}, missing Cyrillic={missing}")
+              report = f"{name}: glyphs={len(ft.getGlyphOrder())}, missing Cyrillic={missing}"
+              print(report)
               specimen(path, name + " — проверка кириллицы", "dist/" + name + "-specimen.png")
-          open("dist/coverage.txt", "w", encoding="utf-8").write("\n".join(report) + "\n")
-          print("\n".join(report))
+              files.append(report)
+          open("dist/coverage.txt", "w", encoding="utf-8").write("\n".join(files) + "\n")
           PY
       - uses: actions/upload-artifact@v4
         with:
