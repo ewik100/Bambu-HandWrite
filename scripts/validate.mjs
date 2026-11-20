@@ -59,7 +59,7 @@ if (html) {
   else ok('All nine handwriting profiles are available');
   if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
   else ok('All five language/script modes are available');
-  for (const marker of ["function schoolVariation(){return $('letterVariety')?.checked===false?0:34}", "schoolPreview=hand==='school'&&mode!=='print'", 'async function loadBambuOriginalFont()', 'function renderSchoolStrokePreview(', 'Неровность самих штрихов', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22', 'feDisplacementMap']) {
+  for (const marker of ['function schoolVariation(){return 0}', "schoolPreview=hand==='school'&&mode!=='print'", 'async function loadBambuOriginalFont()', 'function renderSchoolStrokePreview(', 'Неровность самих штрихов', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22', 'feDisplacementMap']) {
     if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
   if (!errors.length) ok('Eight handwriting profiles, original Bambu typeface OpenType variations, centerline preview, and route generation guard are present');
