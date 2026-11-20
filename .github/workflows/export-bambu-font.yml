@@ -1,0 +1,56 @@
+name: Export Bambu HandWrite Original
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/export-bambu-font.yml"
+      - "fonts/BambuHandWriteOriginal.woff2"
+permissions:
+  contents: read
+jobs:
+  export-font:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Convert and inspect font
+        run: |
+          python -m pip install --upgrade fonttools brotli pillow
+          mkdir -p dist
+          python - <<'PY'
+          from fontTools.ttLib import TTFont
+          from fontTools.ttLib.woff2 import decompress
+          from PIL import Image, ImageDraw, ImageFont
+          import os
+          src = "fonts/BambuHandWriteOriginal.woff2"
+          ttf = "dist/BambuHandWriteOriginal.ttf"
+          decompress(src, ttf)
+          font = TTFont(ttf)
+          cmap = set().union(*(set(t.cmap) for t in font["cmap"].tables if t.isUnicode()))
+          required = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+          missing = [c for c in required if ord(c) not in cmap]
+          print("glyphs:", len(font.getGlyphOrder()))
+          print("missing Cyrillic:", repr(missing))
+          print("name records:", [(n.nameID, n.toUnicode()) for n in font["name"].names if n.nameID in (1,2,4,6)])
+          img = Image.new("RGB", (1900, 760), "white")
+          d = ImageDraw.Draw(img)
+          f = ImageFont.truetype(ttf, 60)
+          d.text((30, 20), "Бамбу ХэндРайт — проверка кириллицы", font=f, fill="black")
+          d.text((30, 140), "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", font=f, fill="black")
+          d.text((30, 245), "абвгдеёжзийклмнопрстуфхцчшщъыьэюя", font=f, fill="black")
+          d.text((30, 360), "Мама мыла раму. Самолёт летит высоко.", font=f, fill="black")
+          d.text((30, 475), "Тетрадь, ручка, авиация, скорость и техника.", font=f, fill="black")
+          img.save("dist/specimen.png")
+          with open("dist/coverage.txt", "w", encoding="utf-8") as f:
+              f.write("Cyrillic required: " + str(len(required)) + "\n")
+              f.write("Cyrillic missing: " + repr(missing) + "\n")
+              f.write("Glyph count: " + str(len(font.getGlyphOrder())) + "\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bambu-font-export
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
