@@ -1086,7 +1086,6 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  const scale=geo.scale,fontPx=geo.fontPx,height=geo.fontPx*geo.heightScale,widthScale=geo.widthScale;
  if(!bin||!measure||!Number.isFinite(fontPx)||fontPx<4)return 0;
  const letterSpacing=(model.profile.letterSpacing||0)*scale;
- const wordSpacing=(model.profile.wordSpacing+(model.lines[0]?.extraWordSpace||0))*scale;
  const supportsLetterSpacing='letterSpacing' in measure,supportsWordSpacing='wordSpacing' in measure;
  const endpoints=[];
  for(let i=0;i<bin.length;i++){
@@ -1140,6 +1139,7 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  const lower=/^[А-Яа-яЁё]$/u;
  for(let li=0;li<model.lines.length;li++){
   const line=model.lines[li];if(line.blank)continue;
+  const wordSpacing=(model.profile.wordSpacing+(line.extraWordSpace||0))*scale;
   const baseline=(model.baseline0+li*model.pitch)*scale-geo.originY-geo.cropY;
   const lineStart=line.x*scale-geo.originX-geo.cropX;
   let cursor=0,wordIndex=0;
@@ -1150,7 +1150,7 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     measure.fontFeatureSettings='"calt" 0,"ss01" 0,"ss02" 0';
     measure.wordSpacing=supportsWordSpacing?wordSpacing+'px':'0px';
     measure.letterSpacing=supportsLetterSpacing?letterSpacing+'px':'0px';
-    cursor+=fullAdvance(part)+(supportsWordSpacing?wordSpacing*charCount(part):0);
+    cursor+=fullAdvance(part);
     continue;
    }
    const seed='line:'+li+':word:'+wordIndex+':'+part;
@@ -1172,10 +1172,11 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     const yMin=baseline-height*.58,yMax=baseline+height*.16;
     const maxDistance=fontPx*.42,maxDistance2=maxDistance*maxDistance;
     let bestA=null,bestB=null,bestScore=Infinity;
-    for(const a of endpoints){
-     if(a.used||a.x<split-leftReach||a.x>split-1||a.y<yMin||a.y>yMax)continue;
-     for(const b of endpoints){
-      if(b===a||b.used||b.x<split+1||b.x>split+rightReach||b.y<yMin||b.y>yMax||b.x<=a.x)continue;
+    const leftCandidates=endpoints.filter(p=>!p.used&&p.x>=split-leftReach&&p.x<=split-1&&p.y>=yMin&&p.y<=yMax);
+    const rightCandidates=endpoints.filter(p=>!p.used&&p.x>=split+1&&p.x<=split+rightReach&&p.y>=yMin&&p.y<=yMax);
+    for(const a of leftCandidates){
+     for(const b of rightCandidates){
+      if(b===a||b.x<=a.x)continue;
       const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
       if(d2>maxDistance2||d2>=bestScore)continue;
       bestScore=d2;bestA=a;bestB=b;
