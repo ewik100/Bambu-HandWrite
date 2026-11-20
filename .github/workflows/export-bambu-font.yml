@@ -1,21 +1,22 @@
-name: Export Bambu HandWrite Original
+name: Export Bambu HandWrite font specimens
 on:
-  workflow_dispatch:
   push:
     paths:
       - ".github/workflows/export-bambu-font.yml"
       - "fonts/BambuHandWriteOriginal.woff2"
+      - "fonts/Pecita.otf"
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  export-font:
+  export-fonts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Convert and inspect font
+      - name: Export and inspect
         run: |
           python -m pip install --upgrade fonttools brotli pillow
           mkdir -p dist
@@ -23,30 +24,33 @@ jobs:
           from fontTools.ttLib import TTFont
           from fontTools.ttLib.woff2 import decompress
           from PIL import Image, ImageDraw, ImageFont
-          import os
-          src = "fonts/BambuHandWriteOriginal.woff2"
-          ttf = "dist/BambuHandWriteOriginal.ttf"
-          decompress(src, ttf)
-          font = TTFont(ttf)
-          cmap = set().union(*(set(t.cmap) for t in font["cmap"].tables if t.isUnicode()))
+          from shutil import copyfile
           required = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
-          missing = [c for c in required if ord(c) not in cmap]
-          print("glyphs:", len(font.getGlyphOrder()))
-          print("missing Cyrillic:", repr(missing))
-          print("name records:", [(n.nameID, n.toUnicode()) for n in font["name"].names if n.nameID in (1,2,4,6)])
-          img = Image.new("RGB", (1900, 760), "white")
-          d = ImageDraw.Draw(img)
-          f = ImageFont.truetype(ttf, 60)
-          d.text((30, 20), "Бамбу ХэндРайт — проверка кириллицы", font=f, fill="black")
-          d.text((30, 140), "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", font=f, fill="black")
-          d.text((30, 245), "абвгдеёжзийклмнопрстуфхцчшщъыьэюя", font=f, fill="black")
-          d.text((30, 360), "Мама мыла раму. Самолёт летит высоко.", font=f, fill="black")
-          d.text((30, 475), "Тетрадь, ручка, авиация, скорость и техника.", font=f, fill="black")
-          img.save("dist/specimen.png")
-          with open("dist/coverage.txt", "w", encoding="utf-8") as f:
-              f.write("Cyrillic required: " + str(len(required)) + "\n")
-              f.write("Cyrillic missing: " + repr(missing) + "\n")
-              f.write("Glyph count: " + str(len(font.getGlyphOrder())) + "\n")
+          def specimen(font_path, title, out):
+              f = ImageFont.truetype(font_path, 60)
+              img = Image.new("RGB", (1900, 760), "white")
+              d = ImageDraw.Draw(img)
+              lines = [
+                  title,
+                  "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+                  "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
+                  "Мама мыла раму. Самолёт летит высоко.",
+                  "Тетрадь, ручка, авиация, скорость и техника."
+              ]
+              for i, line in enumerate(lines):
+                  d.text((30, 20 + i*135), line, font=f, fill="black")
+              img.save(out)
+          decompress("fonts/BambuHandWriteOriginal.woff2", "dist/BambuHandWriteOriginal.ttf")
+          copyfile("fonts/Pecita.otf", "dist/PecitaSchool.otf")
+          report = []
+          for name, path in [("Original", "dist/BambuHandWriteOriginal.ttf"), ("PecitaSchool", "dist/PecitaSchool.otf")]:
+              ft = TTFont(path)
+              cmap = set().union(*(set(t.cmap) for t in ft["cmap"].tables if t.isUnicode()))
+              missing = [c for c in required if ord(c) not in cmap]
+              report.append(f"{name}: glyphs={len(ft.getGlyphOrder())}, missing Cyrillic={missing}")
+              specimen(path, name + " — проверка кириллицы", "dist/" + name + "-specimen.png")
+          open("dist/coverage.txt", "w", encoding="utf-8").write("\n".join(report) + "\n")
+          print("\n".join(report))
           PY
       - uses: actions/upload-artifact@v4
         with:
