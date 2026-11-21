@@ -115,9 +115,9 @@ context.mctx={
 vm.runInContext(measureMixedMatch[0],context);
 const measuredMixed=context.measureMixed('мама рама','ru','school',40);
 let expectedMixed=0,wordIndex=0;
-for(const part of 'мама рама'.split(/(\\s+)/u)){
+for(const part of 'мама рама'.split(/(\s+)/u)){
  if(!part)continue;
- if(/^\\s+$/u.test(part)){
+ if(/^\s+$/u.test(part)){
   context.mctx.fontFeatureSettings=context.schoolFeatureString('');
   for(const ch of Array.from(part))expectedMixed+=context.mctx.measureText(ch).width-.01+.54;
  }else{
