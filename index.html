@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.29.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.29.0">
+<meta name="description" content="Bambu HandWrite 5.30.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.30.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.29.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.30.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -239,7 +239,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img class="brand-logo" src="./assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.29.0 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
+  <div class="brand-lockup"><img class="brand-logo" src="./assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.30.0 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю выбранный рукописный шрифт…</span></p>
 </header>
@@ -518,7 +518,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.29.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.30.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -608,7 +608,7 @@ async function loadBambuOriginalFont(){
  if(bambuFontBase64&&document.fonts?.check('400 24px "Bambu HandWrite Original"','мама мыла раму'))return true;
  if(bambuFontPromise)return bambuFontPromise;
  bambuFontPromise=(async()=>{
-  const response=await fetch('./fonts/BambuHandWriteSchool-Regular.woff2?v=5.29.0',{cache:'reload'});
+  const response=await fetch('./fonts/BambuHandWriteSchool-Regular.woff2?v=5.30.0',{cache:'reload'});
   if(!response.ok)throw Error('Не удалось загрузить собственный шрифт Bambu HandWrite Original.');
   const buffer=await response.arrayBuffer();
   if(buffer.byteLength<8000)throw Error('Файл Bambu HandWrite Original повреждён или неполный.');
@@ -729,18 +729,26 @@ function schoolNoise(seed,index=0,salt=0){
  return (h>>>0)/4294967295;
 }
 function schoolFeatureString(variant=''){
- const a=variant==='ss01'?1:0,b=variant==='ss02'?1:0;
- return '"calt" 0, "ss01" '+a+', "ss02" '+b+', "salt" 0, "dlig" 0, "liga" 0, "clig" 0';
+ const contextual=variant==='calt'?1:0;
+ return '"calt" '+contextual+', "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0, "liga" 1, "clig" 1';
+}
+function schoolWordMetrics(ctx,word,seed,enabled=true){
+ const strength=schoolVariationStrength();
+ const active=!!enabled&&(strength>=100||(strength>0&&schoolNoise(seed,0,73)*100<strength));
+ const features=schoolFeatureString(active?'calt':'');
+ ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=features;
+ if('letterSpacing' in ctx)ctx.letterSpacing='0px';
+ if('wordSpacing' in ctx)ctx.wordSpacing='0px';
+ const width=ctx.measureText(word).width;
+ return {width,features,active};
 }
 function schoolGlyphFeatureSettings(char,seed,index=0,enabled=true,forceVariant=''){
- const strength=schoolVariationStrength();
  const isLetter=/^[А-Яа-яЁё]$/u.test(String(char));
  if(!isLetter)return schoolFeatureString('');
- const active=!!forceVariant||!!enabled&&(strength>=100||(strength>0&&schoolNoise(seed,index,73)*100<strength));
- if(!active)return schoolFeatureString('');
- const phase=Math.floor(schoolNoise(seed,0,149)*2);
- const variant=forceVariant||(((index+phase)%2===0)?'ss01':'ss02');
- return schoolFeatureString(variant);
+ if(forceVariant==='calt')return schoolFeatureString('calt');
+ const strength=schoolVariationStrength();
+ const active=!!enabled&&(strength>=100||(strength>0&&schoolNoise(seed,index,73)*100<strength));
+ return schoolFeatureString(active?'calt':'');
 }
 function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVariant=''){
  const glyphs=[],chars=Array.from(word);let x=0;
@@ -775,37 +783,45 @@ function drawSchoolWordCanvas(ctx,layout,fontSize){
  if('fontFeatureSettings' in ctx)ctx.fontFeatureSettings=layout.features||schoolFeatureSettings(0,true);
  ctx.fillText(layout.text,layout.x,layout.y);ctx.restore();
 }
-function renderVariationDemo(){
- const host=$('variationDemo');if(!host)return;host.replaceChildren();
+let variationDemoSequence=0;
+async function renderVariationDemo(){
+ const host=$('variationDemo');if(!host)return;
+ const sequence=++variationDemoSequence;
+ host.replaceChildren();
+ const loading=document.createElement('p');loading.className='tiny';loading.textContent='Загружаю шрифт и проверяю варианты…';host.append(loading);
+ let fontReady=false;
+ try{fontReady=await loadBambuOriginalFont()}catch(e){fontReady=false}
+ if(sequence!==variationDemoSequence||!host.isConnected)return;
+ host.replaceChildren();
  const enabled=$('letterVariety')?.checked!==false;
- const textSample='мама мыла раму · тетрадь · машина · ширина · шоссе';
- const title=document.createElement('b');title.textContent=enabled?'Настоящие формы букв из Bambu HandWrite':'Варианты выключены';host.append(title);
- const samples=[
-  {label:'БАЗА — исходные формы',variant:'',active:false},
-  {label:'ВАРИАНТ A — набор 1',variant:'ss01',active:true},
-  {label:'ВАРИАНТ B — набор 2',variant:'ss02',active:true},
-  {label:'АВТО — чередование внутри слова',variant:'auto',active:true}
+ const strength=schoolVariationStrength();
+ const sampleWords=['мама мыла раму','машина едет','тетрадь и шоссе'];
+ const title=document.createElement('b');title.textContent='Сравнение настоящих форм шрифта';host.append(title);
+ if(!fontReady){
+  const error=document.createElement('p');error.className='tiny';error.textContent='Не удалось загрузить Bambu HandWrite. Предпросмотр вариантов недоступен.';host.append(error);return;
+ }
+ const rows=[
+  {label:'A · БАЗА',mode:'base'},
+  {label:'B · КОНТЕКСТ',mode:'context'},
+  {label:'АВТО · ПОЛЗУНОК',mode:'auto'}
  ];
- for(const item of samples){
+ for(const item of rows){
   const row=document.createElement('div');row.className='variation-demo-row';
   const label=document.createElement('small');label.textContent=item.label;
   const sample=document.createElement('span');sample.className='variation-demo-text';sample.lang='ru';
-  sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='400';sample.style.fontKerning='none';
-  if(item.variant==='auto'){
-   Array.from(textSample).forEach((char,index)=>{
-    const glyph=document.createElement('span');glyph.textContent=char;
-    glyph.style.fontFeatureSettings=enabled?schoolGlyphFeatureSettings(char,'demo',index,true):schoolFeatureString('');
-    glyph.style.fontVariantLigatures='none';glyph.style.fontKerning='none';sample.append(glyph);
-   });
-  }else{
-   sample.textContent=textSample;
-   sample.style.fontFeatureSettings=enabled?schoolFeatureString(item.variant):schoolFeatureString('');
-   sample.style.fontVariantLigatures='none';
-  }
-  row.append(label,sample);host.append(row);
+  sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='400';
+  sample.style.whiteSpace='normal';sample.style.overflow='visible';sample.style.overflowWrap='anywhere';
+  sample.style.fontKerning='normal';sample.style.fontVariantLigatures='common-ligatures contextual';
+  const textNode=document.createElement('span');textNode.textContent=sampleWords.join(' · ');
+  let features=schoolFeatureString('');
+  if(item.mode==='context')features=schoolFeatureString('calt');
+  if(item.mode==='auto')features=schoolFeatureString(enabled&&strength>0?'calt':'');
+  textNode.style.fontFeatureSettings=features;
+  textNode.style.fontVariantLigatures='common-ligatures contextual';
+  sample.append(textNode);row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent=enabled?'A и B показывают реальные альтернативные глифы из файла шрифта. В строке «Авто» формы ss01 и ss02 чередуются по буквам; ползунок задаёт долю букв с альтернативной формой.':'Показаны исходные формы без альтернативных глифов.';
+ note.textContent='A — исходная форма. B — контекстные замены шрифта (если они предусмотрены его таблицей OpenType). «Авто» включает контекстные замены согласно ползунку. Отдельные ss01/ss02 не заявляются: их наличие в этом файле шрифта не подтверждено.';
  host.append(note);
 }
 
@@ -831,7 +847,7 @@ function measureMixed(t,mode,hand,size){
      for(const ch of Array.from(part))width+=mctx.measureText(ch).width+p.wordSpacing+p.letterSpacing;
     }else{
      const seed='word:'+wordIndex+':'+part;
-     width+=schoolGlyphMetrics(mctx,part,seed,$('letterVariety')?.checked!==false,p.letterSpacing).width;
+     width+=schoolWordMetrics(mctx,part,seed,$('letterVariety')?.checked!==false).width+p.letterSpacing*Math.max(0,Array.from(part).length-1);
      wordIndex++;
     }
    }
@@ -1280,8 +1296,8 @@ async function rasterOriginalFontText(model,token){
  const bounds=model.textBounds||{};
  if(![bounds.left,bounds.top,bounds.right,bounds.bottom].every(Number.isFinite)||bounds.right<=bounds.left||bounds.bottom<=bounds.top)throw Error('Не удалось определить границы рукописного текста.');
  const dm=Number(navigator.deviceMemory)||0,mobile=!!(navigator.maxTouchPoints>0||/Android|iPhone|iPad/i.test(navigator.userAgent||''));
- const budget=mobile?1050000:(dm>0&&dm<=2?3000000:dm>=8?11000000:dm>=6?9200000:dm>=4?7600000:6200000);
- const maxSide=mobile?3000:9216,maxPixels=mobile?1500000:12000000,maxScale=mobile?10:22,pad=Math.max(2.2,Math.min(4,model.lh*.65));
+ const budget=mobile?1650000:(dm>0&&dm<=2?3000000:dm>=8?11000000:dm>=6?9200000:dm>=4?7600000:6200000);
+ const maxSide=mobile?3600:9216,maxPixels=mobile?2200000:12000000,maxScale=mobile?14:26,pad=Math.max(2.2,Math.min(4,model.lh*.65));
  const leftMM=Math.max(0,bounds.left-pad),topMM=Math.max(0,bounds.top-pad),rightMM=Math.min(model.w,bounds.right+pad),bottomMM=Math.min(model.h,bounds.bottom+pad);
  const roiW=Math.max(1,rightMM-leftMM),roiH=Math.max(1,bottomMM-topMM);
  const scale=Math.max(2,Math.floor(Math.min(maxScale,Math.sqrt(budget/(roiW*roiH)),maxSide/Math.max(roiW,roiH))*10)/10);
@@ -1325,9 +1341,9 @@ async function rasterOriginalFontText(model,token){
     filterDefs.push('<filter id="'+id+'" x="-28%" y="-32%" width="156%" height="164%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".045 .018" numOctaves="2" seed="'+noiseSeed+'" result="roughNoise"/><feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="'+filterScale.toFixed(3)+'" xChannelSelector="R" yChannelSelector="G"/></filter>');
     filter=' filter="url(#'+id+')"';
    }
-   const glyphMarkup=glyphRun.glyphs.map(g=>'<tspan x="'+(x+pen+g.x).toFixed(3)+'" style="font-feature-settings:'+esc(g.features)+';font-variant-ligatures:none;font-kerning:none">'+esc(g.char)+'</tspan>').join('');
-   content+='<tspan'+filter+'>'+glyphMarkup+'</tspan>';
-   pen+=glyphRun.width;
+   const wordMetrics=schoolWordMetrics(measure,part,seed,enabled);
+   content+='<tspan x="'+(x+pen).toFixed(3)+'" style="font-feature-settings:'+esc(wordMetrics.features)+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+esc(part)+'</tspan>';
+   pen+=wordMetrics.width+letterSpacing*Math.max(0,Array.from(part).length-1);
    wordIndex++;
   }
   textLines.push('<text xml:space="preserve" x="'+x.toFixed(3)+'" y="'+baseline.toFixed(3)+'" transform="matrix('+widthScale+',0,0,'+heightScale.toFixed(6)+','+tx.toFixed(3)+','+ty.toFixed(3)+')" font-family="Bambu HandWrite Original" font-size="'+fontPx.toFixed(3)+'" font-weight="400" fill="#000" xml:lang="ru" lang="ru" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:none;font-kerning:none">'+content+'</text>');
@@ -1773,7 +1789,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.29.0`,
+  `; generated by Bambu HandWrite 5.30.0`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1801,8 +1817,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.29.0 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.29.0`,
+  `; Bambu HandWrite 5.30.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.30.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
