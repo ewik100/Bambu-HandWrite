@@ -36,7 +36,7 @@ if (html) {
   else ok('Both page rotations use reversible coordinate transforms');
   if (!html.includes('previous.slice(join,-1).reverse()')) fail('Existing skeleton-path merging must remain available.');
   else ok('Existing skeleton-path merging remains available');
-  if (!html.includes('function connectSchoolWordSkeletons(') || !html.includes('const maxDistance=fontPx*.78') || !html.includes('paintLine(px,py,x,y)')) fail('Bambu HandWrite School must add bounded centerline joins between nearby Cyrillic letter endings.');
+  if (!html.includes('function connectSchoolWordSkeletons(') || !html.includes('maxDistance=fontPx*.78') || !html.includes('paintLine(px,py,x,y)')) fail('Bambu HandWrite School must add bounded centerline joins between nearby Cyrillic letter endings.');
   else ok('Bambu HandWrite School adds distance-limited centerline joins for adjacent Cyrillic letters');
   if (!html.includes("const twoCellInset=type==='math-notebook'?Math.min(30,Math.max(2,2*(Number(cell)||5))):10;") || !html.includes('rightX:redLineX-twoCellInset')) fail('Both red-line sides must keep a two-cell writing clearance.');
   else ok('Either binding-side red line keeps a two-cell clearance (10 mm for standard 5 mm grid)');
