@@ -1,0 +1,72 @@
+name: Diagnose handwriting font connections
+on:
+  push:
+    paths:
+      - ".github/workflows/font-connection-diagnostic.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inspect and render bundled fonts
+        run: |
+          python -m pip install fonttools brotli pillow
+          mkdir -p diagnostics
+          python - <<'PY'
+          from fontTools.ttLib import TTFont
+          from PIL import Image, ImageDraw, ImageFont
+          from pathlib import Path
+          import json
+          names = {
+            "Bambu HandWrite": "fonts/BambuHandWriteSchool-Regular.woff2",
+            "FRB American Cursive": "fonts/FRBAmericanCursive-400-Regular.woff2",
+          }
+          report = {}
+          converted = {}
+          for name, path in names.items():
+            f = TTFont(path)
+            ttf = Path("diagnostics") / (name.replace(" ", "-") + ".ttf")
+            f.flavor = None
+            f.save(ttf)
+            converted[name] = str(ttf)
+            info = {"glyph_count": len(f.getGlyphOrder()), "scripts": [], "features": [], "gpos_cursive_lookups": 0, "cyrillic_glyph_count": 0}
+            cmap = f.getBestCmap()
+            info["cyrillic_glyph_count"] = sum(0x400 <= cp <= 0x4ff for cp in cmap)
+            if "GSUB" in f:
+              info["scripts"] = [r.ScriptTag for r in f["GSUB"].table.ScriptList.ScriptRecord]
+              info["features"] = sorted({r.FeatureTag for r in f["GSUB"].table.FeatureList.FeatureRecord})
+            if "GPOS" in f:
+              gpos = f["GPOS"].table
+              info["gpos_features"] = sorted({r.FeatureTag for r in gpos.FeatureList.FeatureRecord})
+              info["gpos_cursive_lookups"] = sum(1 for lookup in gpos.LookupList.Lookup if lookup.LookupType == 3)
+              info["gpos_lookup_types"] = [lookup.LookupType for lookup in gpos.LookupList.Lookup]
+            report[name] = info
+          sample = "мама мыла раму. Тетрадь и ручка. Машина летит высоко. школа, письмо, тетя, ширина."
+          rows = []
+          for name, p in converted.items():
+            font = ImageFont.truetype(p, 62, layout_engine=ImageFont.Layout.RAQM)
+            rows.append((name, font))
+          im = Image.new("RGB", (2200, 500), "white")
+          d = ImageDraw.Draw(im)
+          y = 24
+          for name, font in rows:
+            d.text((25, y), name, font=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30), fill="#555555")
+            y += 54
+            d.text((25, y), sample, font=font, fill="#111111", language="ru", features=["calt"])
+            y += 132
+          im.save("diagnostics/font-connection-comparison.png")
+          Path("diagnostics/font-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: font-connection-diagnostic
+          path: diagnostics/
+          if-no-files-found: error
+          retention-days: 7
