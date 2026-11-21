@@ -1226,23 +1226,23 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     if(!connectable.test(left.char)||!connectable.test(right.char))continue;
     const split=baseX+(left.x+left.advance+letterSpacing*.5)*widthScale;
     const leftAdvance=left.advance*widthScale,rightAdvance=right.advance*widthScale;
-    const maxGap=Math.min(fontPx*.26,Math.max(scale*2.5,Math.min(leftAdvance,rightAdvance)*.24));
-    const reachLeft=Math.min(leftAdvance*.28,fontPx*.24),reachRight=Math.min(rightAdvance*.28,fontPx*.24);
-    const yMin=baseline-height*.42,yMax=baseline+height*.22,maxDistance2=maxGap*maxGap;
-    const leftCandidates=endpoints.filter(p=>!p.used&&p.x>=split-reachLeft&&p.x<=split+maxGap*.12&&p.y>=yMin&&p.y<=yMax);
-    const rightCandidates=endpoints.filter(p=>!p.used&&p.x>=split-maxGap*.12&&p.x<=split+reachRight&&p.y>=yMin&&p.y<=yMax);
+    const maxGap=Math.min(fontPx*.52,Math.max(scale*3.5,Math.min(leftAdvance,rightAdvance)*.48));
+    const reachLeft=Math.min(leftAdvance*.48,fontPx*.42),reachRight=Math.min(rightAdvance*.48,fontPx*.42);
+    const yMin=baseline-height*.82,yMax=baseline+height*.42,maxDistance2=maxGap*maxGap;
+    const leftCandidates=endpoints.filter(p=>!p.used&&p.x>=split-reachLeft&&p.x<=split+maxGap*.22&&p.y>=yMin&&p.y<=yMax);
+    const rightCandidates=endpoints.filter(p=>!p.used&&p.x>=split-maxGap*.22&&p.x<=split+reachRight&&p.y>=yMin&&p.y<=yMax);
     let bestA=null,bestB=null,bestScore=Infinity;
     for(const a of leftCandidates){
      const ta=tangentOut(a);
-     if(ta.x<.18)continue;
+     if(ta.x<-.05)continue;
      for(const b of rightCandidates){
       if(b===a||a.component===b.component||b.x<=a.x)continue;
       const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
-      if(d2>maxDistance2||Math.abs(dy)>height*.20)continue;
+      if(d2>maxDistance2||Math.abs(dy)>height*.34)continue;
       const tb=tangentIn(b);
-      if(tb.x<.12)continue;
+      if(tb.x<-.05)continue;
       const tangentMismatch=Math.abs(ta.y-tb.y);
-      if(tangentMismatch>.85)continue;
+      if(tangentMismatch>1.15)continue;
       const boundaryPenalty=Math.abs(split-a.x)+Math.abs(b.x-split);
       const score=d2+Math.abs(dy)*fontPx*.16+tangentMismatch*fontPx*2+boundaryPenalty*fontPx*.08;
       if(score>=bestScore)continue;
