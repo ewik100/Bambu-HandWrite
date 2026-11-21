@@ -142,7 +142,7 @@ vm.runInContext(html.slice(connectorStart,connectorEnd),context);
 const mockMeasure={letterSpacing:'0px',wordSpacing:'0px',fontFeatureSettings:'normal',fontVariantLigatures:'common-ligatures contextual',fontKerning:'normal',measureText:(value)=>({width:Array.from(value).length*8})};
 const mockMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)mockMask[15*30+x]=1;
-for(let x=11;x<=19;x++)mockMask[15*30+x]=1;
+for(let x=13;x<=19;x++)mockMask[15*30+x]=1;
 const mockModel={fontSize:10,baseline0:15,pitch:8,profile:{letterSpacing:0,wordSpacing:0},lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]};
 const joinedCount=context.connectSchoolWordSkeletons(mockMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
 assert(joinedCount===1&&mockMask.slice(15*30+9,15*30+12).every(Boolean),'Adjacent Russian letter centerlines receive one bounded connecting stroke');
