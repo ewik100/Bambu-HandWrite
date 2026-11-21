@@ -76,35 +76,30 @@ const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Bambu handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
 vm.runInContext(schoolFunctions,context);
-const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,noise:schoolNoise,layout:schoolWordLayout})',context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout})',context);
 assert(schoolApi.variation()===0,'Contextual alternates do not alter line wrapping or reserve extra width');
-const featureModes=Array.from({length:5},(_,i)=>schoolApi.features(i,true));
-assert(featureModes.every(value=>value.includes('"ss01"')&&value.includes('"ss02"')),'Word-level feature helper remains deterministic and selects stylistic sets without enabling broad calt ligatures');
-assert(featureModes[0].includes('"calt" 0')&&featureModes[0].includes('"dlig" 0')&&featureModes[0].includes('"salt" 0'),'Only authored alternate glyph sets are enabled; broad contextual and decorative substitutions stay off');
-const baseGlyph=schoolApi.glyphFeatures('а','unit-seed',0,false);
-const altA=schoolApi.glyphFeatures('а','unit-seed',0,true,'ss01');
-const altB=schoolApi.glyphFeatures('а','unit-seed',0,true,'ss02');
-assert(baseGlyph.includes('"ss01" 0')&&baseGlyph.includes('"ss02" 0'),'Disabling variations returns the original base glyph');
-assert(altA.includes('"ss01" 1')&&altA.includes('"ss02" 0')&&altB.includes('"ss01" 0')&&altB.includes('"ss02" 1'),'A and B explicitly select the two distinct OpenType stylistic sets');
-assert(schoolApi.glyphFeatures(' ','unit-seed',0,true).includes('"ss01" 0'),'Whitespace never receives a letter alternate');
+const baseFeatures=schoolApi.features(0,false);
+const contextualFeatures=schoolApi.features(0,true,true);
+assert(baseFeatures.includes('"calt" 0')&&baseFeatures.includes('"liga" 1'),'Base writing keeps contextual substitutions off while preserving standard ligatures');
+assert(contextualFeatures.includes('"calt" 1')&&contextualFeatures.includes('"liga" 1'),'Contextual writing enables the font-authored OpenType substitutions');
+assert(!contextualFeatures.includes('"ss01" 1')&&!contextualFeatures.includes('"ss02" 1'),'The app does not claim unverified stylistic sets ss01/ss02');
+assert(schoolApi.glyphFeatures(' ','unit-seed',0,true).includes('"calt" 0'),'Spaces never receive contextual letter substitutions');
 variationStrengthInput='0';
-const noVariation=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама','slider-zero',true,0);
-assert(noVariation.glyphs.every(g=>g.features.includes('"ss01" 0')&&g.features.includes('"ss02" 0')),'Variation slider at 0% keeps every Cyrillic glyph in its base form');
+const noVariation=schoolApi.wordMetrics(mockGlyphMeasure(),'мама','slider-zero',true);
+assert(!noVariation.active&&noVariation.features.includes('"calt" 0'),'Variation slider at 0% uses the unmodified base word');
 variationStrengthInput='100';
-const fullVariation=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама','slider-full',true,0);
-assert(fullVariation.glyphs.every(g=>g.features.includes('"ss01" 1')||g.features.includes('"ss02" 1')),'Variation slider at 100% assigns an alternate glyph to every Cyrillic letter');
-assert(new Set(fullVariation.glyphs.map(g=>g.features)).size===2,'Automatic variation alternates between both authored glyph sets inside one word');
+const fullVariation=schoolApi.wordMetrics(mockGlyphMeasure(),'мама','slider-full',true);
+assert(fullVariation.active&&fullVariation.features.includes('"calt" 1'),'Variation slider at 100% enables contextual shaping for the complete word');
 variationStrengthInput='50';
-const partialVariation=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама мама мама мама','slider-half',true,0);
-const changedLetters=partialVariation.glyphs.filter(g=>g.features.includes('"ss01" 1')||g.features.includes('"ss02" 1')).length;
-assert(changedLetters>0&&changedLetters<partialVariation.glyphs.length,'Variation slider at 50% selects a reproducible subset of letters, not whole words');
+const partialVariation=Array.from({length:30},(_,i)=>schoolApi.wordMetrics(mockGlyphMeasure(),'мама','slider-half-'+i,true));
+assert(partialVariation.some(x=>x.active)&&partialVariation.some(x=>!x.active),'Variation slider at 50% deterministically selects a subset of complete words');
 variationStrengthInput='100';
 function mockGlyphMeasure(){return {fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',measureText:(value)=>({width:Array.from(value).length*8})};}
 const mockMetrics={measureText:(value)=>({width:Array.from(value).length*8})};
 const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 assert(baseLayout.endX===sameLayout.endX&&baseLayout.features===sameLayout.features,'Contextual shaping preserves word width and uses a stable OpenType feature set');
-const measureMixedMatch=html.match(/function measureMixed\(t,mode,hand,size\)\{[\s\S]*?\n\}/);
+const measureMixedMatch=html.match(/function measureMixed\\(t,mode,hand,size\\)\\{[\\s\\S]*?\\n\\}/);
 if(!measureMixedMatch)throw new Error('Could not extract mixed-font width calculation.');
 context.FONT_PROFILES={school:{widthScale:1,letterSpacing:-.01,wordSpacing:.54}};
 context.runsFor=(text)=>[{text,font:'Bambu HandWrite Original'}];
@@ -113,25 +108,24 @@ context.CANVAS_SPACING={letter:true,word:true};
 context.mctx={
  font:'',fontFeatureSettings:'normal',fontKerning:'normal',fontVariantLigatures:'normal',letterSpacing:'0px',wordSpacing:'0px',
  measureText(value){
-  const chars=Array.from(value),alt=this.fontFeatureSettings||'';
-  const delta=alt.includes('"ss01" 1')?1.25:alt.includes('"ss02" 1')?.65:0;
-  return {width:chars.reduce((n,ch)=>n+(ch===' '?8:8+delta),0)};
+  const chars=Array.from(value),alt=(this.fontFeatureSettings||'').includes('"calt" 1');
+  return {width:chars.reduce((n,ch)=>n+(ch===' '?8:8+(alt?1.1:0)),0)};
  }
 };
 vm.runInContext(measureMixedMatch[0],context);
 const measuredMixed=context.measureMixed('мама рама','ru','school',40);
 let expectedMixed=0,wordIndex=0;
-for(const part of 'мама рама'.split(/(\s+)/u)){
+for(const part of 'мама рама'.split(/(\\s+)/u)){
  if(!part)continue;
- if(/^\s+$/u.test(part)){
+ if(/^\\s+$/u.test(part)){
   context.mctx.fontFeatureSettings=context.schoolFeatureString('');
   for(const ch of Array.from(part))expectedMixed+=context.mctx.measureText(ch).width-.01+.54;
  }else{
-  expectedMixed+=schoolApi.glyphMetrics(context.mctx,part,'word:'+wordIndex+':'+part,true,-.01).width;
+  expectedMixed+=schoolApi.wordMetrics(context.mctx,part,'word:'+wordIndex+':'+part,true).width-.01*(Array.from(part).length-1);
   wordIndex++;
  }
 }
-assert(Math.abs(measuredMixed-expectedMixed)<1e-8,'Line wrapping measures the exact same per-letter alternate advances as the G-code raster');
+assert(Math.abs(measuredMixed-expectedMixed)<1e-8,'Line wrapping uses whole-word contextual shaping, matching the SVG/G-code raster');
 
 assert(schoolApi.roughness()===28,'Stroke roughness uses the dedicated UI slider value');
 const originalFont=fs.readFileSync(path.join(root,'fonts','BambuHandWriteSchool-Regular.woff2'));
