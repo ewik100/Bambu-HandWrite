@@ -760,7 +760,7 @@ function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVari
   ctx.fontFeatureSettings=features;
   const advance=ctx.measureText(char).width;
   glyphs.push({char,x,advance,features});
-  x+=advance+(i<chars.length?letterSpacing:0);
+  x+=advance+(i<chars.length-1?letterSpacing:0);
  }
  return {glyphs,width:x};
 }
