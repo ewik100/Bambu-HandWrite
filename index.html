@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.27.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.27.0">
+<meta name="description" content="Bambu HandWrite 5.28.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.28.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.27.0 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.28.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -239,7 +239,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img class="brand-logo" src="./assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.27.0 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
+  <div class="brand-lockup"><img class="brand-logo" src="./assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.28.0 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю выбранный рукописный шрифт…</span></p>
 </header>
@@ -337,14 +337,17 @@ Hello, world!</textarea></label>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel">
       <div class="school-variation-heading"><b>Вариативность букв и соединения</b></div>
-      <p class="tiny">Внутри слова буквы автоматически получают контекстные формы. При подготовке письма близкие окончания соседних центральных траекторий соединяются; слишком длинные переходы пропускаются, чтобы сохранить читаемость.</p>
+      <p class="tiny">Настрой силу контекстных вариантов и неровность штрихов отдельно. Соединения строятся между концами соседних буквенных штрихов, а число выполненных переходов показывается ниже.</p>
       <div id="glyphAlternates" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Использовать контекстные формы русских букв</label>
         <input type="checkbox" id="wordBounce" checked hidden aria-hidden="true">
       </div>
-      <label class="school-roughness-control" for="schoolRoughness"><span>Неровность самих штрихов</span><b id="schoolRoughnessValue">28%</b></label>
-      <input type="range" id="schoolRoughness" min="0" max="100" step="1" value="28" aria-label="Неровность самих штрихов">
+      <label class="school-roughness-control" for="schoolVariationStrength"><span>Сила вариативности букв</span><b id="schoolVariationStrengthValue">100%</b></label>
+      <input type="range" id="schoolVariationStrength" min="0" max="100" step="5" value="100" aria-label="Сила вариативности букв">
+      <label class="school-roughness-control" for="schoolRoughness"><span>Неровность штрихов</span><b id="schoolRoughnessValue">18%</b></label>
+      <input type="range" id="schoolRoughness" min="0" max="50" step="1" value="18" aria-label="Неровность штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
+      <p id="schoolStrokeStatus" class="tiny" aria-live="polite">Соединения букв появятся после построения траекторий.</p>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu HandWrite — встроенный шрифт приложения. Тот же файл используется в предпросмотре и G-code.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
@@ -515,12 +518,12 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.27.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.28.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={handwritingRoughness:38,schoolRoughness:28,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={handwritingRoughness:38,schoolRoughness:18,schoolVariationStrength:100,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
@@ -605,7 +608,7 @@ async function loadBambuOriginalFont(){
  if(bambuFontBase64&&document.fonts?.check('400 24px "Bambu HandWrite Original"','мама мыла раму'))return true;
  if(bambuFontPromise)return bambuFontPromise;
  bambuFontPromise=(async()=>{
-  const response=await fetch('./fonts/BambuHandWriteSchool-Regular.woff2',{cache:'force-cache'});
+  const response=await fetch('./fonts/BambuHandWriteSchool-Regular.woff2?v=5.28.0',{cache:'reload'});
   if(!response.ok)throw Error('Не удалось загрузить собственный шрифт Bambu HandWrite Original.');
   const buffer=await response.arrayBuffer();
   if(buffer.byteLength<8000)throw Error('Файл Bambu HandWrite Original повреждён или неполный.');
@@ -718,16 +721,18 @@ function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
 function schoolVariation(){return 0}
 function schoolAccuracy(){return 100}
-function schoolRoughness(){const v=Number($('schoolRoughness')?.value??28);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):28}
+function schoolRoughness(){const v=Number($('schoolRoughness')?.value??18);return Number.isFinite(v)?Math.max(0,Math.min(50,v)):18}
+function schoolVariationStrength(){const v=Number($('schoolVariationStrength')?.value??100);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):100}
 function schoolNoise(seed,index=0,salt=0){
  let h=2166136261;const text=String(seed)+'|'+index+'|'+salt;
  for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0)/4294967295;
 }
-function schoolFeatureSettings(index=0,enabled=true){
- if(!enabled)return '"calt" 0, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0, "liga" 0, "clig" 0';
- // Cyrillic calt now chooses ss01/ss02 glyphs per character from its neighbours.
- // Keep global stylistic sets off so they do not override the contextual sequence.
+function schoolFeatureSettings(index=0,enabled=true,forceActive=false){
+ const strength=schoolVariationStrength();
+ const active=!!enabled&&(forceActive||strength>=100||(strength>0&&schoolNoise(index,0,73)*100<strength));
+ if(!active)return '"calt" 0, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0, "liga" 0, "clig" 0';
+ // The font alternates successive Cyrillic glyphs through its real calt GSUB lookups.
  return '"calt" 1, "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0, "liga" 1, "clig" 1';
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
@@ -751,7 +756,7 @@ function renderVariationDemo(){
   {label:'БАЗА — исходное начертание',features:'"calt" 0,"ss01" 0,"ss02" 0',active:false},
   {label:'ВАРИАНТ A — альтернативные формы 1',features:'"calt" 0,"ss01" 1,"ss02" 0',active:true},
   {label:'ВАРИАНТ B — альтернативные формы 2',features:'"calt" 0,"ss01" 0,"ss02" 1',active:true},
-  {label:'АВТО — чередование по соседним буквам',features:schoolFeatureSettings(0,true),active:true}
+  {label:'АВТО — чередование по соседним буквам',features:schoolFeatureSettings(0,true,true),active:true}
  ];
  for(const item of samples){
   const row=document.createElement('div');row.className='variation-demo-row';
@@ -764,7 +769,7 @@ function renderVariationDemo(){
   row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent=enabled?'A и B показывают два разных набора альтернатив из файла шрифта, а «Авто» чередует формы внутри слова. Исходные буквы сохранены и не перерисовываются.':'Показано базовое начертание без альтернативных форм.';
+ note.textContent=enabled?'A и B — две разные альтернативные формы из файла шрифта. Авто использует контекстные замены внутри слов. Ползунок выше меняет долю слов с вариантами от 0 до 100%.':'Показано базовое начертание без альтернативных форм.';
  host.append(note);
 }
 
@@ -1088,23 +1093,23 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  if(!bin||!measure||!Number.isFinite(fontPx)||fontPx<4)return 0;
  const letterSpacing=(model.profile.letterSpacing||0)*scale;
  const supportsLetterSpacing='letterSpacing' in measure,supportsWordSpacing='wordSpacing' in measure;
- const endpoints=[];
+ const componentData=labelComponents(bin,w,h),labels=componentData.labels,endpoints=[];
  for(let i=0;i<bin.length;i++){
   if(!bin[i])continue;
   const ns=neighbors(bin,w,h,i);
-  if(ns.length===1)endpoints.push({i,x:i%w,y:(i/w)|0,nx:ns[0]%w,ny:(ns[0]/w)|0,used:false});
+  if(ns.length===1)endpoints.push({i,x:i%w,y:(i/w)|0,nx:ns[0]%w,ny:(ns[0]/w)|0,component:labels[i],used:false});
  }
  if(endpoints.length<2)return 0;
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const charCount=t=>Array.from(t).length;
- const measureRun=(t)=>{
+ const measureRun=t=>{
   const n=charCount(t),spaces=(t.match(/ /g)||[]).length;
   let width=measure.measureText(t).width;
   if(!supportsLetterSpacing)width+=Math.max(0,n-1)*letterSpacing;
   if(!supportsWordSpacing)width+=spaces*wordSpacing;
   return width;
  };
- const fullAdvance=(t)=>{
+ const fullAdvance=t=>{
   const n=charCount(t),spaces=(t.match(/ /g)||[]).length;
   return measureRun(t)+(supportsLetterSpacing?letterSpacing:letterSpacing*n)+(!supportsWordSpacing?spaces*0:0);
  };
@@ -1122,13 +1127,15 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  };
  const tangentOut=p=>{const dx=p.x-p.nx,dy=p.y-p.ny,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
  const tangentIn=p=>{const dx=p.nx-p.x,dy=p.ny-p.y,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
+ const smoothTangent=v=>{
+  const x=Math.max(.55,v.x),y=clamp(v.y,-.45,.45)*.42,len=Math.hypot(x,y)||1;
+  return {x:x/len,y:y/len};
+ };
  const drawCurve=(a,b)=>{
-  const distance=Math.hypot(b.x-a.x,b.y-a.y),ta=tangentOut(a),tb=tangentIn(b);
-  const handle=Math.max(1,Math.min(distance*.42,height*.16));
-  const c1x=a.x+ta.x*handle,c1y=a.y+ta.y*handle;
-  const c2x=b.x-tb.x*handle,c2y=b.y-tb.y*handle;
-  const steps=Math.max(12,Math.ceil(distance*2.4));
-  let px=a.x,py=a.y;
+  const distance=Math.hypot(b.x-a.x,b.y-a.y),ta=smoothTangent(tangentOut(a)),tb=smoothTangent(tangentIn(b));
+  const handle=Math.max(1,Math.min(distance*.40,height*.18));
+  const c1x=a.x+ta.x*handle,c1y=a.y+ta.y*handle,c2x=b.x-tb.x*handle,c2y=b.y-tb.y*handle;
+  const steps=Math.max(14,Math.ceil(distance*2.5));let px=a.x,py=a.y;
   for(let n=1;n<=steps;n++){
    const t=n/steps,u=1-t;
    const x=u*u*u*a.x+3*u*u*t*c1x+3*u*t*t*c2x+t*t*t*b.x;
@@ -1144,24 +1151,20 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
   const baseline=(model.baseline0+li*model.pitch)*scale-geo.originY-geo.cropY;
   const lineStart=line.x*scale-geo.originX-geo.cropX;
   let cursor=0,wordIndex=0;
-  const parts=line.text.split(/(\s+)/u);
-  for(const part of parts){
+  for(const part of line.text.split(/(\s+)/u)){
    if(!part)continue;
    if(/^\s+$/u.test(part)){
     measure.fontFeatureSettings='"calt" 0,"ss01" 0,"ss02" 0';
     measure.wordSpacing=supportsWordSpacing?wordSpacing+'px':'0px';
     measure.letterSpacing=supportsLetterSpacing?letterSpacing+'px':'0px';
-    cursor+=fullAdvance(part);
-    continue;
+    cursor+=fullAdvance(part);continue;
    }
    const seed='line:'+li+':word:'+wordIndex+':'+part;
-   const features=schoolFeatureSettings(Math.floor(schoolNoise(seed,0,29)*10000),$('letterVariety')?.checked!==false);
-   measure.fontFeatureSettings=features;
-   measure.fontVariantLigatures='common-ligatures contextual';
-   measure.fontKerning='normal';
+   measure.fontFeatureSettings=schoolFeatureSettings(Math.floor(schoolNoise(seed,0,29)*10000),$('letterVariety')?.checked!==false);
+   measure.fontVariantLigatures='common-ligatures contextual';measure.fontKerning='normal';
    measure.letterSpacing=supportsLetterSpacing?letterSpacing+'px':'0px';
    measure.wordSpacing=supportsWordSpacing?wordSpacing+'px':'0px';
-   const chars=Array.from(part),wordStart=cursor,baseX=lineStart+wordStart*widthScale;
+   const chars=Array.from(part),baseX=lineStart+cursor*widthScale;
    for(let k=0;k<chars.length-1;k++){
     if(!lower.test(chars[k])||!lower.test(chars[k+1]))continue;
     const prefix=chars.slice(0,k+1).join('');
@@ -1169,29 +1172,26 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     const split=baseX+prefixWidth*widthScale;
     const leftAdvance=(measure.measureText(chars[k]).width+letterSpacing)*widthScale;
     const rightAdvance=(measure.measureText(chars[k+1]).width+letterSpacing)*widthScale;
-    const leftReach=Math.max(fontPx*.46,leftAdvance*.86),rightReach=Math.max(fontPx*.46,rightAdvance*.86);
-    const yMin=baseline-height*.58,yMax=baseline+height*.16;
-    const maxDistance=fontPx*.42,maxDistance2=maxDistance*maxDistance;
+    const leftReach=Math.max(fontPx*.82,leftAdvance*1.25),rightReach=Math.max(fontPx*.82,rightAdvance*1.25),overlap=fontPx*.42;
+    const yMin=baseline-height*.32,yMax=baseline+height*.25,maxDistance=fontPx*.78,maxDistance2=maxDistance*maxDistance;
     let bestA=null,bestB=null,bestScore=Infinity;
-    const leftCandidates=endpoints.filter(p=>!p.used&&p.nx<p.x&&p.x>=split-leftReach&&p.x<=split-1&&p.y>=yMin&&p.y<=yMax);
-    const rightCandidates=endpoints.filter(p=>!p.used&&p.nx>p.x&&p.x>=split+1&&p.x<=split+rightReach&&p.y>=yMin&&p.y<=yMax);
+    // Overlapping windows account for the difference between glyph advance and painted stroke terminals.
+    const leftCandidates=endpoints.filter(p=>!p.used&&p.x>=split-leftReach&&p.x<=split+overlap&&p.y>=yMin&&p.y<=yMax);
+    const rightCandidates=endpoints.filter(p=>!p.used&&p.x>=split-overlap&&p.x<=split+rightReach&&p.y>=yMin&&p.y<=yMax);
     for(const a of leftCandidates){
      for(const b of rightCandidates){
-      if(b===a||b.x<=a.x)continue;
+      if(b===a||a.component===b.component||b.x<=a.x)continue;
       const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,ta=tangentOut(a),tb=tangentIn(b);
-      const tangentDot=ta.x*tb.x+ta.y*tb.y;
-      if(d2>maxDistance2||Math.abs(dy)>height*.22||ta.x<.25||tb.x<.25||tangentDot<.30)continue;
-      const score=d2+(1-tangentDot)*maxDistance2*.16+dy*dy*.24;
+      if(d2>maxDistance2||Math.abs(dy)>height*.42)continue;
+      const forwardA=Math.max(-.25,Math.min(1,ta.x)),forwardB=Math.max(-.25,Math.min(1,tb.x));
+      const score=d2+Math.abs(dy)*fontPx*.42+(2-forwardA-forwardB)*fontPx*fontPx*.055;
       if(score>=bestScore)continue;
       bestScore=score;bestA=a;bestB=b;
      }
     }
-    if(bestA&&bestB){
-     drawCurve(bestA,bestB);bestA.used=true;bestB.used=true;joined++;
-    }
+    if(bestA&&bestB){drawCurve(bestA,bestB);bestA.used=true;bestB.used=true;joined++;}
    }
-   cursor+=fullAdvance(part);
-   wordIndex++;
+   cursor+=fullAdvance(part);wordIndex++;
   }
  }
  measure.fontFeatureSettings='normal';measure.letterSpacing='0px';measure.wordSpacing='0px';
@@ -1247,7 +1247,7 @@ async function rasterOriginalFontText(model,token){
  measure.font='400 '+fontPx+'px "Bambu HandWrite Original"';measure.textBaseline='alphabetic';
  const lowerAscent=measure.measureText('х').actualBoundingBoxAscent||fontPx*.52;
  const heightScale=scaleToLowercaseHeight(model.lh*scale,lowerAscent),widthScale=model.profile.widthScale||1;
- const enabled=$('letterVariety')?.checked!==false,roughness=schoolRoughness(),filterScale=roughness*.004*scale;
+ const enabled=$('letterVariety')?.checked!==false,roughness=schoolRoughness(),filterScale=roughness*.008*scale;
  const filterDefs=[],textLines=[];
  for(let i=0;i<model.lines.length;i++){
   if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
@@ -1263,7 +1263,7 @@ async function rasterOriginalFontText(model,token){
    let filter='';
    if(filterScale>.02){
     const id='schoolRough'+i+'_'+wordIndex,noiseSeed=Math.floor(schoolNoise(seed,0,11)*10000)+1;
-    filterDefs.push('<filter id="'+id+'" x="-10%" y="-16%" width="120%" height="132%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".025 .012" numOctaves="1" seed="'+noiseSeed+'" result="roughNoise"/><feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="'+filterScale.toFixed(3)+'" xChannelSelector="R" yChannelSelector="G"/></filter>');
+    filterDefs.push('<filter id="'+id+'" x="-28%" y="-32%" width="156%" height="164%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".045 .018" numOctaves="2" seed="'+noiseSeed+'" result="roughNoise"/><feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="'+filterScale.toFixed(3)+'" xChannelSelector="R" yChannelSelector="G"/></filter>');
     filter=' filter="url(#'+id+')"';
    }
    content+='<tspan'+filter+' style="font-feature-settings:'+esc(features)+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+esc(part)+'</tspan>';
@@ -1416,6 +1416,7 @@ async function renderSchoolStrokePreview(model,seq){
  const paper=$('paper');paper.querySelector('#schoolStrokePreview')?.remove();
  paper.querySelectorAll('text[data-line]').forEach(node=>node.remove());
  const border=paper.lastElementChild;if(border)paper.insertBefore(group,border);else paper.appendChild(group);
+ const joinStatus=$('schoolStrokeStatus');if(joinStatus)joinStatus.textContent=raster.connectionCount>0?`Соединено переходами: ${raster.connectionCount} пар соседних букв. Предпросмотр и G-code используют эти же центральные линии.`:'Для этих букв новых переходов не найдено; уже соприкасающиеся штрихи сохраняются.';
 }
 function labelComponents(bin,w,h){
  const labels=new Int32Array(w*h),queue=new Int32Array(w*h),components=[];let id=0;
@@ -1712,7 +1713,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.27.0`,
+  `; generated by Bambu HandWrite 5.28.0`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1740,8 +1741,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.27.0 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.27.0`,
+  `; Bambu HandWrite 5.28.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.28.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -1915,14 +1916,15 @@ $('routeStart').addEventListener('click',()=>{stopRoutePlayback();setRouteCursor
 $('gcodeHelpBtn').addEventListener('click',()=>{$('gcodeInstruction').hidden=!$('gcodeInstruction').hidden});['stage1','stage2','stage3'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
 $('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paperZoom+.2)*10)/10);applyPaperZoom()});$('zoomOut').addEventListener('click',()=>{paperZoom=Math.max(1,Math.round((paperZoom-.2)*10)/10);applyPaperZoom()});$('zoomFit').addEventListener('click',()=>{paperZoom=1;applyPaperZoom()});
 $('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
-$('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();renderVariationDemo();refreshPreviewAndSave()});$('schoolRoughness')?.addEventListener('input',()=>{const value=Math.max(0,Math.min(100,Number($('schoolRoughness').value)||0));$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});
+$('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();renderVariationDemo();refreshPreviewAndSave()});$('schoolRoughness')?.addEventListener('input',()=>{const value=Math.max(0,Math.min(50,Number($('schoolRoughness').value)||0));$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});
+ $('schoolVariationStrength')?.addEventListener('input',()=>{const value=schoolVariationStrength();$('schoolVariationStrengthValue').textContent=value+'%';invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
  $('wordBounce')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
 ['lh','pitch','pitchMm'].forEach(id=>$(id).addEventListener('change',()=>{const isHeight=id==='lh',isMm=id==='pitchMm',min=isMm?5:2,max=isMm?60:(isHeight?20:30),fallback=isHeight?(lastModel?.lh??DEFAULTS.lh):(isMm?DEFAULTS.pitchMm:(lastModel?.pitch??DEFAULTS.pitch)),digits=isMm?1:(isHeight?1:2);commitEditableDecimal(id,min,max,fallback,digits);invalidateGeneratedGcode();refreshFontMetrics();try{build();save()}catch(e){$('layoutStatus').textContent='Проверь высоту букв и межстрочный интервал: '+(e?.message||e);$('layoutStatus').className='status bad'}}));
 ['txt','scriptMode','lh','pitch','pitchMm','bedTopGap','plateTabX','plateTabWidth','plateTabClearance','plateTabDepth','paragraphIndent'].forEach(id=>$(id).addEventListener('input',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()}));
 ['paragraphIndentToggle','justifyToggle','pitchCells','pitchUnit'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();updateLineSpacingUI();build();save()}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRoutePlayback()});window.addEventListener('pagehide',()=>{stopRoutePlayback();if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}});
 
-const hadSavedSettings=restore();try{if(localStorage.getItem('bhw-our-font-default-v3')!=='1'){$('handFont').value='school';localStorage.setItem('bhw-our-font-default-v3','1')}localStorage.setItem('bhwFRBDefaultV1','1');if(localStorage.getItem('bhw-glyph-mesh-v1')!=='1'){$('letterVariety').checked=true;localStorage.setItem('bhw-glyph-mesh-v1','1')}}catch(e){$('handFont').value='school';$('letterVariety').checked=true}if(hadSavedSettings)save();updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
+const hadSavedSettings=restore();try{if(localStorage.getItem('bhw-our-font-default-v4')!=='1'){$('handFont').value='school';$('schoolVariationStrength').value='100';localStorage.setItem('bhw-our-font-default-v4','1')}localStorage.setItem('bhwFRBDefaultV1','1');if(localStorage.getItem('bhw-glyph-mesh-v1')!=='1'){$('letterVariety').checked=true;localStorage.setItem('bhw-glyph-mesh-v1','1')}}catch(e){$('handFont').value='school';$('letterVariety').checked=true;$('schoolVariationStrength').value='100'}if(hadSavedSettings)save();$('schoolVariationStrengthValue').textContent=schoolVariationStrength()+'%';$('schoolRoughnessValue').textContent=schoolRoughness()+'%';updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
 
 /* UI v2: тема и кнопка «наверх» (не влияет на генерацию G-code) */
 try{(function(){var r=document.documentElement,k='bhw-theme',s=null;try{s=localStorage.getItem(k)}catch(e){}
