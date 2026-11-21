@@ -94,7 +94,7 @@ variationStrengthInput='50';
 const partialVariation=Array.from({length:30},(_,i)=>schoolApi.wordMetrics(mockGlyphMeasure(),'мама','slider-half-'+i,true));
 assert(partialVariation.some(x=>x.active)&&partialVariation.some(x=>!x.active),'Variation slider at 50% deterministically selects a subset of complete words');
 variationStrengthInput='100';
-function mockGlyphMeasure(){return {fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',measureText:(value)=>({width:Array.from(value).length*8})};}
+function mockGlyphMeasure(){return {fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',measureText:(value)=>({width:Array.from(value).length*11})};}
 const mockMetrics={measureText:(value)=>({width:Array.from(value).length*8})};
 const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
@@ -151,6 +151,18 @@ for(let x=2;x<=9;x++)longGapMask[15*36+x]=1;
 for(let x=16;x<=24;x++)longGapMask[15*36+x]=1;
 const longGapCount=context.connectSchoolWordSkeletons(longGapMask,36,24,{...mockModel,lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},{...mockMeasure,measureText:(value)=>({width:Array.from(value).length*8})});
 assert(longGapCount===0,'Long gaps between letters remain separate instead of receiving artificial swooping bridges');
+
+const crossWordMask=new Uint8Array(30*24);
+for(let x=2;x<=9;x++)crossWordMask[15*30+x]=1;
+for(let x=11;x<=19;x++)crossWordMask[15*30+x]=1;
+const crossWordCount=context.connectSchoolWordSkeletons(crossWordMask,30,24,{...mockModel,lines:[{blank:false,text:'а а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+assert(crossWordCount===0,'Letters in separate words are never joined across whitespace');
+const punctuationMask=new Uint8Array(30*24);
+for(let x=2;x<=9;x++)punctuationMask[15*30+x]=1;
+for(let x=11;x<=19;x++)punctuationMask[15*30+x]=1;
+const punctuationCount=context.connectSchoolWordSkeletons(punctuationMask,30,24,{...mockModel,lines:[{blank:false,text:'а-а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+assert(punctuationCount===0,'Connectors never skip punctuation to join non-adjacent letters');
+
 
 assert(html.includes('async function loadBambuOriginalFont()')&&html.includes('./fonts/BambuHandWriteSchool-Regular.woff2'),'Bambu HandWrite School is loaded from the bundled local asset');
 assert(html.includes('async function rasterOriginalFontText(')&&html.includes('function renderSchoolStrokePreview('),'The original custom font is used by the shared preview and G-code centerline rasterizer');
