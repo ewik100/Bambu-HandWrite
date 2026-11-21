@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.31.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta name="description" content="Bambu HandWrite 5.32.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
 <meta property="og:title" content="Bambu HandWrite 5.31.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
 <title>Bambu HandWrite 5.31.0 — генератор рукописного G-code</title>
@@ -721,7 +721,7 @@ function modeFontForScript(sc,mode,hand){if(mode==='print')return FONT.print;if(
 function runsFor(text,mode,hand){let last='latn',runs=[],current='',currentFont='';for(const ch of text){const sc=scriptOf(ch,last);if(sc==='cyrl')last='cyrl';else if(sc==='latn')last='latn';const ff=modeFontForScript(sc,mode,hand);if(current&&ff!==currentFont){runs.push({text:current,font:currentFont});current=''}currentFont=ff;current+=ch}if(current)runs.push({text:current,font:currentFont});return runs}
 function schoolVariation(){return 0}
 function schoolAccuracy(){return 100}
-function schoolRoughness(){const v=Number($('schoolRoughness')?.value??18);return Number.isFinite(v)?Math.max(0,Math.min(50,v)):18}
+function schoolRoughness(){const v=Number($('schoolRoughness')?.value??28);return Number.isFinite(v)?Math.max(0,Math.min(50,v)):28}
 function schoolVariationStrength(){const v=Number($('schoolVariationStrength')?.value??100);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):100}
 function schoolNoise(seed,index=0,salt=0){
  let h=2166136261;const text=String(seed)+'|'+index+'|'+salt;
@@ -1336,11 +1336,11 @@ async function rasterOriginalFontText(model,token){
    let filter='';
    if(filterScale>.02){
     const id='schoolRough'+i+'_'+wordIndex,noiseSeed=Math.floor(schoolNoise(seed,0,11)*10000)+1;
-    filterDefs.push('<filter id="'+id+'" x="-28%" y="-32%" width="156%" height="164%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".035 .014" numOctaves="2" seed="'+noiseSeed+'" result="roughNoise"/><feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="'+filterScale.toFixed(3)+'" xChannelSelector="R" yChannelSelector="G"/></filter>');
+    filterDefs.push('<filter id="'+id+'" x="-28%" y="-32%" width="156%" height="164%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".018 .009" numOctaves="1" seed="'+noiseSeed+'" result="roughNoise"/><feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="'+filterScale.toFixed(3)+'" xChannelSelector="R" yChannelSelector="G"/></filter>');
     filter=' filter="url(#'+id+')"';
    }
    const wordMetrics=schoolWordMetrics(measure,part,seed,enabled);
-   content+='<tspan x="'+(x+pen).toFixed(3)+'" style="font-feature-settings:'+esc(wordMetrics.features)+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+esc(part)+'</tspan>';
+   content+='<tspan x="'+(x+pen).toFixed(3)+'"'+filter+' style="font-feature-settings:'+esc(wordMetrics.features)+';font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+esc(part)+'</tspan>';
    pen+=wordMetrics.width+letterSpacing*Math.max(0,Array.from(part).length-1);
    wordIndex++;
   }
