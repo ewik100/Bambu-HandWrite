@@ -47,11 +47,12 @@ if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pau
 
 let zInput = '30';
 let pauseInput = '130';
+let variationStrengthInput = '100';
 let pitchCellsInput = '2';
 let pitchUnitInput = 'cells';
 let pitchMmInput = '15';
 const context = {
-  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : id === 'schoolRoughness' ? '28' : pauseInput, checked: true }),
+  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : id === 'schoolRoughness' ? '28' : id === 'schoolVariationStrength' ? variationStrengthInput : pauseInput, checked: true }),
   Number, String, Error, Math,
   orderPathsByComponent: (paths) => paths,
   simplify: (points) => points,
@@ -75,14 +76,30 @@ const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Bambu handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
 vm.runInContext(schoolFunctions,context);
-const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,noise:schoolNoise,layout:schoolWordLayout})',context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,noise:schoolNoise,layout:schoolWordLayout})',context);
 assert(schoolApi.variation()===0,'Contextual alternates do not alter line wrapping or reserve extra width');
 const featureModes=Array.from({length:5},(_,i)=>schoolApi.features(i,true));
-assert(new Set(featureModes).size===1,'Russian letters use the same real contextual-alternate feature set, not ineffective Latin-only style presets');
-assert(featureModes[0].includes('"calt" 1')&&featureModes[0].includes('"dlig" 0')&&featureModes[0].includes('"salt" 0'),'Bambu contextual alternates stay enabled while decorative swashes remain disabled');
-assert(featureModes[0].includes('"ss01" 0')&&featureModes[0].includes('"ss02" 0')&&featureModes[0].includes('"calt" 1'),'Cyrillic contextual alternates choose the original authored ss01/ss02 glyphs per character');
-const disabledFeatures=schoolApi.features(2,false);
-assert(disabledFeatures.includes('"calt" 0')&&disabledFeatures.includes('"ss01" 0')&&disabledFeatures.includes('"ss02" 0'),'The letter-variation switch disables contextual and stylistic substitutions');
+assert(featureModes.every(value=>value.includes('"ss01"')&&value.includes('"ss02"')),'Word-level feature helper remains deterministic and selects stylistic sets without enabling broad calt ligatures');
+assert(featureModes[0].includes('"calt" 0')&&featureModes[0].includes('"dlig" 0')&&featureModes[0].includes('"salt" 0'),'Only authored alternate glyph sets are enabled; broad contextual and decorative substitutions stay off');
+const baseGlyph=schoolApi.glyphFeatures('а','unit-seed',0,false);
+const altA=schoolApi.glyphFeatures('а','unit-seed',0,true,'ss01');
+const altB=schoolApi.glyphFeatures('а','unit-seed',0,true,'ss02');
+assert(baseGlyph.includes('"ss01" 0')&&baseGlyph.includes('"ss02" 0'),'Disabling variations returns the original base glyph');
+assert(altA.includes('"ss01" 1')&&altA.includes('"ss02" 0')&&altB.includes('"ss01" 0')&&altB.includes('"ss02" 1'),'A and B explicitly select the two distinct OpenType stylistic sets');
+assert(schoolApi.glyphFeatures(' ','unit-seed',0,true).includes('"ss01" 0'),'Whitespace never receives a letter alternate');
+variationStrengthInput='0';
+const noVariation=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама','slider-zero',true,0);
+assert(noVariation.glyphs.every(g=>g.features.includes('"ss01" 0')&&g.features.includes('"ss02" 0')),'Variation slider at 0% keeps every Cyrillic glyph in its base form');
+variationStrengthInput='100';
+const fullVariation=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама','slider-full',true,0);
+assert(fullVariation.glyphs.every(g=>g.features.includes('"ss01" 1')||g.features.includes('"ss02" 1')),'Variation slider at 100% assigns an alternate glyph to every Cyrillic letter');
+assert(new Set(fullVariation.glyphs.map(g=>g.features)).size===2,'Automatic variation alternates between both authored glyph sets inside one word');
+variationStrengthInput='50';
+const partialVariation=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама мама мама мама','slider-half',true,0);
+const changedLetters=partialVariation.glyphs.filter(g=>g.features.includes('"ss01" 1')||g.features.includes('"ss02" 1')).length;
+assert(changedLetters>0&&changedLetters<partialVariation.glyphs.length,'Variation slider at 50% selects a reproducible subset of letters, not whole words');
+variationStrengthInput='100';
+function mockGlyphMeasure(){return {fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',measureText:(value)=>({width:Array.from(value).length*8})};}
 const mockMetrics={measureText:(value)=>({width:Array.from(value).length*8})};
 const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
@@ -99,10 +116,10 @@ vm.runInContext(html.slice(connectorStart,connectorEnd),context);
 const mockMeasure={letterSpacing:'0px',wordSpacing:'0px',fontFeatureSettings:'normal',fontVariantLigatures:'common-ligatures contextual',fontKerning:'normal',measureText:(value)=>({width:Array.from(value).length*8})};
 const mockMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)mockMask[15*30+x]=1;
-for(let x=12;x<=19;x++)mockMask[15*30+x]=1;
+for(let x=11;x<=19;x++)mockMask[15*30+x]=1;
 const mockModel={fontSize:10,baseline0:15,pitch:8,profile:{letterSpacing:0,wordSpacing:0},lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]};
 const joinedCount=context.connectSchoolWordSkeletons(mockMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
-assert(joinedCount===1&&mockMask.slice(15*30+9,15*30+13).every(Boolean),'Adjacent Russian letter centerlines receive one bounded connecting stroke');
+assert(joinedCount===1&&mockMask.slice(15*30+9,15*30+12).every(Boolean),'Adjacent Russian letter centerlines receive one bounded connecting stroke');
 assert(html.includes('async function loadBambuOriginalFont()')&&html.includes('./fonts/BambuHandWriteSchool-Regular.woff2'),'Bambu HandWrite School is loaded from the bundled local asset');
 assert(html.includes('async function rasterOriginalFontText(')&&html.includes('function renderSchoolStrokePreview('),'The original custom font is used by the shared preview and G-code centerline rasterizer');
 assert(html.includes('traceSkeleton(raster.bin,raster.w,raster.h)')&&html.includes('mergeTouchingPaths(simplified)'),'Preview paths are generated from the thinned centerline skeleton, not the filled font outline');
