@@ -128,6 +128,8 @@ for(const part of 'мама рама'.split(/(\s+)/u)){
 assert(Math.abs(measuredMixed-expectedMixed)<1e-8,'Line wrapping uses whole-word contextual shaping, matching the SVG/G-code raster');
 
 assert(schoolApi.roughness()===28,'Stroke roughness uses the dedicated UI slider value');
+assert(html.includes(`content+='<tspan x="'+(x+pen).toFixed(3)+'"'+filter+`),'The roughness filter is attached to each rendered word');
+assert(html.includes('baseFrequency=".018 .009" numOctaves="1"'),'Stroke deformation uses broad, smooth, low-frequency noise');
 const originalFont=fs.readFileSync(path.join(root,'fonts','BambuHandWriteSchool-Regular.woff2'));
 assert(originalFont.length>6000,'Original Bambu font WOFF2 asset is present and non-empty');
 assert(originalFont.subarray(0,4).toString('ascii')==='wOF2','Original Bambu font has a valid WOFF2 signature');
