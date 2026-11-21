@@ -732,8 +732,10 @@ function schoolFeatureString(variant=''){
  const a=variant==='ss01'?1:0,b=variant==='ss02'?1:0;
  return '"calt" 0, "ss01" '+a+', "ss02" '+b+', "salt" 0, "dlig" 0, "liga" 0, "clig" 0';
 }
-function schoolGlyphFeatureSettings(seed,index=0,enabled=true,forceVariant=''){
+function schoolGlyphFeatureSettings(char,seed,index=0,enabled=true,forceVariant=''){
  const strength=schoolVariationStrength();
+ const isLetter=/^[А-Яа-яЁё]$/u.test(String(char));
+ if(!isLetter)return schoolFeatureString('');
  const active=!!forceVariant||!!enabled&&(strength>=100||(strength>0&&schoolNoise(seed,index,73)*100<strength));
  if(!active)return schoolFeatureString('');
  const phase=Math.floor(schoolNoise(seed,0,149)*2);
@@ -1280,6 +1282,7 @@ async function rasterOriginalFontText(model,token){
   for(let j=0;j<parts.length;j++){
    const part=parts[j];if(!part)continue;
    if(/^\s+$/u.test(part)){
+    measure.fontFeatureSettings=schoolFeatureString('');
     for(const ch of Array.from(part)){
      const advance=measure.measureText(ch).width;
      content+='<tspan x="'+(x+pen).toFixed(3)+'">'+esc(ch)+'</tspan>';
