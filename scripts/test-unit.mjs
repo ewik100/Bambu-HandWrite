@@ -104,6 +104,35 @@ const mockMetrics={measureText:(value)=>({width:Array.from(value).length*8})};
 const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 assert(baseLayout.endX===sameLayout.endX&&baseLayout.features===sameLayout.features,'Contextual shaping preserves word width and uses a stable OpenType feature set');
+const measureMixedMatch=html.match(/function measureMixed\(t,mode,hand,size\)\{[\s\S]*?\n\}/);
+if(!measureMixedMatch)throw new Error('Could not extract mixed-font width calculation.');
+context.FONT_PROFILES={school:{widthScale:1,letterSpacing:-.01,wordSpacing:.54}};
+context.runsFor=(text)=>[{text,font:'Bambu HandWrite Original'}];
+context.fontCss=()=>'"Bambu HandWrite Original"';
+context.CANVAS_SPACING={letter:true,word:true};
+context.mctx={
+ font:'',fontFeatureSettings:'normal',fontKerning:'normal',fontVariantLigatures:'normal',letterSpacing:'0px',wordSpacing:'0px',
+ measureText(value){
+  const chars=Array.from(value),alt=this.fontFeatureSettings||'';
+  const delta=alt.includes('"ss01" 1')?1.25:alt.includes('"ss02" 1')?.65:0;
+  return {width:chars.reduce((n,ch)=>n+(ch===' '?8:8+delta),0)};
+ }
+};
+vm.runInContext(measureMixedMatch[0],context);
+const measuredMixed=context.measureMixed('мама рама','ru','school',40);
+let expectedMixed=0,wordIndex=0;
+for(const part of 'мама рама'.split(/(\s+)/u)){
+ if(!part)continue;
+ if(/^\s+$/u.test(part)){
+  context.mctx.fontFeatureSettings=context.schoolFeatureString('');
+  for(const ch of Array.from(part))expectedMixed+=context.mctx.measureText(ch).width-.01+.54;
+ }else{
+  expectedMixed+=schoolApi.glyphMetrics(context.mctx,part,'word:'+wordIndex+':'+part,true,-.01).width;
+  wordIndex++;
+ }
+}
+assert(Math.abs(measuredMixed-expectedMixed)<1e-8,'Line wrapping measures the exact same per-letter alternate advances as the G-code raster');
+
 assert(schoolApi.roughness()===28,'Stroke roughness uses the dedicated UI slider value');
 const originalFont=fs.readFileSync(path.join(root,'fonts','BambuHandWriteSchool-Regular.woff2'));
 assert(originalFont.length>6000,'Original Bambu font WOFF2 asset is present and non-empty');
@@ -120,6 +149,12 @@ for(let x=11;x<=19;x++)mockMask[15*30+x]=1;
 const mockModel={fontSize:10,baseline0:15,pitch:8,profile:{letterSpacing:0,wordSpacing:0},lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]};
 const joinedCount=context.connectSchoolWordSkeletons(mockMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
 assert(joinedCount===1&&mockMask.slice(15*30+9,15*30+12).every(Boolean),'Adjacent Russian letter centerlines receive one bounded connecting stroke');
+const longGapMask=new Uint8Array(36*24);
+for(let x=2;x<=9;x++)longGapMask[15*36+x]=1;
+for(let x=16;x<=24;x++)longGapMask[15*36+x]=1;
+const longGapCount=context.connectSchoolWordSkeletons(longGapMask,36,24,{...mockModel,lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},{...mockMeasure,measureText:(value)=>({width:Array.from(value).length*8})});
+assert(longGapCount===0,'Long gaps between letters remain separate instead of receiving artificial swooping bridges');
+
 assert(html.includes('async function loadBambuOriginalFont()')&&html.includes('./fonts/BambuHandWriteSchool-Regular.woff2'),'Bambu HandWrite School is loaded from the bundled local asset');
 assert(html.includes('async function rasterOriginalFontText(')&&html.includes('function renderSchoolStrokePreview('),'The original custom font is used by the shared preview and G-code centerline rasterizer');
 assert(html.includes('traceSkeleton(raster.bin,raster.w,raster.h)')&&html.includes('mergeTouchingPaths(simplified)'),'Preview paths are generated from the thinned centerline skeleton, not the filled font outline');
