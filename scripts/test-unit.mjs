@@ -155,6 +155,20 @@ for(let x=16;x<=24;x++)longGapMask[15*36+x]=1;
 const longGapCount=context.connectSchoolWordSkeletons(longGapMask,36,24,{...mockModel,lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},{...mockMeasure,measureText:(value)=>({width:Array.from(value).length*11})});
 assert(longGapCount===0,'Long gaps between letters remain separate instead of receiving artificial swooping bridges');
 
+// Two large neighboring rows can overlap inside a font-height bounding box.
+// The connector must never borrow the left endpoint from one row and the
+// right endpoint from the next row, even when their x positions line up.
+const crossLineMask=new Uint8Array(30*30);
+for(let x=2;x<=9;x++)crossLineMask[10*30+x]=1;
+for(let x=12;x<=18;x++)crossLineMask[15*30+x]=1;
+const crossLineModel={...mockModel,baseline0:10,pitch:5,lines:[
+ {blank:false,text:'аа',x:2,extraWordSpace:0},
+ {blank:false,text:'аа',x:2,extraWordSpace:0}
+]};
+const crossLineCount=context.connectSchoolWordSkeletons(crossLineMask,30,30,crossLineModel,
+ {scale:1,fontPx:10,heightScale:2,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+assert(crossLineCount===0,'Letters on different baselines are never joined, even when large glyph boxes overlap');
+
 const crossWordMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)crossWordMask[15*30+x]=1;
 for(let x=11;x<=19;x++)crossWordMask[15*30+x]=1;
