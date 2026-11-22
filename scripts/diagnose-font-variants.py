@@ -60,7 +60,9 @@ def lookup_details(font, feature_tag="calt"):
 
 font = TTFont(FONT_PATH)
 cmap = font.getBestCmap() or {}
-gs = lookup_details(font)\nstyle01 = lookup_details(font, "ss01")\nstyle02 = lookup_details(font, "ss02")
+gs = lookup_details(font)
+style01 = lookup_details(font, "ss01")
+style02 = lookup_details(font, "ss02")
 report = {
     "font": str(FONT_PATH),
     "glyph_count": len(font.getGlyphOrder()),
@@ -68,7 +70,9 @@ report = {
     "uppercase_cyrillic_missing": [f"U+{ord(ch):04X}" for ch in "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" if ord(ch) not in cmap],
     "lowercase_cyrillic_missing": [f"U+{ord(ch):04X}" for ch in "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" if ord(ch) not in cmap],
     "gsub_features": gs["features"],
-    "calt": gs["calt"],\n    "ss01": style01["ss01"],\n    "ss02": style02["ss02"],
+    "calt": gs["calt"],
+    "ss01": style01["ss01"],
+    "ss02": style02["ss02"],
 }
 if "GPOS" in font:
     gpos = font["GPOS"].table
