@@ -48,11 +48,12 @@ if (!limitsMatch || !pitchCellsMatch || !pitchMmMatch || !zFunctionMatch || !pau
 let zInput = '30';
 let pauseInput = '130';
 let variationStrengthInput = '100';
+let joinVarietyInput = '70';
 let pitchCellsInput = '2';
 let pitchUnitInput = 'cells';
 let pitchMmInput = '15';
 const context = {
-  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : id === 'schoolRoughness' ? '28' : id === 'schoolVariationStrength' ? variationStrengthInput : pauseInput, checked: true }),
+  $: (id) => ({ value: id === 'penWriteZ' ? zInput : id === 'pitchCells' ? pitchCellsInput : id === 'pitchUnit' ? pitchUnitInput : id === 'pitchMm' ? pitchMmInput : id === 'schoolRoughness' ? '28' : id === 'schoolVariationStrength' ? variationStrengthInput : id === 'schoolJoinVariety' ? joinVarietyInput : pauseInput, checked: true }),
   Number, String, Error, Math,
   orderPathsByComponent: (paths) => paths,
   simplify: (points) => points,
@@ -76,8 +77,19 @@ const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Bambu handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
 vm.runInContext(schoolFunctions,context);
-const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout})',context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout,joinVariety:schoolJoinVariety,joinHandles:schoolJoinHandles})',context);
 assert(schoolApi.variation()===0,'Contextual alternates do not alter line wrapping or reserve extra width');
+joinVarietyInput='0';
+const uniformJoin=schoolApi.joinHandles(12,16,'same-pair');
+assert(schoolApi.joinVariety()===0&&Math.abs(uniformJoin.a-uniformJoin.b)<1e-9,'Join-variety slider at 0% keeps the neutral symmetric connector');
+joinVarietyInput='100';
+const variedJoins=Array.from({length:90},(_,i)=>schoolApi.joinHandles(12,16,'pair-style-'+i));
+const joinShapes=new Set(variedJoins.map(x=>x.a.toFixed(3)+':'+x.b.toFixed(3)));
+assert(joinShapes.size>=4,'Join-variety slider at 100% selects multiple distinct connector shapes');
+assert(variedJoins.every(x=>x.a>0&&x.b>0&&x.a<=2.4+1e-9&&x.b<=2.4+1e-9),'All connector handles remain positive and inside the geometric cap');
+const repeatJoin=schoolApi.joinHandles(12,16,'pair-style-17');
+assert(repeatJoin.a===variedJoins[17].a&&repeatJoin.b===variedJoins[17].b,'The same word and letter pair always receives the same connector profile');
+joinVarietyInput='70';
 const baseFeatures=schoolApi.features(0,false);
 const contextualFeatures=schoolApi.features(0,true,true);
 assert(baseFeatures.includes('"calt" 0')&&baseFeatures.includes('"ss01" 0')&&baseFeatures.includes('"ss02" 0')&&baseFeatures.includes('"liga" 1'),'Disabled variation keeps the original glyphs and standard ligatures');
@@ -138,6 +150,8 @@ const originalFont=fs.readFileSync(path.join(root,'fonts','BambuHandWriteSchool-
 assert(originalFont.length>6000,'Original Bambu font WOFF2 asset is present and non-empty');
 assert(originalFont.subarray(0,4).toString('ascii')==='wOF2','Original Bambu font has a valid WOFF2 signature');
 assert(html.includes('function connectSchoolWordSkeletons('),'The custom school font has a dedicated centerline connector');
+assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
+assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(bestA,bestB,seed+'|'+k+'|'+left.char+right.char)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
 const connectorEnd=html.indexOf('async function rasterOriginalFontText(',connectorStart);
 if(connectorStart<0||connectorEnd<=connectorStart)throw new Error('Could not extract school centerline connector.');

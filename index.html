@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.35.1 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.35.1">
+<meta name="description" content="Bambu HandWrite 5.36.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.36.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.35.1 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.36.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -344,6 +344,9 @@ Hello, world!</textarea></label>
       </div>
       <label class="school-roughness-control" for="schoolVariationStrength"><span>Доля слов с альтернативными буквами</span><b id="schoolVariationStrengthValue">100%</b></label>
       <input type="range" id="schoolVariationStrength" min="0" max="100" step="5" value="100" aria-label="Доля слов с альтернативными буквами">
+      <label class="school-roughness-control" for="schoolJoinVariety"><span>Разнообразие соединений</span><b id="schoolJoinVarietyValue">70%</b></label>
+      <input type="range" id="schoolJoinVariety" min="0" max="100" step="5" value="70" aria-label="Разнообразие соединений">
+      <p class="tiny">Меняет характер переходов между соседними буквами: короткие, плавные и асимметричные. Длинные мостики и соединения между словами или строками не добавляются.</p>
       <label class="school-roughness-control" for="schoolRoughness"><span>Неровность штрихов</span><b id="schoolRoughnessValue">28%</b></label>
       <input type="range" id="schoolRoughness" min="0" max="50" step="1" value="28" aria-label="Неровность штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
@@ -518,12 +521,12 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.35.1 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.36.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const DEFAULTS={handwritingRoughness:38,schoolRoughness:18,schoolVariationStrength:100,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
+const DEFAULTS={handwritingRoughness:38,schoolRoughness:18,schoolVariationStrength:100,schoolJoinVariety:70,pitchUnit:'cells',pitchCells:2,pitchMm:15,pause2Seconds:130,penWriteZ:30,paperType:'math-notebook',paperFlip:'right',paperRotation:'none',paperOrientation:'portrait',customPaperW:165,customPaperH:203,bedTopGap:0,plateTabX:108,plateTabWidth:40,plateTabClearance:18,plateTabDepth:18,routeSpeed:500,pw:165,ph:203,lh:4.7,pitch:8.2,cell:5,left:10,top:10,margin:20,gapAfterMargin:1,paragraphIndent:5,rightSafe:0};
 const NOTEBOOK={w:165,h:203},BED={w:256,h:256};
 const Z_LIMITS={min:10,max:150,travelOffset:4,safeOffset:20};
 function getPenZSettings(){
@@ -727,6 +730,16 @@ function schoolNoise(seed,index=0,salt=0){
  let h=2166136261;const text=String(seed)+'|'+index+'|'+salt;
  for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}
  return (h>>>0)/4294967295;
+}
+function schoolJoinVariety(){const v=Number($('schoolJoinVariety')?.value??70);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):70}
+function schoolJoinHandles(distance,fontPx,seed){
+ const strength=schoolJoinVariety()/100;
+ const profiles=[[.22,.22],[.42,.24],[.24,.42],[.38,.38],[.18,.36],[.36,.18]];
+ const selected=profiles[Math.min(profiles.length-1,Math.floor(schoolNoise(seed,0,307)*profiles.length))];
+ const baseHandle=Math.max(.75,Math.min(distance*.32,fontPx*.09));
+ const maxHandle=Math.max(.75,Math.min(distance*.46,fontPx*.15));
+ const handle=factor=>Math.max(.35,Math.min(maxHandle,baseHandle*(.32+(factor-.32)*strength)/.32));
+ return {a:handle(selected[0]),b:handle(selected[1])};
 }
 function schoolFeatureString(variant=''){
  const contextual=variant==='calt'||variant==='ss01'||variant==='ss02'?1:0;
@@ -1204,10 +1217,10 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  };
  const tangentOut=p=>{const dx=p.x-p.nx,dy=p.y-p.ny,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
  const tangentIn=p=>{const dx=p.nx-p.x,dy=p.ny-p.y,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
- const drawCurve=(a,b)=>{
+ const drawCurve=(a,b,seed)=>{
   const distance=Math.hypot(b.x-a.x,b.y-a.y),ta=tangentOut(a),tb=tangentIn(b);
-  const handle=Math.max(.75,Math.min(distance*.32,fontPx*.09));
-  const c1x=a.x+ta.x*handle,c1y=a.y+ta.y*handle,c2x=b.x-tb.x*handle,c2y=b.y-tb.y*handle;
+  const handles=schoolJoinHandles(distance,fontPx,seed);
+  const c1x=a.x+ta.x*handles.a,c1y=a.y+ta.y*handles.a,c2x=b.x-tb.x*handles.b,c2y=b.y-tb.y*handles.b;
   const steps=Math.max(10,Math.ceil(distance*2));let px=a.x,py=a.y;
   for(let n=1;n<=steps;n++){
    const t=n/steps,u=1-t;
@@ -1273,7 +1286,7 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
       bestScore=score;bestA=a;bestB=b;
      }
     }
-    if(bestA&&bestB){drawCurve(bestA,bestB);bestA.used=true;bestB.used=true;joined++;}
+    if(bestA&&bestB){drawCurve(bestA,bestB,seed+'|'+k+'|'+left.char+right.char);bestA.used=true;bestB.used=true;joined++;}
    }
    cursor+=run.width;
    wordIndex++;
@@ -1812,7 +1825,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.35.1`,
+  `; generated by Bambu HandWrite 5.36.0`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1840,8 +1853,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.35.1 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.35.1`,
+  `; Bambu HandWrite 5.36.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.36.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -2017,13 +2030,14 @@ $('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paper
 $('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
 $('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();renderVariationDemo();refreshPreviewAndSave()});$('schoolRoughness')?.addEventListener('input',()=>{const value=Math.max(0,Math.min(50,Number($('schoolRoughness').value)||0));$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});
  $('schoolVariationStrength')?.addEventListener('input',()=>{const value=schoolVariationStrength();$('schoolVariationStrengthValue').textContent=value+'%';invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
+ $('schoolJoinVariety')?.addEventListener('input',()=>{const value=schoolJoinVariety();$('schoolJoinVarietyValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});
  $('wordBounce')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
 ['lh','pitch','pitchMm'].forEach(id=>$(id).addEventListener('change',()=>{const isHeight=id==='lh',isMm=id==='pitchMm',min=isMm?5:2,max=isMm?60:(isHeight?20:30),fallback=isHeight?(lastModel?.lh??DEFAULTS.lh):(isMm?DEFAULTS.pitchMm:(lastModel?.pitch??DEFAULTS.pitch)),digits=isMm?1:(isHeight?1:2);commitEditableDecimal(id,min,max,fallback,digits);invalidateGeneratedGcode();refreshFontMetrics();try{build();save()}catch(e){$('layoutStatus').textContent='Проверь высоту букв и межстрочный интервал: '+(e?.message||e);$('layoutStatus').className='status bad'}}));
 ['txt','scriptMode','lh','pitch','pitchMm','bedTopGap','plateTabX','plateTabWidth','plateTabClearance','plateTabDepth','paragraphIndent'].forEach(id=>$(id).addEventListener('input',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()}));
 ['paragraphIndentToggle','justifyToggle','pitchCells','pitchUnit'].forEach(id=>$(id).addEventListener('change',()=>{invalidateGeneratedGcode();updateLineSpacingUI();build();save()}));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRoutePlayback()});window.addEventListener('pagehide',()=>{stopRoutePlayback();if(generatedGcodeUrl){URL.revokeObjectURL(generatedGcodeUrl);generatedGcodeUrl=null}});
 
-const hadSavedSettings=restore();try{if(localStorage.getItem('bhw-our-font-default-v4')!=='1'){$('handFont').value='school';$('schoolVariationStrength').value='100';localStorage.setItem('bhw-our-font-default-v4','1')}localStorage.setItem('bhwFRBDefaultV1','1');if(localStorage.getItem('bhw-glyph-mesh-v1')!=='1'){$('letterVariety').checked=true;localStorage.setItem('bhw-glyph-mesh-v1','1')}}catch(e){$('handFont').value='school';$('letterVariety').checked=true;$('schoolVariationStrength').value='100'}if(hadSavedSettings)save();$('schoolVariationStrengthValue').textContent=schoolVariationStrength()+'%';$('schoolRoughnessValue').textContent=schoolRoughness()+'%';updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
+const hadSavedSettings=restore();try{if(localStorage.getItem('bhw-our-font-default-v4')!=='1'){$('handFont').value='school';$('schoolVariationStrength').value='100';localStorage.setItem('bhw-our-font-default-v4','1')}localStorage.setItem('bhwFRBDefaultV1','1');if(localStorage.getItem('bhw-glyph-mesh-v1')!=='1'){$('letterVariety').checked=true;localStorage.setItem('bhw-glyph-mesh-v1','1')}}catch(e){$('handFont').value='school';$('letterVariety').checked=true;$('schoolVariationStrength').value='100'}if(hadSavedSettings)save();$('schoolVariationStrengthValue').textContent=schoolVariationStrength()+'%';$('schoolJoinVarietyValue').textContent=schoolJoinVariety()+'%';$('schoolRoughnessValue').textContent=schoolRoughness()+'%';updateLineSpacingUI();updateDocumentTitlePreview();initTextHistory();updatePauseUI();updatePenZUI();if(!hadSavedSettings)applyFontProfile($('handFont').value||'neucha');else{const p=FONT_PROFILES[$('handFont').value]||FONT_PROFILES.neucha;$('fontProfileTitle').textContent=p.title;$('fontProfileTag').textContent=p.tag;$('fontProfileDescription').textContent=p.description;refreshFontMetrics()}$('routeSpeedValue').textContent=`${(1000/routeInterval()).toFixed(1).replace('.',',')} штриха/сек`;setPreset($('paperType').value,$('paperOrientation').value,false);$('left').value=10;refreshFontMetrics();build();applyPaperZoom();startOptionalFontStylesheet();refreshFontAvailability(lastModel);window.addEventListener('handwritingfontsready',()=>refreshFontAvailability(lastModel));window.addEventListener('handwritingfontserror',()=>{setFontStatus(false)});
 
 /* UI v2: тема и кнопка «наверх» (не влияет на генерацию G-code) */
 try{(function(){var r=document.documentElement,k='bhw-theme',s=null;try{s=localStorage.getItem(k)}catch(e){}
