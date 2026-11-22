@@ -1245,9 +1245,14 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     if(!connectable.test(left.char)||!connectable.test(right.char))continue;
     const split=baseX+(left.x+left.advance+letterSpacing*.5)*widthScale;
     const leftAdvance=left.advance*widthScale,rightAdvance=right.advance*widthScale;
-    const maxGap=Math.min(fontPx*.52,Math.max(scale*3.5,Math.min(leftAdvance,rightAdvance)*.48));
-    const reachLeft=Math.min(leftAdvance*.48,fontPx*.42),reachRight=Math.min(rightAdvance*.48,fontPx*.42);
-    const yMin=baseline-height*.82,yMax=baseline+height*.42,maxDistance2=maxGap*maxGap;
+    const maxGap=Math.min(fontPx*.60,Math.max(scale*3.5,Math.min(leftAdvance,rightAdvance)*.55));
+    const reachLeft=Math.min(leftAdvance*.54,fontPx*.46),reachRight=Math.min(rightAdvance*.54,fontPx*.46);
+    // Keep every candidate inside this baseline's own vertical cell.
+    // Font-height boxes overlap when notebook line spacing is tight; half-pitch
+    // boundaries never overlap with the row above or below.
+    const pitchPx=Math.max(1,(model.pitch||fontPx*1.25)*scale);
+    const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49;
+    const yMin=Math.max(baseline-height*.9,lineTop),yMax=Math.min(baseline+height*.45,lineBottom),maxDistance2=maxGap*maxGap;
     const leftCandidates=endpoints.filter(p=>!p.used&&belongsToWord(p)&&p.x>=wordLeft&&p.x<=wordRight&&p.x>=split-reachLeft&&p.x<=split+maxGap*.22&&p.y>=yMin&&p.y<=yMax);
     const rightCandidates=endpoints.filter(p=>!p.used&&belongsToWord(p)&&p.x>=wordLeft&&p.x<=wordRight&&p.x>=split-maxGap*.22&&p.x<=split+reachRight&&p.y>=yMin&&p.y<=yMax);
     let bestA=null,bestB=null,bestScore=Infinity;
