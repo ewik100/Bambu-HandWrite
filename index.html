@@ -729,50 +729,48 @@ function schoolNoise(seed,index=0,salt=0){
  return (h>>>0)/4294967295;
 }
 function schoolFeatureString(variant=''){
- const contextual=variant==='calt'?1:0;
- return '"calt" '+contextual+', "ss01" 0, "ss02" 0, "salt" 0, "dlig" 0, "liga" 1, "clig" 1';
+ const contextual=variant==='calt'||variant==='ss01'||variant==='ss02'?1:0;
+ const ss01=variant==='ss01'?1:0,ss02=variant==='ss02'?1:0;
+ return '"calt" '+contextual+', "ss01" '+ss01+', "ss02" '+ss02+', "salt" 0, "dlig" 0, "liga" 1, "clig" 1';
+}
+function schoolVariationChoice(seed,enabled=true,index=0,forceVariant=''){
+ if(!enabled)return {active:false,variant:'',features:schoolFeatureString('')};
+ if(forceVariant==='ss01'||forceVariant==='ss02')return {active:true,variant:forceVariant,features:schoolFeatureString(forceVariant)};
+ if(forceVariant==='base'||forceVariant==='calt')return {active:false,variant:'',features:schoolFeatureString('calt')};
+ const strength=schoolVariationStrength();
+ const active=strength>=100||(strength>0&&schoolNoise(seed,index,73)*100<strength);
+ const variant=active?(schoolNoise(seed,index,211)<.5?'ss01':'ss02'):'';
+ return {active,variant,features:schoolFeatureString(variant||'calt')};
 }
 function schoolWordMetrics(ctx,word,seed,enabled=true){
- const strength=schoolVariationStrength();
- const active=!!enabled&&(strength>=100||(strength>0&&schoolNoise(seed,0,73)*100<strength));
- const features=schoolFeatureString(active?'calt':'');
- ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=features;
+ const stableSeed='word:'+String(word);
+ const choice=schoolVariationChoice(stableSeed,enabled);
+ ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
  if('letterSpacing' in ctx)ctx.letterSpacing='0px';
  if('wordSpacing' in ctx)ctx.wordSpacing='0px';
  const width=ctx.measureText(word).width;
- return {width,features,active};
+ return {width,seed:stableSeed,...choice};
 }
 function schoolGlyphFeatureSettings(char,seed,index=0,enabled=true,forceVariant=''){
- const isLetter=/^[А-Яа-яЁё]$/u.test(String(char));
- if(!isLetter)return schoolFeatureString('');
- if(forceVariant==='calt')return schoolFeatureString('calt');
- const strength=schoolVariationStrength();
- const active=!!enabled&&(strength>=100||(strength>0&&schoolNoise(seed,index,73)*100<strength));
- return schoolFeatureString(active?'calt':'');
+ if(!/^[А-Яа-яЁёA-Za-z]$/u.test(String(char)))return schoolFeatureString('');
+ return schoolVariationChoice(String(seed)+'|'+String(char),enabled,index,forceVariant).features;
 }
 function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVariant=''){
- const glyphs=[],chars=Array.from(word);let x=0;
- ctx.fontKerning='none';ctx.fontVariantLigatures='none';
+ const choice=schoolVariationChoice('word:'+String(word),enabled,0,forceVariant);
+ ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
  if('letterSpacing' in ctx)ctx.letterSpacing='0px';
  if('wordSpacing' in ctx)ctx.wordSpacing='0px';
- for(let i=0;i<chars.length;i++){
-  const char=chars[i],features=schoolGlyphFeatureSettings(char,seed,i,enabled,forceVariant);
-  ctx.fontFeatureSettings=features;
-  const advance=ctx.measureText(char).width;
-  glyphs.push({char,x,advance,features});
-  x+=advance+(i<chars.length-1?letterSpacing:0);
- }
- return {glyphs,width:x};
+ const width=ctx.measureText(word).width;
+ return {glyphs:[{char:word,x:0,advance:width,features:choice.features}],width,...choice};
 }
 function schoolFeatureSettings(index=0,enabled=true,forceActive=false){
- const strength=schoolVariationStrength();
- const active=!!enabled&&(forceActive||strength>=100||(strength>0&&schoolNoise(index,0,73)*100<strength));
- return schoolFeatureString(active?'calt':'');
+ return schoolVariationChoice(String(index),enabled,0,forceActive?'ss01':'').features;
 }
 function schoolWordLayout(ctx,word,startX,baseline,fontSize,roughness,letterSpacing,seed,kind='school'){
+ const wordMetrics=schoolWordMetrics(ctx,word,seed,$('letterVariety')?.checked!==false);
  const metrics=ctx.measureText(word);
- return {text:word,x:startX,y:baseline,metrics,endX:startX+metrics.width+letterSpacing,seed,
-  features:schoolFeatureSettings(Math.floor(schoolNoise(seed,0,29)*10000),$('letterVariety')?.checked!==false),fontSize,kind};
+ return {text:word,x:startX,y:baseline,metrics,endX:startX+wordMetrics.width+letterSpacing,seed:wordMetrics.seed,
+  features:wordMetrics.features,fontSize,kind};
 }
 function drawSchoolWordCanvas(ctx,layout,fontSize){
  ctx.save();ctx.textBaseline='alphabetic';ctx.textAlign='left';
@@ -1339,7 +1337,6 @@ async function rasterOriginalFontText(model,token){
     continue;
    }
    const seed='word:'+wordIndex+':'+part;
-   const glyphRun=schoolGlyphMetrics(measure,part,seed,enabled,letterSpacing);
    let filter='';
    if(filterScale>.02){
     const id='schoolRough'+i+'_'+wordIndex,noiseSeed=Math.floor(schoolNoise(seed,0,11)*10000)+1;
