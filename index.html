@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.34.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta name="description" content="Bambu HandWrite 5.35.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
 <meta property="og:title" content="Bambu HandWrite 5.34.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
 <title>Bambu HandWrite 5.34.0 — генератор рукописного G-code</title>
@@ -337,13 +337,13 @@ Hello, world!</textarea></label>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel">
       <div class="school-variation-heading"><b>Вариативность букв и соединения</b></div>
-      <p class="tiny">Настрой силу контекстных вариантов и неровность штрихов отдельно. Соединения строятся между концами соседних буквенных штрихов, а число выполненных переходов показывается ниже.</p>
+      <p class="tiny">Настрой долю слов с настоящими альтернативными буквами и неровность штрихов отдельно. Варианты ss01/ss02 применяются к целому слову, поэтому контекстные формы и соединения внутри него сохраняются.</p>
       <div id="glyphAlternates" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Использовать контекстные формы русских букв</label>
         <input type="checkbox" id="wordBounce" checked hidden aria-hidden="true">
       </div>
-      <label class="school-roughness-control" for="schoolVariationStrength"><span>Сила вариативности букв</span><b id="schoolVariationStrengthValue">100%</b></label>
-      <input type="range" id="schoolVariationStrength" min="0" max="100" step="5" value="100" aria-label="Сила вариативности букв">
+      <label class="school-roughness-control" for="schoolVariationStrength"><span>Доля слов с альтернативными буквами</span><b id="schoolVariationStrengthValue">100%</b></label>
+      <input type="range" id="schoolVariationStrength" min="0" max="100" step="5" value="100" aria-label="Доля слов с альтернативными буквами">
       <label class="school-roughness-control" for="schoolRoughness"><span>Неровность штрихов</span><b id="schoolRoughnessValue">28%</b></label>
       <input type="range" id="schoolRoughness" min="0" max="50" step="1" value="28" aria-label="Неровность штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
@@ -784,22 +784,22 @@ async function renderVariationDemo(){
  const host=$('variationDemo');if(!host)return;
  const sequence=++variationDemoSequence;
  host.replaceChildren();
- const loading=document.createElement('p');loading.className='tiny';loading.textContent='Загружаю шрифт и проверяю варианты…';host.append(loading);
+ const loading=document.createElement('p');loading.className='tiny';loading.textContent='Загружаю шрифт и проверяю альтернативные формы…';host.append(loading);
  let fontReady=false;
  try{fontReady=await loadBambuOriginalFont()}catch(e){fontReady=false}
  if(sequence!==variationDemoSequence||!host.isConnected)return;
  host.replaceChildren();
  const enabled=$('letterVariety')?.checked!==false;
- const strength=schoolVariationStrength();
- const sampleWords=['мама мыла раму','машина едет','тетрадь и шоссе'];
- const title=document.createElement('b');title.textContent='Сравнение настоящих форм шрифта';host.append(title);
+ const sampleWords=['мама мыла раму.','машина едет.','тетрадь и шоссе.'];
+ const title=document.createElement('b');title.textContent='Сравнение встроенных форм шрифта';host.append(title);
  if(!fontReady){
-  const error=document.createElement('p');error.className='tiny';error.textContent='Не удалось загрузить Bambu HandWrite. Предпросмотр вариантов недоступен.';host.append(error);return;
+  const error=document.createElement('p');error.className='tiny';error.textContent='Не удалось загрузить Bambu HandWrite. Предпросмотр альтернатив недоступен.';host.append(error);return;
  }
  const rows=[
-  {label:'A · БАЗА',mode:'base'},
-  {label:'B · КОНТЕКСТ',mode:'context'},
-  {label:'АВТО · ПОЛЗУНОК',mode:'auto'}
+  {label:'A · ОСНОВА + КОНТЕКСТ',mode:'base'},
+  {label:'B · АЛЬТЕРНАТИВА SS01',mode:'ss01'},
+  {label:'C · АЛЬТЕРНАТИВА SS02',mode:'ss02'},
+  {label:'АВТО · СМЕШИВАНИЕ ПО СЛОВАМ',mode:'auto'}
  ];
  for(const item of rows){
   const row=document.createElement('div');row.className='variation-demo-row';
@@ -808,16 +808,29 @@ async function renderVariationDemo(){
   sample.style.fontFamily='"Bambu HandWrite Original",cursive';sample.style.fontWeight='400';
   sample.style.whiteSpace='normal';sample.style.overflow='visible';sample.style.overflowWrap='anywhere';
   sample.style.fontKerning='normal';sample.style.fontVariantLigatures='common-ligatures contextual';
-  const textNode=document.createElement('span');textNode.textContent=sampleWords.join(' · ');
-  let features=schoolFeatureString('');
-  if(item.mode==='context')features=schoolFeatureString('calt');
-  if(item.mode==='auto')features=schoolFeatureString(enabled&&strength>0?'calt':'');
-  textNode.style.fontFeatureSettings=features;
-  textNode.style.fontVariantLigatures='common-ligatures contextual';
-  sample.append(textNode);row.append(label,sample);host.append(row);
+  if(item.mode!=='auto'){
+   const textNode=document.createElement('span');textNode.textContent=sampleWords.join(' · ');
+   textNode.style.fontFeatureSettings=schoolFeatureString(item.mode==='base'?'calt':item.mode);
+   textNode.style.fontVariantLigatures='common-ligatures contextual';
+   sample.append(textNode);
+  }else{
+   for(let sentenceIndex=0;sentenceIndex<sampleWords.length;sentenceIndex++){
+    const words=sampleWords[sentenceIndex].split(/(\s+)/u);
+    for(const word of words){
+     if(!word)continue;
+     if(/^\s+$/u.test(word)){sample.append(document.createTextNode(word));continue}
+     const textNode=document.createElement('span');textNode.textContent=word;
+     textNode.style.fontFeatureSettings=schoolVariationChoice('demo:'+word,enabled).features;
+     textNode.style.fontVariantLigatures='common-ligatures contextual';
+     sample.append(textNode);
+    }
+    if(sentenceIndex<sampleWords.length-1)sample.append(document.createTextNode(' · '));
+   }
+  }
+  row.append(label,sample);host.append(row);
  }
  const note=document.createElement('p');note.className='variation-demo-note';
- note.textContent='A — исходная форма. B — контекстные замены шрифта (если они предусмотрены его таблицей OpenType). «Авто» включает контекстные замены согласно ползунку. Отдельные ss01/ss02 не заявляются: их наличие в этом файле шрифта не подтверждено.';
+ note.textContent='A — базовая форма с контекстными соединениями. B и C — реальные альтернативные наборы ss01 и ss02, найденные в файле Bambu HandWrite. «Авто» распределяет их по целым словам, не разбивая слова на отдельные буквы.';
  host.append(note);
 }
 
