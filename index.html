@@ -756,12 +756,15 @@ function schoolGlyphFeatureSettings(char,seed,index=0,enabled=true,forceVariant=
  return schoolVariationChoice(String(seed)+'|'+String(char),enabled,index,forceVariant).features;
 }
 function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVariant=''){
- const choice=schoolVariationChoice('word:'+String(word),enabled,0,forceVariant);
- ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
+ const chars=Array.from(word),choice=schoolVariationChoice('word:'+String(word),enabled,0,forceVariant);
+ ctx.fontKerning='none';ctx.fontVariantLigatures='none';ctx.fontFeatureSettings=choice.features;
  if('letterSpacing' in ctx)ctx.letterSpacing='0px';
  if('wordSpacing' in ctx)ctx.wordSpacing='0px';
- const width=ctx.measureText(word).width;
- return {glyphs:[{char:word,x:0,advance:width,features:choice.features}],width,...choice};
+ const raw=chars.map(char=>ctx.measureText(char).width),rawWidth=raw.reduce((sum,value)=>sum+value,0);
+ ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
+ const shapedWidth=ctx.measureText(word).width,scale=rawWidth>0?shapedWidth/rawWidth:1;
+ let x=0;const glyphs=chars.map((char,index)=>{const advance=raw[index]*scale,glyph={char,x,advance,features:choice.features};x+=advance+(index<chars.length-1?letterSpacing:0);return glyph});
+ return {glyphs,width:shapedWidth+letterSpacing*Math.max(0,chars.length-1),...choice};
 }
 function schoolFeatureSettings(index=0,enabled=true,forceActive=false){
  return schoolVariationChoice(String(index),enabled,0,forceActive?'ss01':'').features;
