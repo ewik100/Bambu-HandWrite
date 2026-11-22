@@ -19,12 +19,12 @@ SAMPLE = [
     "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
 ]
 
-def lookup_details(font):
+def lookup_details(font, feature_tag="calt"):
     if "GSUB" not in font:
-        return {"features": [], "calt": None}
+        return {"features": [], feature_tag: None}
     table = font["GSUB"].table
     feature_tags = sorted({r.FeatureTag for r in table.FeatureList.FeatureRecord})
-    calt_records = [r for r in table.FeatureList.FeatureRecord if r.FeatureTag == "calt"]
+    calt_records = [r for r in table.FeatureList.FeatureRecord if r.FeatureTag == feature_tag]
     lookups = []
     seen = set()
     for record in calt_records:
@@ -56,11 +56,11 @@ def lookup_details(font):
                 entry["subtables"].append(subinfo)
             lookups.append(entry)
     types = sorted({x["lookup_type"] for x in lookups})
-    return {"features": feature_tags, "calt": {"lookup_count": len(lookups), "lookup_types": types, "lookups": lookups}}
+    return {"features": feature_tags, feature_tag: {"lookup_count": len(lookups), "lookup_types": types, "lookups": lookups}}
 
 font = TTFont(FONT_PATH)
 cmap = font.getBestCmap() or {}
-gs = lookup_details(font)
+gs = lookup_details(font)\nstyle01 = lookup_details(font, "ss01")\nstyle02 = lookup_details(font, "ss02")
 report = {
     "font": str(FONT_PATH),
     "glyph_count": len(font.getGlyphOrder()),
@@ -68,7 +68,7 @@ report = {
     "uppercase_cyrillic_missing": [f"U+{ord(ch):04X}" for ch in "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" if ord(ch) not in cmap],
     "lowercase_cyrillic_missing": [f"U+{ord(ch):04X}" for ch in "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" if ord(ch) not in cmap],
     "gsub_features": gs["features"],
-    "calt": gs["calt"],
+    "calt": gs["calt"],\n    "ss01": style01["ss01"],\n    "ss02": style02["ss02"],
 }
 if "GPOS" in font:
     gpos = font["GPOS"].table
@@ -85,24 +85,27 @@ font.save(ttf_path)
 size = 58
 pil_font = ImageFont.truetype(str(ttf_path), size, layout_engine=ImageFont.Layout.RAQM)
 label_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22)
-small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 17)
+sample_font = [
+    ("A — база + контекст", ["+calt", "-ss01", "-ss02"]),
+    ("B — альтернатива ss01 + контекст", ["+calt", "+ss01", "-ss02"]),
+    ("C — альтернатива ss02 + контекст", ["+calt", "-ss01", "+ss02"]),
+]
 width, height = 2300, 940
 sheet = Image.new("RGB", (width, height), "#f7f5ef")
 draw = ImageDraw.Draw(sheet)
-draw.text((30, 16), "Bambu HandWrite — same base glyphs, contextual feature comparison", font=label_font, fill="#263b54")
+draw.text((30, 16), "Bambu HandWrite — real OpenType letter variants", font=label_font, fill="#263b54")
 y = 62
 rendered = {}
-for feature_name, features in (("A — calt off", ["-calt"]), ("B — calt on", ["+calt"])):
+for label, features in sample_font:
     draw.rounded_rectangle((24, y, width - 24, y + 38), radius=8, fill="#e8edf1")
-    draw.text((38, y + 5), feature_name, font=label_font, fill="#263b54")
+    draw.text((38, y + 5), label, font=label_font, fill="#263b54")
     y += 46
     for line in SAMPLE:
         draw.text((38, y), line, font=pil_font, fill="#183c70", language="ru", features=features)
         y += 82
-    rendered[feature_name] = features
+    rendered[label] = features
     y += 5
 
-# Pixel-level A/B comparison on the same specimen, not a visual guess.
 def render_sample(features):
     im = Image.new("L", (2100, 620), 0)
     d = ImageDraw.Draw(im)
@@ -112,15 +115,17 @@ def render_sample(features):
         yy += 66
     return im
 
-base = render_sample(["-calt"])
-variant = render_sample(["+calt"])
-diff = ImageChops.difference(base, variant)
-report["calt_render_comparison"] = {
-    "different_pixels": sum(1 for p in diff.getdata() if p),
-    "difference_bbox": list(diff.getbbox()) if diff.getbbox() else None,
-    "sample_line_count": len(SAMPLE),
-}
-sheet.save(OUT / "font-variants-A-B.png")
-diff.convert("RGB").save(OUT / "font-variants-difference.png")
+renders = {label: render_sample(features) for label, features in sample_font}
+base = renders[sample_font[0][0]]
+report["render_comparison"] = {}
+for label, _ in sample_font[1:]:
+    diff = ImageChops.difference(base, renders[label])
+    report["render_comparison"][label] = {
+        "different_pixels_vs_base": sum(1 for p in diff.getdata() if p),
+        "difference_bbox": list(diff.getbbox()) if diff.getbbox() else None,
+    }
+sheet.save(OUT / "font-variants-A-B-C.png")
+diff01 = ImageChops.difference(renders[sample_font[1][0]], renders[sample_font[2][0]])
+diff01.convert("RGB").save(OUT / "font-variants-ss01-vs-ss02.png")
 (OUT / "font-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 print(json.dumps(report, ensure_ascii=False, indent=2))
