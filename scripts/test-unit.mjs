@@ -90,6 +90,11 @@ assert(variedJoins.every(x=>x.a>0&&x.b>0&&x.a<=2.4+1e-9&&x.b<=2.4+1e-9),'All con
 const repeatJoin=schoolApi.joinHandles(12,16,'pair-style-17');
 assert(repeatJoin.a===variedJoins[17].a&&repeatJoin.b===variedJoins[17].b,'The same word and letter pair always receives the same connector profile');
 joinVarietyInput='70';
+const shapedCtx={fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',letterSpacing:'0px',wordSpacing:'0px',measureText(value){const widths={'м':8,'а':8,'ма':13,'мам':20,'мама':28};return {width:widths[value]??Array.from(value).length*8};}};
+const shapedMetrics=schoolApi.glyphMetrics(shapedCtx,'мама','shaped-boundaries',true,1);
+assert(shapedMetrics.glyphs.length===4&&shapedMetrics.width===31,'Glyph metrics preserve shaped word width and explicit inter-letter spacing');
+assert(Math.abs(shapedMetrics.glyphs[1].x-7.5)<1e-9,'First glyph boundary uses shaped prefix and suffix widths');
+assert(shapedMetrics.glyphs.every((g,i)=>g.advance>=0&&(i===0?g.x===0:g.x>=shapedMetrics.glyphs[i-1].x)),'Shaped glyph boundaries remain ordered and non-negative');
 const baseFeatures=schoolApi.features(0,false);
 const contextualFeatures=schoolApi.features(0,true,true);
 assert(baseFeatures.includes('"calt" 0')&&baseFeatures.includes('"ss01" 0')&&baseFeatures.includes('"ss02" 0')&&baseFeatures.includes('"liga" 1'),'Disabled variation keeps the original glyphs and standard ligatures');
@@ -150,6 +155,7 @@ const originalFont=fs.readFileSync(path.join(root,'fonts','BambuHandWriteSchool-
 assert(originalFont.length>6000,'Original Bambu font WOFF2 asset is present and non-empty');
 assert(originalFont.subarray(0,4).toString('ascii')==='wOF2','Original Bambu font has a valid WOFF2 signature');
 assert(html.includes('function connectSchoolWordSkeletons('),'The custom school font has a dedicated centerline connector');
+assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;'),'Glyph positioning uses shaped prefix/suffix measurements');
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
 assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(bestA,bestB,seed+'|'+k+'|'+left.char+right.char)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
