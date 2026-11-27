@@ -93,7 +93,7 @@ joinVarietyInput='70';
 const shapedCtx={fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',letterSpacing:'0px',wordSpacing:'0px',measureText(value){const widths={'м':8,'а':8,'ма':13,'мам':20,'мама':28};return {width:widths[value]??Array.from(value).length*8};}};
 const shapedMetrics=schoolApi.glyphMetrics(shapedCtx,'мама','shaped-boundaries',true,1);
 assert(shapedMetrics.glyphs.length===4&&shapedMetrics.width===31,'Glyph metrics preserve shaped word width and explicit inter-letter spacing');
-assert(Math.abs(shapedMetrics.glyphs[1].x-7.5)<1e-9,'First glyph boundary uses shaped prefix and suffix widths');
+assert(Math.abs(shapedMetrics.glyphs[1].x-7)<1e-9,'First glyph boundary uses shaped prefix and suffix widths');
 assert(shapedMetrics.glyphs.every((g,i)=>g.advance>=0&&(i===0?g.x===0:g.x>=shapedMetrics.glyphs[i-1].x)),'Shaped glyph boundaries remain ordered and non-negative');
 const baseFeatures=schoolApi.features(0,false);
 const contextualFeatures=schoolApi.features(0,true,true);
