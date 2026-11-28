@@ -1364,6 +1364,37 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure,diagnostics=null){
  if(diagnostics)diagnostics.joined=joined;
  return joined;
 }
+function analyzeSkeleton(bin,w,h,paths,scale){
+ let branchNodes=0,endpoints=0,inkPixels=0;
+ for(let i=0;i<bin.length;i++)if(bin[i]){
+  inkPixels++;
+  const degree=neighbors(bin,w,h,i).length;
+  if(degree>2)branchNodes++;
+  else if(degree===1)endpoints++;
+ }
+ const lengths=paths.map(path=>{
+  let n=0;
+  for(let i=1;i<path.length;i++){
+   const ax=path[i-1]%w,ay=Math.floor(path[i-1]/w),bx=path[i]%w,by=Math.floor(path[i]/w);
+   n+=Math.hypot(bx-ax,by-ay);
+  }
+  return n/scale;
+ });
+ const shortCount=lengths.filter(v=>v<.35).length;
+ return {branchNodes,endpoints,inkPixels,shortCount,pathCount:paths.length,shortRatio:paths.length?shortCount/paths.length:0};
+}
+function simplify(points,tol=1.1){if(points.length<3)return points;const sq=v=>v*v,dist=(p,a,b)=>{let dx=b.x-a.x,dy=b.y-a.y;if(!dx&&!dy)return sq(p.x-a.x)+sq(p.y-a.y);let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));return sq(p.x-(a.x+t*dx))+sq(p.y-(a.y+t*dy))};function rec(a,b,out){let m=tol*tol,idx=-1;for(let i=a+1;i<b;i++){const d=dist(points[i],points[a],points[b]);if(d>m){m=d;idx=i}}if(idx>=0){rec(a,idx,out);out.push(points[idx]);rec(idx,b,out)}}const out=[points[0]];rec(0,points.length-1,out);out.push(points[points.length-1]);return out}
+function withCanvasLineTransform(cx,x,y,width,heightScale,draw){
+ cx.save();
+ try{
+  cx.translate(x,y);
+  cx.transform(width,0,0,heightScale,0,0);
+  cx.translate(-x,-y);
+  return draw();
+ }finally{
+  cx.restore();
+ }
+}
 async function rasterOriginalFontText(model,token){
  await loadBambuOriginalFont();
  const bounds=model.textBounds||{};
