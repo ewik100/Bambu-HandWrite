@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.36.3 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.36.3">
+<meta name="description" content="Bambu HandWrite 5.36.4 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.36.4">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.36.3 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.36.4 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="../fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -239,7 +239,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img class="brand-logo" src="../assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.36.3 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
+  <div class="brand-lockup"><img class="brand-logo" src="../assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.36.4 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю выбранный рукописный шрифт…</span></p>
 </header>
@@ -337,13 +337,13 @@ Hello, world!</textarea></label>
     </div>
     <div class="wide school-variation-panel" id="schoolVariationPanel">
       <div class="school-variation-heading"><b>Вариативность букв и соединения</b></div>
-      <p class="tiny">Настрой долю слов с настоящими альтернативными буквами и неровность штрихов отдельно. Варианты ss01/ss02 применяются к целому слову, поэтому контекстные формы и соединения внутри него сохраняются.</p>
+      <p class="tiny">Настрой разнообразие начертания самих букв отдельно от соединений и неровности штрихов. Одинаковые слова в разных местах могут получать разные реальные наборы форм букв. OpenType-набор ss01 или ss02 выбирается отдельно для каждого вхождения слова, а контекстные формы calt работают внутри слова. Это меняет очертания букв, а не только линии-соединители; слово не разбивается на отдельные символы.</p>
       <div id="glyphAlternates" style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px">
         <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="letterVariety" checked>Использовать контекстные формы русских букв</label>
         <input type="checkbox" id="wordBounce" checked hidden aria-hidden="true">
       </div>
-      <label class="school-roughness-control" for="schoolVariationStrength"><span>Доля слов с альтернативными буквами</span><b id="schoolVariationStrengthValue">100%</b></label>
-      <input type="range" id="schoolVariationStrength" min="0" max="100" step="5" value="100" aria-label="Доля слов с альтернативными буквами">
+      <label class="school-roughness-control" for="schoolVariationStrength"><span>Доля слов с альтернативными начертаниями</span><b id="schoolVariationStrengthValue">100%</b></label>
+      <input type="range" id="schoolVariationStrength" min="0" max="100" step="5" value="100" aria-label="Доля слов с альтернативными начертаниями букв">
       <label class="school-roughness-control" for="schoolJoinVariety"><span>Разнообразие соединений</span><b id="schoolJoinVarietyValue">70%</b></label>
       <input type="range" id="schoolJoinVariety" min="0" max="100" step="5" value="70" aria-label="Разнообразие соединений">
       <p class="tiny">Меняет характер переходов между соседними буквами: короткие, плавные и асимметричные. Длинные мостики и соединения между словами или строками не добавляются.</p>
@@ -522,7 +522,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.36.3 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.36.4 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -612,7 +612,7 @@ async function loadBambuOriginalFont(){
  if(bambuFontBase64&&document.fonts?.check('400 24px "Bambu HandWrite Original"','мама мыла раму'))return true;
  if(bambuFontPromise)return bambuFontPromise;
  bambuFontPromise=(async()=>{
-  const response=await fetch('../fonts/BambuHandWriteSchool-Regular.woff2?v=5.36.3',{cache:'reload'});
+  const response=await fetch('../fonts/BambuHandWriteSchool-Regular.woff2?v=5.36.4',{cache:'reload'});
   if(!response.ok)throw Error('Не удалось загрузить собственный шрифт Bambu HandWrite Original.');
   const buffer=await response.arrayBuffer();
   if(buffer.byteLength<8000)throw Error('Файл Bambu HandWrite Original повреждён или неполный.');
@@ -780,7 +780,7 @@ function schoolVariationChoice(seed,enabled=true,index=0,forceVariant=''){
  return {active,variant,features:schoolFeatureString(variant||'calt')};
 }
 function schoolWordMetrics(ctx,word,seed,enabled=true){
- const stableSeed='word:'+String(word);
+ const stableSeed=String(seed||('word:'+String(word)));
  const choice=schoolVariationChoice(stableSeed,enabled);
  ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
  if('letterSpacing' in ctx)ctx.letterSpacing='0px';
@@ -793,7 +793,7 @@ function schoolGlyphFeatureSettings(char,seed,index=0,enabled=true,forceVariant=
  return schoolVariationChoice(String(seed)+'|'+String(char),enabled,index,forceVariant).features;
 }
 function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVariant=''){
- const chars=Array.from(word),choice=schoolVariationChoice('word:'+String(word),enabled,0,forceVariant);
+ const chars=Array.from(word),stableSeed=String(seed||('word:'+String(word))),choice=schoolVariationChoice(stableSeed,enabled,0,forceVariant);
  ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
  if('letterSpacing' in ctx)ctx.letterSpacing='0px';
  if('wordSpacing' in ctx)ctx.wordSpacing='0px';
@@ -837,7 +837,7 @@ async function renderVariationDemo(){
  if(sequence!==variationDemoSequence||!host.isConnected)return;
  host.replaceChildren();
  const enabled=$('letterVariety')?.checked!==false;
- const sampleWords=['мама мыла раму.','машина едет.','тетрадь и шоссе.'];
+ const sampleWords=['мама мама мыла раму.','машина едет.','тетрадь и шоссе.'];
  const title=document.createElement('b');title.textContent='Сравнение встроенных форм шрифта';host.append(title);
  if(!fontReady){
   const error=document.createElement('p');error.className='tiny';error.textContent='Не удалось загрузить Bambu HandWrite. Предпросмотр альтернатив недоступен.';host.append(error);return;
@@ -863,11 +863,13 @@ async function renderVariationDemo(){
   }else{
    for(let sentenceIndex=0;sentenceIndex<sampleWords.length;sentenceIndex++){
     const words=sampleWords[sentenceIndex].split(/(\s+)/u);
+    let demoWordIndex=0;
     for(const word of words){
      if(!word)continue;
      if(/^\s+$/u.test(word)){sample.append(document.createTextNode(word));continue}
      const textNode=document.createElement('span');textNode.textContent=word;
-     textNode.style.fontFeatureSettings=schoolVariationChoice('demo:'+word,enabled).features;
+     textNode.style.fontFeatureSettings=schoolVariationChoice('demo:'+sentenceIndex+':'+demoWordIndex+':'+word,enabled).features;
+     demoWordIndex++;
      textNode.style.fontVariantLigatures='common-ligatures contextual';
      sample.append(textNode);
     }
@@ -1940,7 +1942,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.36.3`,
+  `; generated by Bambu HandWrite 5.36.4`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1968,8 +1970,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.36.3 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.36.3`,
+  `; Bambu HandWrite 5.36.4 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.36.4`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -2071,7 +2073,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.36.3',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.36.4',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}

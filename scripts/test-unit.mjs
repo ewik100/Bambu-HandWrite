@@ -113,6 +113,12 @@ assert(!noVariation.active&&noVariation.features.includes('"calt" 1')&&noVariati
 variationStrengthInput='100';
 const fullVariation=schoolApi.wordMetrics(mockGlyphMeasure(),'мама','slider-full',true);
 assert(fullVariation.active&&fullVariation.features.includes('"calt" 1')&&(fullVariation.features.includes('"ss01" 1')!==fullVariation.features.includes('"ss02" 1')),'Variation slider at 100% selects exactly one real alternate set per complete word');
+const repeatedWordA=schoolApi.wordMetrics(mockGlyphMeasure(),'мама','repeat:0',true);
+const repeatedWordB=schoolApi.wordMetrics(mockGlyphMeasure(),'мама','repeat:1',true);
+assert(repeatedWordA.active&&repeatedWordB.active&&repeatedWordA.features!==repeatedWordB.features,'Identical word occurrences can receive different real letterform sets from their position seed');
+const repeatedGlyphA=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама','repeat:0',true);
+const repeatedGlyphB=schoolApi.glyphMetrics(mockGlyphMeasure(),'мама','repeat:1',true);
+assert(repeatedGlyphA.features!==repeatedGlyphB.features,'Skeleton glyph metrics use the same occurrence-specific letterform selection as SVG preview');
 const styleDistribution=Array.from({length:60},(_,i)=>schoolApi.wordMetrics(mockGlyphMeasure(),'слово'+i,'distribution-'+i,true));
 assert(styleDistribution.some(x=>x.features.includes('"ss01" 1'))&&styleDistribution.some(x=>x.features.includes('"ss02" 1')),'Automatic selection uses both ss01 and ss02 across different words');
 variationStrengthInput='50';
