@@ -1279,8 +1279,8 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure,diagnostics=null){
   const distance=Math.hypot(b.x-a.x,b.y-a.y);
   if(distance<1||distance>bounds.maxGap)return false;
   const ta=tangentOut(a),tb=tangentIn(b);
-  const handle=Math.max(.6,Math.min(distance*.38,fontPx*.12));
-  const c1={x:a.x+ta.x*handle,y:a.y+ta.y*handle},c2={x:b.x-tb.x*handle,y:b.y-tb.y*handle};
+  const handles=schoolJoinHandles(distance,fontPx,seed,pair);
+  const c1={x:a.x+ta.x*handles.a,y:a.y+ta.y*handles.a},c2={x:b.x-tb.x*handles.b,y:b.y-tb.y*handles.b};
   const steps=Math.max(8,Math.ceil(distance*2)),points=[];
   let previousX=a.x;
   for(let n=0;n<=steps;n++){
