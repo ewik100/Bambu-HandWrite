@@ -1334,7 +1334,7 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure,diagnostics=null){
     if(!connectable.test(left.char)||!connectable.test(right.char))continue;
     const split=baseX+(left.x+left.advance)*widthScale,leftAdvance=regions[k].advance,rightAdvance=regions[k+1].advance;
     if(leftAdvance<geo.scale*.35||rightAdvance<geo.scale*.35)continue;
-    const maxGap=Math.min(fontPx*.72,Math.max(geo.scale*4.5,Math.min(leftAdvance,rightAdvance)*.78));
+    const maxGap=Math.min(fontPx*.60,Math.max(geo.scale*4.5,Math.min(leftAdvance,rightAdvance)*.78));
     const reachLeft=Math.max(fontPx*.18,Math.min(leftAdvance*.92,fontPx*.72));
     const reachRight=Math.max(fontPx*.18,Math.min(rightAdvance*.92,fontPx*.72));
     const leftCandidates=wordEndpoints.filter(p=>!p.used&&p.owner===k&&p.x>=split-reachLeft&&p.x<=split+maxGap*.35);
