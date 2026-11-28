@@ -185,6 +185,18 @@ jobs:
           )
           print("Built", ttf_path, "glyphs", len(check.getGlyphOrder()), "features", features)
           PY
+      - name: Straighten lowercase Cyrillic т and verify all variants
+        run: |
+          python scripts/patch-school-t-glyphs.py dist/BambuHandWriteSchool-Regular.ttf
+          python - <<'PY'
+          from fontTools.ttLib import TTFont
+          font = TTFont("dist/BambuHandWriteSchool-Regular.ttf")
+          font.flavor = "woff2"
+          font.save("dist/BambuHandWriteSchool-Regular.woff2")
+          PY
+          python scripts/diagnose-font-variants.py dist/BambuHandWriteSchool-Regular.woff2
+          cp diagnostics/font-variants-A-B-C.png dist/font-variants-A-B-C.png
+          cp diagnostics/font-report.json dist/font-report.json
       - uses: actions/upload-artifact@v4
         with:
           name: Bambu-HandWrite-School-1.1
@@ -199,6 +211,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add fonts/BambuHandWriteSchool-Regular.woff2
           if ! git diff --cached --quiet; then
-            git commit -m "Publish Bambu HandWrite School 1.1 web font"
+            git commit -m "Publish Bambu HandWrite School font with upright т"
             git push
           fi

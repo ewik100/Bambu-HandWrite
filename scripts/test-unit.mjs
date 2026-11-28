@@ -77,7 +77,7 @@ const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Bambu handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
 vm.runInContext(schoolFunctions,context);
-const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout,joinVariety:schoolJoinVariety,joinHandles:schoolJoinHandles})',context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout,joinVariety:schoolJoinVariety,joinHandles:schoolJoinHandles,joinPairShape:schoolJoinPairShape})',context);
 assert(schoolApi.variation()===0,'Contextual alternates do not alter line wrapping or reserve extra width');
 joinVarietyInput='0';
 const uniformJoin=schoolApi.joinHandles(12,16,'same-pair');
@@ -90,6 +90,8 @@ const pairShapeMa=schoolApi.joinHandles(12,16,'same-pair','ма');
 const pairShapeAm=schoolApi.joinHandles(12,16,'same-pair','ам');
 assert(pairShapeMa.a!==pairShapeAm.a||pairShapeMa.b!==pairShapeAm.b,'Different ordered letter pairs receive different base transition profiles');
 assert(html.includes('function schoolJoinPairShape(pair){')&&html.includes("'ма':[.24,.38]")&&html.includes("'ст':[.30,.22]"),'Common Cyrillic pairs have explicit, ordered transition profiles');
+assert(schoolApi.joinPairShape('ат').join(',')==='0.34,0.24'&&schoolApi.joinPairShape('тт').join(',')==='0.3,0.25','Lowercase т has dedicated incoming and outgoing connector profiles');
+assert(html.includes("const seed='line:'+i+':word:'+wordIndex+':'+part;")&&html.includes("const seed='line:'+li+':word:'+wordIndex+':'+part;")&&html.includes("function wrapLine(text,maxW,mode,hand,size,baseLineIndex=0)"),'Line-specific word variation is shared by wrapping, raster and join geometry');
 
 assert(variedJoins.every(x=>x.a>0&&x.b>0&&x.a<=2.4+1e-9&&x.b<=2.4+1e-9),'All connector handles remain positive and inside the geometric cap');
 const repeatJoin=schoolApi.joinHandles(12,16,'pair-style-17');
@@ -236,6 +238,10 @@ assert(blockedCount===0,'A connector is rejected when its curve passes too close
 
 
 assert(html.includes('async function loadBambuOriginalFont()')&&html.includes('./fonts/BambuHandWriteSchool-Regular.woff2'),'Bambu HandWrite School is loaded from the bundled local asset');
+const tGlyphPatch=fs.readFileSync(path.join(root,'scripts/patch-school-t-glyphs.py'),'utf8');
+const fontBuildWorkflow=fs.readFileSync(path.join(root,'.github/workflows/export-bambu-font.yml'),'utf8');
+assert(tGlyphPatch.includes('uni0442.ss01')&&tGlyphPatch.includes('uni0442.ss02')&&tGlyphPatch.includes('SHEAR = 0.38')&&tGlyphPatch.includes('old_width / sheared_width'),'Lowercase т is corrected in base, SS01 and SS02 while preserving horizontal bounds');
+assert(fontBuildWorkflow.includes('python scripts/patch-school-t-glyphs.py dist/BambuHandWriteSchool-Regular.ttf'),'The published webfont is rebuilt from corrected TrueType outlines');
 assert(html.includes('async function rasterOriginalFontText(')&&html.includes('function renderSchoolStrokePreview('),'The original custom font is used by the shared preview and G-code centerline rasterizer');
 assert(html.includes('traceSkeleton(raster.bin,raster.w,raster.h)')&&html.includes('mergeTouchingPaths(simplified)'),'Preview paths are generated from the thinned centerline skeleton, not the filled font outline');
 assert(html.includes('feDisplacementMap')&&html.includes('id="schoolRoughness"'),'Natural irregularity is applied to the stroke shape itself with an explicit control');

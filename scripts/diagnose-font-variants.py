@@ -2,17 +2,19 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 from fontTools.ttLib import TTFont
 import json
+import sys
 
 ROOT = Path(".")
 OUT = ROOT / "diagnostics"
 OUT.mkdir(exist_ok=True)
-FONT_PATH = ROOT / "fonts/BambuHandWriteSchool-Regular.woff2"
+FONT_PATH = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "fonts/BambuHandWriteSchool-Regular.woff2"
 SAMPLE = [
     "мама мыла раму",
     "тетрадь и шоссе",
     "школьная ручка",
     "Привет, мир!",
     "машина летит высоко",
+    "т тт ттт. Тетрадь. мама там.",
     "тт, лл, мм, шш, ии, жж, ёж, йод",
     "minimum  letter  school  hello",
     "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
@@ -63,8 +65,22 @@ cmap = font.getBestCmap() or {}
 gs = lookup_details(font)
 style01 = lookup_details(font, "ss01")
 style02 = lookup_details(font, "ss02")
+t_glyph_names = ["uni0442", "uni0442.ss01", "uni0442.ss02"]
+t_glyph_report = {}
+for glyph_name in t_glyph_names:
+    glyph = font["glyf"][glyph_name]
+    if glyph.numberOfContours <= 0 or getattr(glyph, "components", None):
+        raise SystemExit(f"Lowercase т glyph {glyph_name} is not a decomposed outline")
+    advance, lsb = font["hmtx"][glyph_name]
+    t_glyph_report[glyph_name] = {
+        "bounds": [glyph.xMin, glyph.yMin, glyph.xMax, glyph.yMax],
+        "advance": advance,
+        "left_side_bearing": lsb,
+        "contours": glyph.numberOfContours,
+    }
 report = {
     "font": str(FONT_PATH),
+    "lowercase_t_glyphs": t_glyph_report,
     "glyph_count": len(font.getGlyphOrder()),
     "cyrillic_codepoints": sum(0x400 <= cp <= 0x4FF for cp in cmap),
     "uppercase_cyrillic_missing": [f"U+{ord(ch):04X}" for ch in "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" if ord(ch) not in cmap],
