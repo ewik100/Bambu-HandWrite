@@ -171,8 +171,8 @@ assert(html.includes('function connectSchoolWordSkeletons('),'The custom school 
 assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;'),'Glyph positioning uses shaped prefix/suffix measurements');
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
 assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed,pair)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+pair,pair,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
-assert(html.includes('const ownerByComponent=new Map();')&&html.includes('p.owner===k')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Every candidate endpoint is assigned to one glyph owner and tangent direction is scored');
-assert(html.includes('joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component'),'Connector geometry rejects collisions with unrelated skeletons and previous joins');
+assert(html.includes('const ownerByComponent=new Map();')&&html.includes('bestDistance>Math.max(fontPx*.62,region.advance*.95)')&&html.includes('directionPenalty=(1-ta.x)+(1-tb.x)'),'Endpoints are assigned to their nearest glyph and connector direction is scored without fragile centroid ties');
+assert(html.includes('if(component&&component!==a.component&&component!==b.component)return false;'),'Connector geometry rejects collisions with unrelated skeletons while allowing endpoint contact');
 assert(html.includes('diagnostics.words.push(wordReport)')&&html.includes("pairReport.result='соединено'")&&html.includes('id="schoolJoinDiagnosticsText"'),'The HTML exposes per-word, per-pair diagnostic ownership and connection decisions');
 
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
@@ -240,7 +240,7 @@ assert(blockedCount===0,'A connector is rejected when its curve passes too close
 assert(html.includes('async function loadBambuOriginalFont()')&&html.includes('./fonts/BambuHandWriteSchool-Regular.woff2'),'Bambu HandWrite School is loaded from the bundled local asset');
 const tGlyphPatch=fs.readFileSync(path.join(root,'scripts/patch-school-t-glyphs.py'),'utf8');
 const fontBuildWorkflow=fs.readFileSync(path.join(root,'.github/workflows/export-bambu-font.yml'),'utf8');
-assert(tGlyphPatch.includes('uni0442.ss01')&&tGlyphPatch.includes('uni0442.ss02')&&tGlyphPatch.includes('SHEAR = 0.38')&&tGlyphPatch.includes('old_width / sheared_width'),'Lowercase т is corrected in base, SS01 and SS02 while preserving horizontal bounds');
+assert(tGlyphPatch.includes('uni0442.ss01')&&tGlyphPatch.includes('uni0442.ss02')&&tGlyphPatch.includes('SHEAR = 0.42')&&tGlyphPatch.includes('expanded_advance')&&!tGlyphPatch.includes('scale_x'),'Lowercase т is fully deskewed in base, SS01 and SS02 without cancelling the correction by width compression');
 assert(fontBuildWorkflow.includes('python scripts/patch-school-t-glyphs.py dist/BambuHandWriteSchool-Regular.ttf'),'The published webfont is rebuilt from corrected TrueType outlines');
 assert(html.includes('async function rasterOriginalFontText(')&&html.includes('function renderSchoolStrokePreview('),'The original custom font is used by the shared preview and G-code centerline rasterizer');
 assert(html.includes('traceSkeleton(raster.bin,raster.w,raster.h)')&&html.includes('mergeTouchingPaths(simplified)'),'Preview paths are generated from the thinned centerline skeleton, not the filled font outline');
