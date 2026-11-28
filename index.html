@@ -922,7 +922,7 @@ function measureMixed(t,mode,hand,size,seedPrefix=''){
  },0);
 }
 function wrapLine(text,maxW,mode,hand,size,baseLineIndex=0){
- const words=text.split(/(\\s+)/u),reserve=mode==='print'?1:1+schoolVariation()/100*.08;
+ const words=text.split(/(\s+)/u),reserve=mode==='print'?1:1+schoolVariation()/100*.08;
  let out=[],line='';
  const measure=(value,lineIndex)=>measureMixed(value,mode,hand,size,'line:'+lineIndex+':')*reserve;
  for(const word of words){
@@ -1309,9 +1309,9 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure,diagnostics=null){
   const pitchPx=Math.max(fontPx,((model.pitch||fontPx*1.25)*geo.scale));
   const yMin=baseline-Math.min(fontPx*.78,pitchPx*.46),yMax=baseline+Math.min(fontPx*.42,pitchPx*.46);
   let cursor=0,wordIndex=0;
-  for(const part of line.text.split(/(\\s+)/u)){
+  for(const part of line.text.split(/(\s+)/u)){
    if(!part)continue;
-   if(/^\\s+$/u.test(part)){for(const ch of Array.from(part))cursor+=measure.measureText(ch).width+wordSpacing+letterSpacing;continue}
+   if(/^\s+$/u.test(part)){for(const ch of Array.from(part))cursor+=measure.measureText(ch).width+wordSpacing+letterSpacing;continue}
    const seed='line:'+li+':word:'+wordIndex+':'+part;
    const run=schoolGlyphMetrics(measure,part,seed,enabled,letterSpacing),chars=run.glyphs,baseX=lineStart+cursor*widthScale;
    const wordLeft=baseX-fontPx*.12,wordRight=baseX+run.width*widthScale+fontPx*.12;
