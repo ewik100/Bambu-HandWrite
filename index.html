@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.36.2 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.36.2">
+<meta name="description" content="Bambu HandWrite 5.37.0 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.37.0">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.36.2 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.37.0 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -44,7 +44,10 @@
 .preview-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:9px}.preview-tools .status{margin:0}
 #penRouteLayer{pointer-events:none}#routeOverlayBtn{flex:0 0 auto}
 
-.recommended-settings{border:1px solid #d9e4ec;background:#f7fafc;border-radius:12px;padding:12px;line-height:1.45}.recommended-settings> b{display:block;margin-bottom:8px;color:#29465d}.recommended-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13px}.recommended-settings p{margin:9px 0 0}.paper-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
+.recommended-settings{border:1px solid #d9e4ec;background:#f7fafc;border-radius:12px;padding:12px;line-height:1.45}
+.school-diagnostic-panel{margin-top:8px;padding:10px;border:1px solid #d5e0e8;border-radius:10px;background:#f7fafc;max-height:230px;overflow:auto}
+.school-diagnostic-panel p{margin:4px 0;line-height:1.4}.school-diagnostic-list{border-top:1px solid #e1e7eb;margin-top:7px;padding-top:5px}
+.recommended-settings> b{display:block;margin-bottom:8px;color:#29465d}.recommended-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13px}.recommended-settings p{margin:9px 0 0}.paper-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}
 .paper-choice{display:flex;flex-direction:column;gap:7px;align-items:stretch;text-align:left;padding:9px;border:1px solid #d7dfe4;border-radius:12px;background:#fbfcfd;color:#293743;cursor:pointer;min-width:0}
 .paper-choice[aria-pressed="true"]{border:2px solid #315f83;background:#f0f6fa;padding:8px;box-shadow:0 0 0 2px #315f8314}
 .paper-thumb{height:88px;border:1px solid #c8d0d6;border-radius:4px;background:#fff;position:relative;overflow:hidden;box-shadow:0 2px 5px #0000000d}
@@ -351,6 +354,8 @@ Hello, world!</textarea></label>
       <input type="range" id="schoolRoughness" min="0" max="50" step="1" value="28" aria-label="Неровность штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
       <p id="schoolStrokeStatus" class="tiny" aria-live="polite">Соединения букв появятся после построения траекторий.</p>
+      <label class="option-toggle" for="schoolJoinDiagnosticsToggle"><input id="schoolJoinDiagnosticsToggle" type="checkbox"><span><b>Диагностика соединений</b><small>Показывает границы строк, слов и букв, владельцев штрихов, найденные концы и причины отклонения пар.</small></span></label>
+      <div id="schoolJoinDiagnosticsPanel" class="school-diagnostic-panel" hidden aria-live="polite"></div>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu HandWrite — встроенный шрифт приложения. Тот же файл используется в предпросмотре и G-code.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
@@ -521,7 +526,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.36.2 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.37.0 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -732,14 +737,163 @@ function schoolNoise(seed,index=0,salt=0){
  return (h>>>0)/4294967295;
 }
 function schoolJoinVariety(){const v=Number($('schoolJoinVariety')?.value??70);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):70}
-function schoolJoinHandles(distance,fontPx,seed){
+const SCHOOL_JOIN_PAIR_KIND=Object.freeze({
+ "ма":"low","ам":"compact","ми":"compact","им":"low","мо":"round","ом":"round",
+ "ли":"narrow","ил":"rise","лл":"flow","ра":"rise","ар":"low","ро":"round","ор":"round",
+ "но":"low","он":"flow","ст":"compact","сп":"compact","пр":"rise","тр":"rise","ан":"low",
+ "ин":"narrow","шк":"rise","ск":"compact","ши":"low","ти":"narrow","та":"low","те":"low",
+ "ер":"round","ре":"rise","ви":"flow","ов":"round",
+ "th":"compact","he":"low","ll":"flow","oo":"round","on":"low","in":"narrow",
+ "an":"low","er":"round","re":"rise","st":"compact","sp":"compact","pr":"rise",
+ "tr":"rise","ch":"round","sh":"compact"
+});
+const SCHOOL_JOIN_PROFILES=Object.freeze({
+ low:{handleA:.27,handleB:.34,maxGap:.52,gapLimit:.58,maxDy:.23,bend:-.025,scoreBias:0},
+ compact:{handleA:.19,handleB:.23,maxGap:.43,gapLimit:.48,maxDy:.16,bend:0,scoreBias:.12},
+ narrow:{handleA:.22,handleB:.30,maxGap:.47,gapLimit:.52,maxDy:.18,bend:.018,scoreBias:.08},
+ rise:{handleA:.36,handleB:.25,maxGap:.53,gapLimit:.59,maxDy:.25,bend:-.035,scoreBias:.06},
+ round:{handleA:.30,handleB:.30,maxGap:.48,gapLimit:.54,maxDy:.22,bend:.04,scoreBias:.05},
+ flow:{handleA:.29,handleB:.29,maxGap:.50,gapLimit:.56,maxDy:.21,bend:0,scoreBias:0}
+});
+function schoolJoinTransitionProfile(leftChar,rightChar,seed=""){
+ const left=String(leftChar||"").toLocaleLowerCase(),right=String(rightChar||"").toLocaleLowerCase();
+ const key=left+right;
+ let kind=SCHOOL_JOIN_PAIR_KIND[key];
+ if(!kind){
+  if(/[аоеэсзх]/u.test(left)&&/[аоеэсзх]/u.test(right))kind="round";
+  else if(/[лмнтпкрв]/u.test(left)&&/[иеёй]/u.test(right))kind="rise";
+  else if(/[шщц]/u.test(left)||/[шщц]/u.test(right))kind="compact";
+  else if(/[друф]/u.test(left)||/[друф]/u.test(right))kind="narrow";
+  else kind="flow";
+ }
+ const source=SCHOOL_JOIN_PROFILES[kind]||SCHOOL_JOIN_PROFILES.flow;
+ const variant=Math.floor(schoolNoise(key+"|"+String(seed),0,809)*3);
+ const variation=schoolJoinVariety()/100;
+ const jitter=(variant-1)*.025*variation;
+ return {
+  kind,handleA:source.handleA+jitter,handleB:source.handleB-jitter,
+  maxGap:source.maxGap,maxDy:source.maxDy,gapLimit:source.gapLimit,
+  bend:source.bend,scoreBias:source.scoreBias,variant,
+  minExitX:.07,minEntryX:.07
+ };
+}
+function schoolJoinHandles(distance,fontPx,seed,profile=null){
  const strength=schoolJoinVariety()/100;
- const profiles=[[.22,.22],[.42,.24],[.24,.42],[.38,.38],[.18,.36],[.36,.18]];
- const selected=profiles[Math.min(profiles.length-1,Math.floor(schoolNoise(seed,0,307)*profiles.length))];
- const baseHandle=Math.max(.75,Math.min(distance*.32,fontPx*.09));
- const maxHandle=Math.max(.75,Math.min(distance*.46,fontPx*.15));
- const handle=factor=>Math.max(.35,Math.min(maxHandle,baseHandle*(.32+(factor-.32)*strength)/.32));
- return {a:handle(selected[0]),b:handle(selected[1])};
+ const neutral={handleA:.32,handleB:.32};
+ const selected=profile||neutral;
+ const jitter=(schoolNoise(seed,0,307)-.5)*.16*strength;
+ const baseHandle=Math.max(.65,Math.min(distance*.30,fontPx*.10));
+ const maxHandle=Math.max(.65,Math.min(distance*.43,fontPx*.14));
+ const handle=factor=>Math.max(.35,Math.min(maxHandle,baseHandle*(factor+jitter)/.32));
+ return {a:handle(selected.handleA),b:handle(selected.handleB)};
+}
+function schoolAssignEndpointOwner(point,regions,options={}){
+ const scale=Math.max(.25,Number(options.scale)||1);
+ const maxPad=Math.max(scale*.45,Number(options.maxPad)||scale*1.15);
+ const ambiguity=Math.max(scale*.24,Number(options.ambiguityMargin)||scale*.34);
+ const box=point.box||null,boxWidth=box?Math.max(1,box.maxX-box.minX+1):1;
+ const candidates=[];
+ for(const region of regions){
+  if(!region||region.joinable===false||!Number.isFinite(region.advance)||region.advance<scale*.45)continue;
+  const pad=Math.min(maxPad,Math.max(scale*.30,region.advance*.055));
+  const gap=point.x<region.left?region.left-point.x:point.x>region.right?point.x-region.right:0;
+  if(gap>pad)continue;
+  let coverage=1,spillPenalty=0;
+  if(box){
+   const overlap=Math.max(0,Math.min(box.maxX,region.right)-Math.max(box.minX,region.left)+1);
+   coverage=Math.min(1,overlap/boxWidth);
+   if(coverage<.42)continue;
+   const spill=Math.max(0,region.left-box.minX)+Math.max(0,box.maxX-region.right);
+   spillPenalty=spill/boxWidth*scale*1.2;
+  }
+  const score=gap+spillPenalty+(1-coverage)*scale*.35;
+  candidates.push({owner:region.index,score,coverage,gap});
+ }
+ candidates.sort((a,b)=>a.score-b.score||a.owner-b.owner);
+ if(!candidates.length)return {owner:-1,confidence:0,reason:"нет однозначного геометрического владельца"};
+ const best=candidates[0],second=candidates[1];
+ if(second&&second.score-best.score<ambiguity)return {owner:-1,confidence:0,reason:"точка находится на неоднозначной границе букв"};
+ const confidence=Math.max(0,Math.min(1,1-best.score/Math.max(scale*.9,maxPad+scale*.25)));
+ if(confidence<.45)return {owner:-1,confidence,reason:"недостаточная уверенность принадлежности"};
+ return {owner:best.owner,confidence,reason:"владелец определён по локальной геометрии конца штриха"};
+}
+const schoolGlyphMetricsCache=new Map();
+function schoolTrySvgGlyphMetrics(ctx,word,choice,canvasWidth){
+ if(typeof document==="undefined"||!document.createElementNS||!document.body)return null;
+ const chars=Array.from(word),key=[ctx.font||"",choice.features||"",word].join("|");
+ if(schoolGlyphMetricsCache.has(key))return schoolGlyphMetricsCache.get(key);
+ const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg"),text=document.createElementNS(ns,"text");
+ svg.setAttribute("width","12000");svg.setAttribute("height","240");
+ svg.style.position="fixed";svg.style.left="-12000px";svg.style.top="-12000px";
+ svg.style.width="12000px";svg.style.height="240px";svg.style.visibility="hidden";
+ svg.style.pointerEvents="none";svg.style.overflow="hidden";
+ text.setAttribute("x","0");text.setAttribute("y","180");text.setAttribute("xml:lang","ru");
+ text.style.font=ctx.font||"400 32px sans-serif";
+ text.style.fontKerning="normal";
+ text.style.fontVariantLigatures="common-ligatures contextual";
+ text.style.fontFeatureSettings=choice.features||"normal";
+ text.style.letterSpacing="0px";text.style.direction="ltr";
+ text.style.unicodeBidi="isolate";text.textContent=word;svg.appendChild(text);
+ document.body.appendChild(svg);
+ let result=null;
+ try{
+  if(typeof text.getNumberOfChars!=="function"||typeof text.getStartPositionOfChar!=="function"||
+     typeof text.getEndPositionOfChar!=="function"||typeof text.getExtentOfChar!=="function")return null;
+  const count=text.getNumberOfChars();
+  if(count!==chars.length||!count)return null;
+  const width=Number(text.getComputedTextLength());
+  if(!Number.isFinite(width)||width<=0||Math.abs(width-canvasWidth)>Math.max(1.25,canvasWidth*.012))return null;
+  const starts=[],ends=[],boxes=[];
+  for(let i=0;i<count;i++){
+   const start=text.getStartPositionOfChar(i),end=text.getEndPositionOfChar(i),box=text.getExtentOfChar(i);
+   const values=[start?.x,end?.x,box?.x,box?.width];
+   if(!values.every(Number.isFinite))return null;
+   starts.push(start.x);ends.push(end.x);boxes.push({left:box.x,right:box.x+box.width});
+  }
+  const origin=starts[0],boundaries=starts.map(x=>x-origin);
+  boundaries.push(width);
+  for(let i=1;i<boundaries.length;i++){
+   if(boundaries[i]<boundaries[i-1]-.05)return null;
+   boundaries[i]=Math.max(boundaries[i-1],boundaries[i]);
+  }
+  const glyphs=chars.map((char,index)=>{
+   const previous=boxes[index],next=boxes[index+1];
+   const overlap=next?Math.max(0,Math.min(previous.right,next.right)-Math.max(previous.left,next.left)):0;
+   const smaller=next?Math.max(.01,Math.min(previous.right-previous.left,next.right-next.left)):1;
+   const shared=overlap/smaller>.68;
+   const advance=Math.max(0,boundaries[index+1]-boundaries[index]);
+   return {char,x:boundaries[index],advance,features:choice.features,confidence:shared?.68:.97,joinable:!shared&&advance>.25,extentLeft:previous.left-origin,extentRight:previous.right-origin};
+  });
+  result={glyphs,shapedWidth:width,precision:"svg-shaped",confidence:glyphs.every(g=>g.confidence>.8)? .97:.78};
+  if(schoolGlyphMetricsCache.size>512)schoolGlyphMetricsCache.delete(schoolGlyphMetricsCache.keys().next().value);
+  schoolGlyphMetricsCache.set(key,result);
+  return result;
+ }catch(error){return null}
+ finally{svg.remove()}
+}
+function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVariant=""){
+ const chars=Array.from(word),choice=schoolVariationChoice("word:"+String(word),enabled,0,forceVariant);
+ ctx.fontKerning="normal";ctx.fontVariantLigatures="common-ligatures contextual";ctx.fontFeatureSettings=choice.features;
+ if("letterSpacing" in ctx)ctx.letterSpacing="0px";
+ if("wordSpacing" in ctx)ctx.wordSpacing="0px";
+ const fullWidth=ctx.measureText(word).width;
+ const exact=schoolTrySvgGlyphMetrics(ctx,word,choice,fullWidth);
+ let glyphs,precision="canvas-estimate",confidence=.72;
+ if(exact){glyphs=exact.glyphs;precision=exact.precision;confidence=exact.confidence}
+ else{
+  // Canvas does not expose per-glyph positions. Estimate boundaries from the
+  // same shaped run, prefix and suffix; ambiguous endpoints are later rejected.
+  const boundaries=[0];
+  for(let i=1;i<chars.length;i++){
+   const prefix=chars.slice(0,i).join(""),suffix=chars.slice(i).join("");
+   const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;
+   const boundary=(prefixWidth+fullWidth-suffixWidth)*.5;
+   boundaries.push(Math.max(boundaries[i-1],Math.min(fullWidth,boundary)));
+  }
+  boundaries.push(fullWidth);
+  glyphs=chars.map((char,index)=>({char,x:boundaries[index],advance:Math.max(0,boundaries[index+1]-boundaries[index]),features:choice.features,confidence:.72,joinable:boundaries[index+1]-boundaries[index]>.25}));
+ }
+ return {glyphs,width:fullWidth+letterSpacing*Math.max(0,chars.length-1),shapedWidth:fullWidth,precision,confidence,...choice};
 }
 function schoolFeatureString(variant=''){
  const contextual=variant==='calt'||variant==='ss01'||variant==='ss02'?1:0;
@@ -768,24 +922,7 @@ function schoolGlyphFeatureSettings(char,seed,index=0,enabled=true,forceVariant=
  if(!/^[А-Яа-яЁёA-Za-z]$/u.test(String(char)))return schoolFeatureString('');
  return schoolVariationChoice(String(seed)+'|'+String(char),enabled,index,forceVariant).features;
 }
-function schoolGlyphMetrics(ctx,word,seed,enabled=true,letterSpacing=0,forceVariant=''){
- const chars=Array.from(word),choice=schoolVariationChoice('word:'+String(word),enabled,0,forceVariant);
- ctx.fontKerning='normal';ctx.fontVariantLigatures='common-ligatures contextual';ctx.fontFeatureSettings=choice.features;
- if('letterSpacing' in ctx)ctx.letterSpacing='0px';
- if('wordSpacing' in ctx)ctx.wordSpacing='0px';
- // Canvas exposes shaped run widths, not individual glyph advances. Estimate
- // each boundary from both prefixes and suffixes using the same OpenType state.
- const fullWidth=ctx.measureText(word).width,boundaries=[0];
- for(let i=1;i<chars.length;i++){
-  const prefix=chars.slice(0,i).join(''),suffix=chars.slice(i).join('');
-  const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;
-  const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;
-  boundaries.push(Math.max(boundaries[i-1],Math.min(fullWidth+letterSpacing*i,boundary)));
- }
- boundaries.push(fullWidth+letterSpacing*Math.max(0,chars.length-1));
- const glyphs=chars.map((char,index)=>({char,x:boundaries[index],advance:Math.max(0,boundaries[index+1]-boundaries[index]),features:choice.features}));
- return {glyphs,width:fullWidth+letterSpacing*Math.max(0,chars.length-1),...choice};
-}
+
 function schoolFeatureSettings(index=0,enabled=true,forceActive=false){
  return schoolVariationChoice(String(index),enabled,0,forceActive?'ss01':'').features;
 }
@@ -1201,7 +1338,8 @@ function neighbors(bin,w,h,i){
 function traceSkeleton(bin,w,h){const total=w*h,seen=new Set(),paths=[];const edge=(a,b)=>a<b?a*total+b:b*total+a;const nodes=[];for(let i=0;i<total;i++)if(bin[i]){const d=neighbors(bin,w,h,i).length;if(d!==2)nodes.push(i)}function trace(start,next){let path=[start],prev=start,cur=next;seen.add(edge(prev,cur));let guard=0;while(guard++<total){path.push(cur);const ns=neighbors(bin,w,h,cur).filter(v=>v!==prev);if(ns.length!==1)break;const nx=ns[0],key=edge(cur,nx);if(seen.has(key)){if(nx===start)path.push(nx);break}seen.add(key);prev=cur;cur=nx;if(cur===start){path.push(cur);break}}if(path.length>1)paths.push(path)}for(const n of nodes)for(const q of neighbors(bin,w,h,n))if(!seen.has(edge(n,q)))trace(n,q);for(let i=0;i<total;i++)if(bin[i])for(const q of neighbors(bin,w,h,i))if(!seen.has(edge(i,q)))trace(i,q);return paths}
 function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  const scale=geo.scale,fontPx=geo.fontPx,height=geo.fontPx*geo.heightScale,widthScale=geo.widthScale;
- if(!bin||!measure||!Number.isFinite(fontPx)||fontPx<4)return 0;
+ const diagnostics={joined:0,endpointCount:0,owned:0,unowned:0,candidateCount:0,rejectedCount:0,lines:[],words:[],endpoints:[],joins:[],rejected:[]};
+ if(!bin||!measure||!Number.isFinite(fontPx)||fontPx<4)return {joined:0,diagnostics};
  const letterSpacing=(model.profile.letterSpacing||0)*scale;
  const componentData=labelComponents(bin,w,h),labels=componentData.labels;
  const componentBoxes=new Map(componentData.components.map(c=>[c.id,c]));
@@ -1209,9 +1347,13 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  for(let i=0;i<bin.length;i++){
   if(!bin[i])continue;
   const ns=neighbors(bin,w,h,i);
-  if(ns.length===1)endpoints.push({i,x:i%w,y:(i/w)|0,nx:ns[0]%w,ny:(ns[0]/w)|0,component:labels[i],used:false,owner:-1});
+  if(ns.length===1){
+   const component=labels[i],box=componentBoxes.get(component);
+   endpoints.push({i,x:i%w,y:(i/w)|0,nx:ns[0]%w,ny:(ns[0]/w)|0,component,box,used:false,owner:-1,ownerConfidence:0});
+  }
  }
- if(endpoints.length<2)return 0;
+ diagnostics.endpointCount=endpoints.length;
+ if(endpoints.length<2)return {joined:0,diagnostics};
  const paintLine=(x0,y0,x1,y1)=>{
   let x=Math.round(x0),y=Math.round(y0),endX=Math.round(x1),endY=Math.round(y1);
   const dx=Math.abs(endX-x),sx=x<endX?1:-1,dy=-Math.abs(endY-y),sy=y<endY?1:-1;
@@ -1226,134 +1368,157 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  };
  const tangentOut=p=>{const dx=p.x-p.nx,dy=p.y-p.ny,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
  const tangentIn=p=>{const dx=p.nx-p.x,dy=p.ny-p.y,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
- const connectable=/^[А-Яа-яЁёA-Za-z]$/u,enabled=$('letterVariety')?.checked!==false;
- const drawCurve=(a,b,seed,bounds)=>{
+ const connectable=/^[А-Яа-яЁёA-Za-z]$/u,enabled=$("letterVariety")?.checked!==false;
+ const recordReject=(pair,lineIndex,wordIndex,reason,a=null,b=null,score=null)=>{
+  diagnostics.rejectedCount++;
+  if(diagnostics.rejected.length<100)diagnostics.rejected.push({pair,lineIndex:lineIndex+1,wordIndex:wordIndex+1,reason,a:a?{x:a.x,y:a.y}:null,b:b?{x:b.x,y:b.y}:null,score});
+ };
+ const drawCurve=(a,b,seed,bounds,profile)=>{
   const distance=Math.hypot(b.x-a.x,b.y-a.y),ta=tangentOut(a),tb=tangentIn(b);
-  const handles=schoolJoinHandles(distance,fontPx,seed);
-  const c1x=a.x+ta.x*handles.a,c1y=a.y+ta.y*handles.a,c2x=b.x-tb.x*handles.b,c2y=b.y-tb.y*handles.b;
-  const steps=Math.max(10,Math.ceil(distance*2)),points=[];
+  const handles=schoolJoinHandles(distance,fontPx,seed,profile);
+  const c1x=a.x+ta.x*handles.a,c1y=a.y+ta.y*handles.a;
+  const c2x=b.x-tb.x*handles.b,c2y=b.y-tb.y*handles.b;
+  const variety=schoolJoinVariety()/100;
+  const bow=(profile.bend||0)*distance*(.55+schoolNoise(seed,0,513)*.18)*variety;
+  const control1y=c1y+bow,control2y=c2y+bow;
+  const steps=Math.max(12,Math.ceil(distance*2.4)),points=[];
   let previousX=a.x;
   for(let n=0;n<=steps;n++){
    const t=n/steps,u=1-t;
    const x=u*u*u*a.x+3*u*u*t*c1x+3*u*t*t*c2x+t*t*t*b.x;
-   const y=u*u*u*a.y+3*u*u*t*c1y+3*u*t*t*c2y+t*t*t*b.y;
+   const y=u*u*u*a.y+3*u*u*t*control1y+3*u*t*t*control2y+t*t*t*b.y;
    if(!Number.isFinite(x)||!Number.isFinite(y))return false;
-   if(x<previousX-.35||x<a.x-.35||x>b.x+.35)return false;
-   if(x<bounds.wordLeft||x>bounds.wordRight||y<bounds.yMin||y>bounds.yMax)return false;
+   if(x<previousX-.20||x<a.x-.25||x>b.x+.25)return false;
+   if(x<bounds.wordLeft||x>bounds.wordRight||y<bounds.lineTop||y>bounds.lineBottom)return false;
    const px=Math.round(x),py=Math.round(y);
    if(px<0||px>=w||py<0||py>=h)return false;
-   // A curve may touch its two own endpoints, but not another stroke or join.
+   // Check a small safety neighbourhood. Only the two endpoint components
+   // may be touched, and only immediately adjacent to their own endpoints.
    for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
     const xx=px+dx,yy=py+dy;
     if(xx<0||xx>=w||yy<0||yy>=h)continue;
     const index=yy*w+xx,component=labels[index];
     if(joinMask[index])return false;
     if(component&&component!==a.component&&component!==b.component)return false;
-    if(component===a.component&&Math.hypot(xx-a.x,yy-a.y)>3.2)return false;
-    if(component===b.component&&Math.hypot(xx-b.x,yy-b.y)>3.2)return false;
+    if(component===a.component&&Math.hypot(xx-a.x,yy-a.y)>3.1)return false;
+    if(component===b.component&&Math.hypot(xx-b.x,yy-b.y)>3.1)return false;
    }
    points.push({x,y});previousX=x;
   }
-  for(let n=1;n<points.length;n++){
-   const px=points[n-1].x,py=points[n-1].y,x=points[n].x,y=points[n].y;
-   paintLine(px,py,x,y);
-  }
+  for(let n=1;n<points.length;n++)paintLine(points[n-1].x,points[n-1].y,points[n].x,points[n].y);
   return true;
  };
  let joined=0;
- for(let li=0;li<model.lines.length;li++){
-  const line=model.lines[li];if(line.blank)continue;
-  const wordSpacing=(model.profile.wordSpacing+(line.extraWordSpace||0))*scale;
-  const baseline=(model.baseline0+li*model.pitch)*scale-geo.originY-geo.cropY;
-  const lineStart=line.x*scale-geo.originX-geo.cropX;
-  let cursor=0,wordIndex=0;
-  for(const part of line.text.split(/(\\s+)/u)){
-   if(!part)continue;
-   if(/^\\s+$/u.test(part)){
-    for(const ch of Array.from(part))cursor+=measure.measureText(ch).width+wordSpacing+letterSpacing;
-    continue;
-   }
-   const seed='word:'+wordIndex+':'+part;
-   const run=schoolGlyphMetrics(measure,part,seed,enabled,letterSpacing);
-   const chars=run.glyphs,baseX=lineStart+cursor*widthScale;
-   const wordLeft=baseX-fontPx*.08,wordRight=baseX+run.width*widthScale+fontPx*.08;
-   const wordEndpoints=endpoints.filter(p=>{
-    if(p.used)return false;
-    const box=componentBoxes.get(p.component);
-    return !!box&&box.minX>=wordLeft&&box.maxX<=wordRight;
-   });
-   const regions=chars.map(glyph=>{
-    const left=baseX+glyph.x*widthScale,right=baseX+(glyph.x+glyph.advance)*widthScale;
-    return {left,right,advance:Math.max(0,right-left),center:(left+right)*.5};
-   });
-   // Assign every connected component to one glyph from its centroid.
-   // Boundary-centred or poorly fitting components remain unowned and cannot join.
-   const ownerByComponent=new Map();
-   for(const p of wordEndpoints){
-    if(ownerByComponent.has(p.component))continue;
-    const box=componentBoxes.get(p.component);
-    let best=-1,bestGap=Infinity,secondGap=Infinity,bestSlack=0;
-    for(let i=0;i<regions.length;i++){
-     if(!connectable.test(chars[i].char))continue;
-     const region=regions[i],gap=box.cx<region.left?region.left-box.cx:box.cx>region.right?box.cx-region.right:0;
-     if(gap<bestGap){secondGap=bestGap;bestGap=gap;best=i;bestSlack=Math.min(fontPx*.09,Math.max(scale*.55,region.advance*.18))}
-     else if(gap<secondGap)secondGap=gap;
+ const previousMeasure={
+  fontFeatureSettings:measure.fontFeatureSettings,fontVariantLigatures:measure.fontVariantLigatures,
+  fontKerning:measure.fontKerning,letterSpacing:measure.letterSpacing,wordSpacing:measure.wordSpacing
+ };
+ try{
+  for(let li=0;li<model.lines.length;li++){
+   const line=model.lines[li];if(line.blank)continue;
+   const wordSpacing=(model.profile.wordSpacing+(line.extraWordSpace||0))*scale;
+   const baseline=(model.baseline0+li*model.pitch)*scale-geo.originY-geo.cropY;
+   const lineStart=line.x*scale-geo.originX-geo.cropX;
+   const pitchPx=Math.max(1,(model.pitch||fontPx*1.25)*scale);
+   const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49;
+   diagnostics.lines.push({line:li+1,left:lineStart,right:lineStart+Math.max(1,model.w*scale),top:lineTop,bottom:lineBottom,baseline});
+   let cursor=0,wordIndex=0;
+   for(const part of line.text.split(/(\s+)/u)){
+    if(!part)continue;
+    if(/^\s+$/u.test(part)){
+     for(const ch of Array.from(part))cursor+=measure.measureText(ch).width+wordSpacing+letterSpacing;
+     continue;
     }
-    const tieTolerance=Math.max(.35,fontPx*.025);
-    if(best<0||bestGap>bestSlack||secondGap-bestGap<tieTolerance)best=-1;
-    ownerByComponent.set(p.component,best);
-   }
-   for(const p of wordEndpoints)p.owner=ownerByComponent.get(p.component)??-1;
-   for(let k=0;k<chars.length-1;k++){
-    const left=chars[k],right=chars[k+1];
-    if(!connectable.test(left.char)||!connectable.test(right.char))continue;
-    const split=baseX+(left.x+left.advance)*widthScale;
-    const leftAdvance=regions[k].advance,rightAdvance=regions[k+1].advance;
-    if(leftAdvance<scale*.45||rightAdvance<scale*.45)continue;
-    const maxGap=Math.min(fontPx*.60,Math.max(scale*3.5,Math.min(leftAdvance,rightAdvance)*.55));
-    const reachLeft=Math.min(leftAdvance*.54,fontPx*.46),reachRight=Math.min(rightAdvance*.54,fontPx*.46);
-    const pitchPx=Math.max(1,(model.pitch||fontPx*1.25)*scale);
-    const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49;
-    const yMin=Math.max(baseline-height*.9,lineTop),yMax=Math.min(baseline+height*.45,lineBottom);
-    const leftCandidates=wordEndpoints.filter(p=>!p.used&&p.owner===k&&p.x>=split-reachLeft&&p.x<=split+maxGap*.16&&p.y>=yMin&&p.y<=yMax);
-    const rightCandidates=wordEndpoints.filter(p=>!p.used&&p.owner===k+1&&p.x>=split-maxGap*.16&&p.x<=split+reachRight&&p.y>=yMin&&p.y<=yMax);
-    const candidates=[];
-    for(const a of leftCandidates){
-     const ta=tangentOut(a);
-     if(ta.x<.08)continue;
-     for(const b of rightCandidates){
-      if(b===a||a.component===b.component||b.x<=a.x)continue;
-      const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
-      if(d2>maxGap*maxGap||Math.abs(dy)>Math.min(height*.30,pitchPx*.27))continue;
-      const tb=tangentIn(b);
-      if(tb.x<.08)continue;
-      const tangentDot=ta.x*tb.x+ta.y*tb.y;
-      if(tangentDot<-.08)continue;
-      const tangentPenalty=1-tangentDot;
-      const boundaryPenalty=Math.abs(split-a.x)+Math.abs(b.x-split);
-      const baselinePenalty=Math.abs(a.y-baseline)+Math.abs(b.y-baseline);
-      const score=d2+Math.abs(dy)*fontPx*.12+tangentPenalty*fontPx*2.1+boundaryPenalty*fontPx*.055+baselinePenalty*fontPx*.018;
-      candidates.push({a,b,score});
+    const seed="word:"+wordIndex+":"+part;
+    const run=schoolGlyphMetrics(measure,part,seed,enabled,letterSpacing);
+    const chars=run.glyphs,baseX=lineStart+cursor*widthScale;
+    const wordPad=Math.min(fontPx*.035,Math.max(scale*.42,Math.max(0,wordSpacing)*.10));
+    const wordLeft=baseX-wordPad,wordRight=baseX+run.shapedWidth*widthScale+wordPad;
+    const lineEndpoints=endpoints.filter(p=>{
+     if(p.used||p.y<lineTop||p.y>lineBottom)return false;
+     const box=p.box;
+     return !!box&&box.minX>=wordLeft&&box.maxX<=wordRight&&box.cy>=lineTop-pitchPx*.03&&box.cy<=lineBottom+pitchPx*.03;
+    });
+    const regions=chars.map((glyph,index)=>{
+     const left=baseX+glyph.x*widthScale,right=baseX+(glyph.x+glyph.advance)*widthScale;
+     return {index,char:glyph.char,left,right,advance:Math.max(0,right-left),center:(left+right)*.5,
+      joinable:glyph.joinable!==false&&glyph.confidence>=.65,confidence:glyph.confidence??run.confidence};
+    });
+    diagnostics.words.push({line:li+1,word:wordIndex+1,text:part,left:wordLeft,right:wordRight,top:lineTop,bottom:lineBottom,
+      precision:run.precision,glyphs:regions.map(r=>({index:r.index,char:r.char,left:r.left,right:r.right,confidence:r.confidence,joinable:r.joinable}))});
+    for(const point of lineEndpoints){
+     const owner=schoolAssignEndpointOwner(point,regions,{scale,maxPad:Math.min(fontPx*.055,Math.max(scale*.75,fontPx*.035)),ambiguityMargin:scale*.30});
+     point.owner=owner.owner;point.ownerConfidence=owner.confidence;point.ownerReason=owner.reason;
+     diagnostics.owned+=owner.owner>=0?1:0;diagnostics.unowned+=owner.owner<0?1:0;
+     if(diagnostics.endpoints.length<800)diagnostics.endpoints.push({x:point.x,y:point.y,owner:owner.owner,confidence:owner.confidence,reason:owner.reason,
+       line:li+1,word:wordIndex+1,component:point.component});
+    }
+    for(let k=0;k<chars.length-1;k++){
+     const left=chars[k],right=chars[k+1],pair=left.char+right.char;
+     if(!connectable.test(left.char)||!connectable.test(right.char))continue;
+     const regionLeft=regions[k],regionRight=regions[k+1];
+     if(!regionLeft.joinable||!regionRight.joinable) {recordReject(pair,li,wordIndex,"глиф объединён shaping или его граница ненадёжна");continue}
+     const split=baseX+(left.x+left.advance)*widthScale;
+     const leftAdvance=regionLeft.advance,rightAdvance=regionRight.advance;
+     if(leftAdvance<scale*.45||rightAdvance<scale*.45){recordReject(pair,li,wordIndex,"слишком узкая область символа");continue}
+     const profile=schoolJoinTransitionProfile(left.char,right.char,seed+"|"+k);
+     const maxGap=Math.min(fontPx*profile.maxGap,Math.max(scale*2.8,Math.min(leftAdvance,rightAdvance)*profile.gapLimit));
+     const maxDy=Math.min(height*profile.maxDy,pitchPx*.25);
+     const yMin=Math.max(baseline-height*.92,lineTop),yMax=Math.min(baseline+height*.48,lineBottom);
+     const leftCandidates=lineEndpoints.filter(p=>!p.used&&p.owner===k&&p.ownerConfidence>=.45&&p.x>=split-Math.min(leftAdvance*.58,fontPx*.48)&&p.x<=split+maxGap*.12&&p.y>=yMin&&p.y<=yMax);
+     const rightCandidates=lineEndpoints.filter(p=>!p.used&&p.owner===k+1&&p.ownerConfidence>=.45&&p.x>=split-maxGap*.12&&p.x<=split+Math.min(rightAdvance*.58,fontPx*.48)&&p.y>=yMin&&p.y<=yMax);
+     const candidates=[];
+     for(const a of leftCandidates){
+      const ta=tangentOut(a);if(ta.x<profile.minExitX)continue;
+      for(const b of rightCandidates){
+       if(b===a||a.component===b.component||b.x<=a.x)continue;
+       const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
+       if(d2>maxGap*maxGap||Math.abs(dy)>maxDy)continue;
+       const tb=tangentIn(b);if(tb.x<profile.minEntryX)continue;
+       const tangentDot=ta.x*tb.x+ta.y*tb.y;if(tangentDot<-.02)continue;
+       const tangentPenalty=1-tangentDot;
+       const boundaryPenalty=Math.abs(split-a.x)+Math.abs(b.x-split);
+       const baselinePenalty=Math.abs(a.y-baseline)+Math.abs(b.y-baseline);
+       const confidence=Math.min(a.ownerConfidence,b.ownerConfidence,regionLeft.confidence,regionRight.confidence);
+       const score=d2+Math.abs(dy)*fontPx*.10+tangentPenalty*fontPx*1.9+
+        boundaryPenalty*fontPx*.045+baselinePenalty*fontPx*.018+(1-confidence)*fontPx*.9+profile.scoreBias;
+       candidates.push({a,b,score,confidence,profile});
+      }
      }
-    }
-    candidates.sort((a,b)=>a.score-b.score);
-    const bounds={wordLeft,wordRight,yMin:Math.max(yMin,lineTop),yMax:Math.min(yMax,lineBottom)};
-    for(const candidate of candidates){
-     const {a,b}=candidate;
-     if(a.used||b.used)continue;
-     if(drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)){
-      a.used=true;b.used=true;joined++;break;
+     diagnostics.candidateCount+=candidates.length;
+     if(!candidates.length){recordReject(pair,li,wordIndex,"нет пары уверенных концов с совместимым направлением и расстоянием");continue}
+     candidates.sort((a,b)=>a.score-b.score);
+     const ambiguityLimit=Math.max(scale*scale*1.4,fontPx*fontPx*.008);
+     if(candidates.length>1&&candidates[1].score-candidates[0].score<ambiguityLimit){
+      recordReject(pair,li,wordIndex,"несколько почти равнозначных вариантов; соединение пропущено",candidates[0].a,candidates[0].b,candidates[0].score);
+      continue;
      }
+     const bounds={wordLeft,wordRight,lineTop,lineBottom};
+     let accepted=false;
+     for(const candidate of candidates){
+      const a=candidate.a,b=candidate.b;
+      if(a.used||b.used)continue;
+      if(drawCurve(a,b,seed+"|"+k+"|"+pair,bounds,profile)){
+       a.used=true;b.used=true;joined++;diagnostics.joined++;
+       if(diagnostics.joins.length<250)diagnostics.joins.push({pair,kind:profile.kind,variant:profile.variant,
+        a:{x:a.x,y:a.y},b:{x:b.x,y:b.y},score:candidate.score,confidence:candidate.confidence,line:li+1,word:wordIndex+1});
+       accepted=true;break;
+      }
+     }
+     if(!accepted)recordReject(pair,li,wordIndex,"кривая пересекает чужой штрих или выходит за границы",candidates[0].a,candidates[0].b,candidates[0].score);
     }
+    cursor+=run.width;
+    wordIndex++;
    }
-   cursor+=run.width;
-   wordIndex++;
   }
+ }finally{
+  measure.fontFeatureSettings=previousMeasure.fontFeatureSettings||"normal";
+  measure.fontVariantLigatures=previousMeasure.fontVariantLigatures||"normal";
+  measure.fontKerning=previousMeasure.fontKerning||"normal";
+  if("letterSpacing" in measure)measure.letterSpacing=previousMeasure.letterSpacing||"0px";
+  if("wordSpacing" in measure)measure.wordSpacing=previousMeasure.wordSpacing||"0px";
  }
- measure.fontFeatureSettings='normal';measure.fontVariantLigatures='normal';measure.fontKerning='normal';
- if('letterSpacing' in measure)measure.letterSpacing='0px';
- if('wordSpacing' in measure)measure.wordSpacing='0px';
- return joined;
+ return {joined,diagnostics};
 }
 function analyzeSkeleton(bin,w,h,paths,scale){
  let branchNodes=0,endpoints=0,inkPixels=0;
@@ -1463,9 +1628,9 @@ async function rasterOriginalFontText(model,token){
  for(let y=0;y<cropH;y++){const src=((y+y0)*w+x0)*4,dst=y*cropW;for(let x=0;x<cropW;x++)binary[dst+x]=pixels[src+x*4+3]>threshold?1:0}
  imageData=null;pixels=null;canvas.width=1;canvas.height=1;
  const thin=await skeletonizeAsync(binary,cropW,cropH,token);
- const connectionCount=connectSchoolWordSkeletons(thin.bin,cropW,cropH,model,{scale,originX,originY,cropX:x0,cropY:y0,fontPx,heightScale,widthScale},measure);
+ const connectionResult=connectSchoolWordSkeletons(thin.bin,cropW,cropH,model,{scale,originX,originY,cropX:x0,cropY:y0,fontPx,heightScale,widthScale},measure),connectionCount=connectionResult.joined;
  measureCanvas.width=1;measureCanvas.height=1;
- return {bin:thin.bin,w:cropW,h:cropH,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,connectionCount,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
+ return {bin:thin.bin,w:cropW,h:cropH,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,connectionCount,joinDiagnostics:connectionResult.diagnostics,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
 }
 async function rasterText(model,token){
  if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token);
@@ -1586,7 +1751,59 @@ async function renderSchoolStrokePreview(model,seq){
  const paper=$('paper');paper.querySelector('#schoolStrokePreview')?.remove();
  paper.querySelectorAll('text[data-line]').forEach(node=>node.remove());
  const border=paper.lastElementChild;if(border)paper.insertBefore(group,border);else paper.appendChild(group);
- const joinStatus=$('schoolStrokeStatus');if(joinStatus)joinStatus.textContent=raster.connectionCount>0?`Соединено переходами: ${raster.connectionCount} пар соседних букв. Предпросмотр и G-code используют эти же центральные линии.`:'Для этих букв новых переходов не найдено; уже соприкасающиеся штрихи сохраняются.';
+ const joinStatus=$('schoolStrokeStatus');if(joinStatus)joinStatus.textContent=raster.connectionCount>0?"Соединено переходами: "+raster.connectionCount+" пар соседних букв. Предпросмотр и G-code используют одну геометрию.":"Новых переходов не найдено; неоднозначные и небезопасные пары оставлены раздельными.";
+ const oldDiagnostics=paper.querySelector("#schoolJoinDiagnostics");if(oldDiagnostics)oldDiagnostics.remove();
+ const diag=raster.joinDiagnostics||{},diagnosticsOn=$("schoolJoinDiagnosticsToggle")?.checked===true;
+ const panel=$("schoolJoinDiagnosticsPanel");
+ if(panel){
+  panel.replaceChildren();panel.hidden=!diagnosticsOn;
+  if(diagnosticsOn){
+   const summary=document.createElement("p");summary.className="tiny";
+   summary.textContent="Строк: "+(diag.lines?.length||0)+" · слов: "+(diag.words?.length||0)+" · концы скелета: "+(diag.endpointCount||0)+
+    " · с владельцем: "+(diag.owned||0)+" · без владельца: "+(diag.unowned||0)+" · кандидаты: "+(diag.candidateCount||0)+
+    " · соединено: "+(diag.joined||0)+" · отклонено: "+(diag.rejectedCount||0);
+   panel.append(summary);
+   const precision=document.createElement("p");precision.className="tiny";
+   const svgRuns=(diag.words||[]).filter(w=>w.precision==="svg-shaped").length;
+   precision.textContent="Точные позиции SVG shaping: "+svgRuns+" из "+(diag.words?.length||0)+" слов. Остальные используют консервативную оценку Canvas.";
+   panel.append(precision);
+   const list=document.createElement("div");list.className="school-diagnostic-list";
+   for(const item of (diag.rejected||[]).slice(0,12)){
+    const row=document.createElement("p");row.className="tiny";
+    row.textContent="Строка "+item.line+", слово "+item.word+", "+item.pair+": "+item.reason;
+    list.append(row);
+   }
+   if(!diag.rejected?.length){const row=document.createElement("p");row.className="tiny";row.textContent="Отклонённых пар нет.";list.append(row)}
+   panel.append(list);
+   const ns="http://www.w3.org/2000/svg",layer=document.createElementNS(ns,"g");layer.setAttribute("id","schoolJoinDiagnostics");layer.setAttribute("pointer-events","none");
+   const toX=x=>(x+raster.offsetX)/raster.scale,toY=y=>(y+raster.offsetY)/raster.scale;
+   const addRect=(x,y,width,height,stroke,dash)=>{
+    const el=document.createElementNS(ns,"rect");el.setAttribute("x",toX(x));el.setAttribute("y",toY(y));
+    el.setAttribute("width",Math.max(.1,width/raster.scale));el.setAttribute("height",Math.max(.1,height/raster.scale));
+    el.setAttribute("fill","none");el.setAttribute("stroke",stroke);el.setAttribute("stroke-width",".12");
+    if(dash)el.setAttribute("stroke-dasharray",dash);layer.append(el);
+   };
+   for(const line of diag.lines||[])addRect(line.left,line.top,line.right-line.left,line.bottom-line.top,"#8b9aaa","1.2 .9");
+   for(const word of diag.words||[]){
+    addRect(word.left,word.top,word.right-word.left,word.bottom-word.top,"#d18b25","1 .55");
+    for(const glyph of word.glyphs||[])addRect(glyph.left,word.top,glyph.right-glyph.left,word.bottom-word.top,glyph.joinable?"#2878b8":"#8c8c8c"," .45 .55");
+   }
+   const colors=["#2474bd","#15946b","#a36bc5","#b7791f","#c65353","#386d81"];
+   for(const point of diag.endpoints||[]){
+    const dot=document.createElementNS(ns,"circle");dot.setAttribute("cx",toX(point.x));dot.setAttribute("cy",toY(point.y));dot.setAttribute("r",".42");
+    dot.setAttribute("fill",point.owner>=0?colors[point.owner%colors.length]:"#818a93");dot.setAttribute("stroke","#fff");dot.setAttribute("stroke-width",".12");layer.append(dot);
+   }
+   for(const join of diag.joins||[]){
+    for(const point of [join.a,join.b]){const ring=document.createElementNS(ns,"circle");ring.setAttribute("cx",toX(point.x));ring.setAttribute("cy",toY(point.y));ring.setAttribute("r",".72");ring.setAttribute("fill","none");ring.setAttribute("stroke","#17834b");ring.setAttribute("stroke-width",".22");layer.append(ring)}
+   }
+   for(const item of diag.rejected||[]){
+    for(const point of [item.a,item.b])if(point){const cross=document.createElementNS(ns,"path");const x=toX(point.x),y=toY(point.y);
+     cross.setAttribute("d","M "+(x-.45)+" "+(y-.45)+" L "+(x+.45)+" "+(y+.45)+" M "+(x-.45)+" "+(y+.45)+" L "+(x+.45)+" "+(y-.45));
+     cross.setAttribute("fill","none");cross.setAttribute("stroke","#c33d34");cross.setAttribute("stroke-width",".2");layer.append(cross)}
+   }
+   paper.append(layer);
+  }
+ }
 }
 function labelComponents(bin,w,h){
  const labels=new Int32Array(w*h),queue=new Int32Array(w*h),components=[];let id=0;
@@ -1883,7 +2100,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.36.2`,
+  `; generated by Bambu HandWrite 5.37.0`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1911,8 +2128,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.36.2 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.36.2`,
+  `; Bambu HandWrite 5.37.0 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.37.0`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -2088,7 +2305,7 @@ $('zoomIn').addEventListener('click',()=>{paperZoom=Math.min(3,Math.round((paper
 $('mobilePreview').addEventListener('click',()=>$('previewSection').scrollIntoView({behavior:'smooth',block:'start'}));$('mobileGenerate').addEventListener('click',()=>{if(!isGenerating)generateGcode()});
 $('handFont').addEventListener('change',()=>{invalidateGeneratedGcode();applyFontProfile($('handFont').value);refreshFontMetrics();try{build();save()}catch(e){}refreshFontAvailability(lastModel)});$('letterVariety')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();renderVariationDemo();refreshPreviewAndSave()});$('schoolRoughness')?.addEventListener('input',()=>{const value=Math.max(0,Math.min(50,Number($('schoolRoughness').value)||0));$('schoolRoughnessValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});
  $('schoolVariationStrength')?.addEventListener('input',()=>{const value=schoolVariationStrength();$('schoolVariationStrengthValue').textContent=value+'%';invalidateGeneratedGcode();renderVariationDemo();refreshPreviewAndSave()});
- $('schoolJoinVariety')?.addEventListener('input',()=>{const value=schoolJoinVariety();$('schoolJoinVarietyValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});
+ $('schoolJoinVariety')?.addEventListener('input',()=>{const value=schoolJoinVariety();$('schoolJoinVarietyValue').textContent=value+'%';invalidateGeneratedGcode();refreshPreviewAndSave()});$('schoolJoinDiagnosticsToggle')?.addEventListener('change',()=>scheduleSchoolStrokePreview(lastModel));
  $('wordBounce')?.addEventListener('change',()=>{invalidateGeneratedGcode();refreshPreviewAndSave()});$('scriptMode').addEventListener('change',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()});
 ['lh','pitch','pitchMm'].forEach(id=>$(id).addEventListener('change',()=>{const isHeight=id==='lh',isMm=id==='pitchMm',min=isMm?5:2,max=isMm?60:(isHeight?20:30),fallback=isHeight?(lastModel?.lh??DEFAULTS.lh):(isMm?DEFAULTS.pitchMm:(lastModel?.pitch??DEFAULTS.pitch)),digits=isMm?1:(isHeight?1:2);commitEditableDecimal(id,min,max,fallback,digits);invalidateGeneratedGcode();refreshFontMetrics();try{build();save()}catch(e){$('layoutStatus').textContent='Проверь высоту букв и межстрочный интервал: '+(e?.message||e);$('layoutStatus').className='status bad'}}));
 ['txt','scriptMode','lh','pitch','pitchMm','bedTopGap','plateTabX','plateTabWidth','plateTabClearance','plateTabDepth','paragraphIndent'].forEach(id=>$(id).addEventListener('input',()=>{invalidateGeneratedGcode();refreshFontMetrics();refreshPreviewAndSave()}));
