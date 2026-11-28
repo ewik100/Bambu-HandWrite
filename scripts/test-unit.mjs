@@ -159,7 +159,7 @@ assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidt
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
 assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
 assert(html.includes('const ownerByComponent=new Map();')&&html.includes('p.owner===k')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Every candidate endpoint is assigned to one glyph owner and tangent direction is scored');
-assert(html.includes('const joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component'),'Connector geometry rejects collisions with unrelated skeletons and previous joins');
+assert(html.includes('joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component'),'Connector geometry rejects collisions with unrelated skeletons and previous joins');
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
 const connectorEnd=html.indexOf('async function rasterOriginalFontText(',connectorStart);
 if(connectorStart<0||connectorEnd<=connectorStart)throw new Error('Could not extract school centerline connector.');

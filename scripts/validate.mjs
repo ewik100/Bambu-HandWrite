@@ -44,7 +44,7 @@ if (html) {
       !html.includes('const ownerByComponent=new Map();') ||
       !html.includes('p.owner===k+1') ||
       !html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;') ||
-      !html.includes('const joinMask=new Uint8Array(bin.length)') ||
+      !html.includes('joinMask=new Uint8Array(bin.length)') ||
       !html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')) {
     fail('Bambu HandWrite School must enforce one-glyph ownership, same-row geometry, tangent checks and collision-safe connectors.');
   } else ok('Bambu HandWrite School assigns skeleton components to one glyph and rejects unsafe connector geometry');
