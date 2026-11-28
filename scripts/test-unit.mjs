@@ -86,6 +86,11 @@ joinVarietyInput='100';
 const variedJoins=Array.from({length:90},(_,i)=>schoolApi.joinHandles(12,16,'pair-style-'+i));
 const joinShapes=new Set(variedJoins.map(x=>x.a.toFixed(3)+':'+x.b.toFixed(3)));
 assert(joinShapes.size>=4,'Join-variety slider at 100% selects multiple distinct connector shapes');
+const pairShapeMa=schoolApi.joinHandles(12,16,'same-pair','ма');
+const pairShapeAm=schoolApi.joinHandles(12,16,'same-pair','ам');
+assert(pairShapeMa.a!==pairShapeAm.a||pairShapeMa.b!==pairShapeAm.b,'Different ordered letter pairs receive different base transition profiles');
+assert(html.includes('function schoolJoinPairShape(pair){')&&html.includes("'ма':[.24,.38]")&&html.includes("'ст':[.30,.22]"),'Common Cyrillic pairs have explicit, ordered transition profiles');
+
 assert(variedJoins.every(x=>x.a>0&&x.b>0&&x.a<=2.4+1e-9&&x.b<=2.4+1e-9),'All connector handles remain positive and inside the geometric cap');
 const repeatJoin=schoolApi.joinHandles(12,16,'pair-style-17');
 assert(repeatJoin.a===variedJoins[17].a&&repeatJoin.b===variedJoins[17].b,'The same word and letter pair always receives the same connector profile');
@@ -157,9 +162,11 @@ assert(originalFont.subarray(0,4).toString('ascii')==='wOF2','Original Bambu fon
 assert(html.includes('function connectSchoolWordSkeletons('),'The custom school font has a dedicated centerline connector');
 assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;'),'Glyph positioning uses shaped prefix/suffix measurements');
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
-assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
+assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed,pair)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+pair,pair,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
 assert(html.includes('const ownerByComponent=new Map();')&&html.includes('p.owner===k')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Every candidate endpoint is assigned to one glyph owner and tangent direction is scored');
 assert(html.includes('joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component'),'Connector geometry rejects collisions with unrelated skeletons and previous joins');
+assert(html.includes('diagnostics.words.push(wordReport)')&&html.includes("pairReport.result='соединено'")&&html.includes('id="schoolJoinDiagnosticsText"'),'The HTML exposes per-word, per-pair diagnostic ownership and connection decisions');
+
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
 const connectorEnd=html.indexOf('async function rasterOriginalFontText(',connectorStart);
 if(connectorStart<0||connectorEnd<=connectorStart)throw new Error('Could not extract school centerline connector.');
@@ -170,6 +177,13 @@ for(let x=2;x<=9;x++)mockMask[15*30+x]=1;
 for(let x=12;x<=18;x++)mockMask[15*30+x]=1;
 const mockModel={fontSize:10,baseline0:15,pitch:8,profile:{letterSpacing:0,wordSpacing:0},lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]};
 const joinedCount=context.connectSchoolWordSkeletons(mockMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const diagnosticMask=new Uint8Array(30*24);
+for(let x=2;x<=9;x++)diagnosticMask[15*30+x]=1;
+for(let x=12;x<=18;x++)diagnosticMask[15*30+x]=1;
+const connectorReport={};
+const diagnosticJoinCount=context.connectSchoolWordSkeletons(diagnosticMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure,connectorReport);
+assert(diagnosticJoinCount===1&&connectorReport.joined===1&&connectorReport.words[0].pairs[0].result==='соединено','Diagnostic report agrees with the actual connected geometry');
+
 assert(joinedCount===1&&mockMask.slice(15*30+9,15*30+12).every(Boolean),'Adjacent Russian letter centerlines receive one bounded connecting stroke');
 const longGapMask=new Uint8Array(36*24);
 for(let x=2;x<=9;x++)longGapMask[15*36+x]=1;

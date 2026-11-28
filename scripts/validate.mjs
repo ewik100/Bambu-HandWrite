@@ -26,7 +26,7 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.36.2', 'function schoolVariationChoice(', 'function schoolJoinVariety(){', 'function schoolJoinHandles(', 'id="schoolJoinVariety"', 'function schoolFeatureSettings(', 'async function rasterOriginalFontText(', "if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token)", 'Сравнение встроенных форм шрифта', 'АВТО · СМЕШИВАНИЕ ПО СЛОВАМ', 'ss01', 'ss02', './fonts/BambuHandWriteSchool-Regular.woff2', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'id="paperRotation"', "function getPaperPhysicalSize(w,h,rotation='none')", "function pageToPhysicalPoint(x,y,w,h,rotation='none')", "function physicalToPagePoint(x,y,w,h,rotation='none')", 'function mergeTouchingPaths(paths)', 'physicalW:physicalSize.width', 'page={x,y,w:m.physicalW,h:m.physicalH}', 'function validateTextRouteCommands(commands,zSettings)']) {
+  for (const marker of ['Bambu HandWrite 5.36.3', 'function schoolVariationChoice(', 'function schoolJoinVariety(){', 'function schoolJoinHandles(', 'id="schoolJoinVariety"', 'function schoolFeatureSettings(', 'async function rasterOriginalFontText(', "if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token)", 'Сравнение встроенных форм шрифта', 'АВТО · СМЕШИВАНИЕ ПО СЛОВАМ', 'ss01', 'ss02', './fonts/BambuHandWriteSchool-Regular.woff2', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'id="paperRotation"', "function getPaperPhysicalSize(w,h,rotation='none')", "function pageToPhysicalPoint(x,y,w,h,rotation='none')", "function physicalToPagePoint(x,y,w,h,rotation='none')", 'function mergeTouchingPaths(paths)', 'physicalW:physicalSize.width', 'page={x,y,w:m.physicalW,h:m.physicalH}', 'function validateTextRouteCommands(commands,zSettings)']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
   if (!errors.length) ok('Version 5.36.2, glyph-owned centerline joins and existing page-layout features are present');
@@ -40,8 +40,11 @@ if (html) {
       !html.includes('maxGap=Math.min(fontPx*.60') ||
       !html.includes('paintLine(px,py,x,y)') ||
       !html.includes('const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49') ||
-      !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)') ||
+      !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed,pair)') ||
       !html.includes('const ownerByComponent=new Map();') ||
+      !html.includes('function schoolJoinPairShape(pair){') ||
+      !html.includes('id="schoolJoinDiagnosticsText"') ||
+      !html.includes('diagnostics.words.push(wordReport)') ||
       !html.includes('p.owner===k+1') ||
       !html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;') ||
       !html.includes('joinMask=new Uint8Array(bin.length)') ||

@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1e8">
-<meta name="description" content="Bambu HandWrite 5.36.2 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
-<meta property="og:title" content="Bambu HandWrite 5.36.2">
+<meta name="description" content="Bambu HandWrite 5.36.3 — генератор рукописного текста для Bambu Lab A1 со связной кириллической прописью и контекстными формами букв.">
+<meta property="og:title" content="Bambu HandWrite 5.36.3">
 <meta property="og:description" content="Браузерный генератор рукописного G-code для Bambu Lab A1.">
-<title>Bambu HandWrite 5.36.2 — генератор рукописного G-code</title>
+<title>Bambu HandWrite 5.36.3 — генератор рукописного G-code</title>
 <!-- Optional Google Fonts are inserted after the app starts; they never block offline use. -->
 <link rel="preload" href="./fonts/FRBAmericanCursive-400-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/Pecita.otf" as="font" type="font/otf" crossorigin>
@@ -351,6 +351,7 @@ Hello, world!</textarea></label>
       <input type="range" id="schoolRoughness" min="0" max="50" step="1" value="28" aria-label="Неровность штрихов">
       <div id="variationDemo" class="variation-demo" aria-live="polite"></div>
       <p id="schoolStrokeStatus" class="tiny" aria-live="polite">Соединения букв появятся после построения траекторий.</p>
+      <details id="schoolJoinDiagnostics" class="school-join-diagnostics"><summary>Подробная диагностика соединений</summary><pre id="schoolJoinDiagnosticsText" class="tiny" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto">Появится после построения траекторий.</pre></details>
       <div id="schoolFontLoader" class="school-font-loader" hidden><p class="tiny">Bambu HandWrite — встроенный шрифт приложения. Тот же файл используется в предпросмотре и G-code.</p></div>
     </div>
     <p class="tiny wide" id="writingStartNote">Начало текста — 5 мм от левого края. Красная строка и заполнение строк настраиваются отдельно переключателями.</p>
@@ -521,7 +522,7 @@ Hello, world!</textarea></label>
   <div id="gcodeDetails" class="checks" style="margin-top:10px"></div>
   <div id="gcodeInstruction" class="warning" hidden style="margin-top:12px"><b>Порядок работы:</b><ol style="padding-left:20px"><li>Сохрани файл .gcode на SD-карту.</li><li>Проверь крепление бумаги и свободный ход головки.</li><li>Пауза 1: убери держатель ручки, затем нажми «Продолжить» — принтер выполнит home.</li><li>Головка переместится с поднятой ручкой к верхнему левому углу листа.</li><li>Вторая остановка: после homing сопло паркуется на 3 мм левее и на 3 мм ниже верхнего левого угла листа. Оно остаётся на безопасной высоте Z (Z пера + 20 мм) заданное время, по умолчанию 130 секунд. За это время установи держатель и проверь бумагу. Нажимать «Продолжить» не нужно.</li><li>После выдержки головка опустится до безопасного уровня перемещения, переместится к первой букве и опустит ручку до заданной координаты Z. Не оставляй принтер без присмотра.</li></ol><b>Важно:</b> сначала проверь файл на коротком тестовом тексте. Минимум Z=10 мм — это ограничение координаты сопла, а не гарантия зазора кончика пера. Длина держателя может опускать ручку значительно ниже сопла. При любом касании, зацепе или необычном звуке немедленно останови задание. Не запускай длинную работу, пока короткий тест не пройден.</div>
 </section>
-<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.36.2 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
+<p class="tiny" style="text-align:center;margin:16px 0">Bambu HandWrite 5.36.3 · адаптивное разрешение до 18 пикс./мм на телефонах и 22 пикс./мм на ПК, проверка фактических траекторий и генератор G-code.</p>
 <div class="mobile-dock no-print" id="mobileDock"><span id="dockStatus">Лист готов к проверке</span><div><button id="mobilePreview" type="button" class="dock-secondary">Лист</button><button id="mobileGenerate" type="button" class="dock-primary">Создать G-code</button></div></div>
 <script>
 'use strict';
@@ -732,14 +733,37 @@ function schoolNoise(seed,index=0,salt=0){
  return (h>>>0)/4294967295;
 }
 function schoolJoinVariety(){const v=Number($('schoolJoinVariety')?.value??70);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):70}
-function schoolJoinHandles(distance,fontPx,seed){
+function schoolJoinPairShape(pair){
+ const p=String(pair||'').toLowerCase();
+ const explicit={
+  'ма':[.24,.38],'ам':[.36,.24],'ми':[.22,.34],'им':[.34,.22],
+  'мо':[.25,.36],'ом':[.36,.25],'ли':[.28,.36],'ил':[.36,.25],
+  'лл':[.22,.32],'ра':[.34,.25],'ар':[.25,.34],'ро':[.34,.24],
+  'ор':[.24,.34],'но':[.25,.36],'он':[.36,.25],'ст':[.30,.22],
+  'сп':[.32,.24],'пр':[.34,.24],'тр':[.31,.23],'ан':[.25,.36],
+  'ин':[.24,.34],'шк':[.22,.32],'ск':[.30,.24],'ши':[.22,.34],
+  'ти':[.30,.22],'та':[.30,.25],'те':[.28,.34],'ер':[.36,.24],
+  'ре':[.34,.26],'ви':[.24,.35],'ов':[.35,.24],
+  'sh':[.22,.34],'ch':[.28,.34],'th':[.34,.24],'in':[.24,.35],
+  'an':[.26,.36],'er':[.35,.24],'st':[.30,.23],'tr':[.32,.24]
+ };
+ if(explicit[p])return explicit[p];
+ const left=p[0]||'',right=p[1]||'';
+ const exit=/[лмнптишщшкл]/u.test(left)?'arch':/[аоеэсзюя]/u.test(left)?'round':/[рдзуфцщ]/u.test(left)?'desc':'neutral';
+ const entry=/[аоеэсзюя]/u.test(right)?'round':/[лмнптишщшкл]/u.test(right)?'arch':/[рдзуфцщ]/u.test(right)?'desc':'neutral';
+ const exitBase=exit==='arch'?.26:exit==='round'?.34:exit==='desc'?.38:.30;
+ const entryBase=entry==='arch'?.25:entry==='round'?.36:entry==='desc'?.24:.30;
+ return [exitBase,entryBase];
+}
+function schoolJoinHandles(distance,fontPx,seed,pair=''){
  const strength=schoolJoinVariety()/100;
- const profiles=[[.22,.22],[.42,.24],[.24,.42],[.38,.38],[.18,.36],[.36,.18]];
- const selected=profiles[Math.min(profiles.length-1,Math.floor(schoolNoise(seed,0,307)*profiles.length))];
+ const base=schoolJoinPairShape(pair),profiles=[[.82,1.12],[1,1],[1.14,.84],[.92,1.20],[1.20,.92]];
+ const selected=profiles[Math.min(profiles.length-1,Math.floor(schoolNoise(String(seed)+'|'+String(pair),0,307)*profiles.length))];
+ const factors=[base[0]*selected[0],base[1]*selected[1]];
  const baseHandle=Math.max(.75,Math.min(distance*.32,fontPx*.09));
  const maxHandle=Math.max(.75,Math.min(distance*.46,fontPx*.15));
- const handle=factor=>Math.max(.35,Math.min(maxHandle,baseHandle*(.32+(factor-.32)*strength)/.32));
- return {a:handle(selected[0]),b:handle(selected[1])};
+ const handle=factor=>Math.max(.35,Math.min(maxHandle,baseHandle*(.30+(factor-.30)*strength)/.30));
+ return {a:handle(factors[0]),b:handle(factors[1])};
 }
 function schoolFeatureString(variant=''){
  const contextual=variant==='calt'||variant==='ss01'||variant==='ss02'?1:0;
@@ -1199,7 +1223,7 @@ function neighbors(bin,w,h,i){
  return out;
 }
 function traceSkeleton(bin,w,h){const total=w*h,seen=new Set(),paths=[];const edge=(a,b)=>a<b?a*total+b:b*total+a;const nodes=[];for(let i=0;i<total;i++)if(bin[i]){const d=neighbors(bin,w,h,i).length;if(d!==2)nodes.push(i)}function trace(start,next){let path=[start],prev=start,cur=next;seen.add(edge(prev,cur));let guard=0;while(guard++<total){path.push(cur);const ns=neighbors(bin,w,h,cur).filter(v=>v!==prev);if(ns.length!==1)break;const nx=ns[0],key=edge(cur,nx);if(seen.has(key)){if(nx===start)path.push(nx);break}seen.add(key);prev=cur;cur=nx;if(cur===start){path.push(cur);break}}if(path.length>1)paths.push(path)}for(const n of nodes)for(const q of neighbors(bin,w,h,n))if(!seen.has(edge(n,q)))trace(n,q);for(let i=0;i<total;i++)if(bin[i])for(const q of neighbors(bin,w,h,i))if(!seen.has(edge(i,q)))trace(i,q);return paths}
-function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
+function connectSchoolWordSkeletons(bin,w,h,model,geo,measure,diagnostics=null){
  const scale=geo.scale,fontPx=geo.fontPx,height=geo.fontPx*geo.heightScale,widthScale=geo.widthScale;
  if(!bin||!measure||!Number.isFinite(fontPx)||fontPx<4)return 0;
  const letterSpacing=(model.profile.letterSpacing||0)*scale;
@@ -1226,10 +1250,11 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  };
  const tangentOut=p=>{const dx=p.x-p.nx,dy=p.y-p.ny,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
  const tangentIn=p=>{const dx=p.nx-p.x,dy=p.ny-p.y,len=Math.hypot(dx,dy)||1;return {x:dx/len,y:dy/len}};
+ if(diagnostics)Object.assign(diagnostics,{components:componentData.components.length,endpoints:endpoints.length,joined:0,ambiguousComponents:0,words:[],stopReason:endpoints.length<2?'Найдено меньше двух концевых точек.':''});
  const connectable=/^[А-Яа-яЁёA-Za-z]$/u,enabled=$('letterVariety')?.checked!==false;
- const drawCurve=(a,b,seed,bounds)=>{
+ const drawCurve=(a,b,seed,pair,bounds)=>{
   const distance=Math.hypot(b.x-a.x,b.y-a.y),ta=tangentOut(a),tb=tangentIn(b);
-  const handles=schoolJoinHandles(distance,fontPx,seed);
+  const handles=schoolJoinHandles(distance,fontPx,seed,pair);
   const c1x=a.x+ta.x*handles.a,c1y=a.y+ta.y*handles.a,c2x=b.x-tb.x*handles.b,c2y=b.y-tb.y*handles.b;
   const steps=Math.max(10,Math.ceil(distance*2)),points=[];
   let previousX=a.x;
@@ -1282,6 +1307,7 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     const box=componentBoxes.get(p.component);
     return !!box&&box.minX>=wordLeft&&box.maxX<=wordRight;
    });
+   const wordReport=diagnostics?{text:part,line:li+1,wordIndex,components:[...new Set(wordEndpoints.map(p=>p.component))].length,ownedComponents:0,ambiguousComponents:0,ownership:[],pairs:[]}:null;
    const regions=chars.map(glyph=>{
     const left=baseX+glyph.x*widthScale,right=baseX+(glyph.x+glyph.advance)*widthScale;
     return {left,right,advance:Math.max(0,right-left),center:(left+right)*.5};
@@ -1302,10 +1328,15 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     const tieTolerance=Math.max(.35,fontPx*.025);
     if(best<0||bestGap>bestSlack||secondGap-bestGap<tieTolerance)best=-1;
     ownerByComponent.set(p.component,best);
+    if(wordReport){
+     const owner=best>=0?chars[best].char:null;
+     wordReport.ownership.push({component:p.component,ownerIndex:best,owner,center:{x:+box.cx.toFixed(2),y:+box.cy.toFixed(2)},bounds:{left:box.minX,top:box.minY,right:box.maxX,bottom:box.maxY}});
+     if(best<0){wordReport.ambiguousComponents++;diagnostics.ambiguousComponents++}else wordReport.ownedComponents++;
+    }
    }
    for(const p of wordEndpoints)p.owner=ownerByComponent.get(p.component)??-1;
    for(let k=0;k<chars.length-1;k++){
-    const left=chars[k],right=chars[k+1];
+    const left=chars[k],right=chars[k+1],pair=left.char+right.char;
     if(!connectable.test(left.char)||!connectable.test(right.char))continue;
     const split=baseX+(left.x+left.advance)*widthScale;
     const leftAdvance=regions[k].advance,rightAdvance=regions[k+1].advance;
@@ -1315,8 +1346,10 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
     const pitchPx=Math.max(1,(model.pitch||fontPx*1.25)*scale);
     const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49;
     const yMin=Math.max(baseline-height*.9,lineTop),yMax=Math.min(baseline+height*.45,lineBottom);
+    const pairReport=diagnostics?{pair,leftEndpoints:0,rightEndpoints:0,candidates:0,result:'нет кандидатов',selected:null}:null;
     const leftCandidates=wordEndpoints.filter(p=>!p.used&&p.owner===k&&p.x>=split-reachLeft&&p.x<=split+maxGap*.16&&p.y>=yMin&&p.y<=yMax);
     const rightCandidates=wordEndpoints.filter(p=>!p.used&&p.owner===k+1&&p.x>=split-maxGap*.16&&p.x<=split+reachRight&&p.y>=yMin&&p.y<=yMax);
+    if(pairReport){pairReport.leftEndpoints=leftCandidates.length;pairReport.rightEndpoints=rightCandidates.length}
     const candidates=[];
     for(const a of leftCandidates){
      const ta=tangentOut(a);
@@ -1337,15 +1370,28 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
      }
     }
     candidates.sort((a,b)=>a.score-b.score);
+    if(pairReport)pairReport.candidates=candidates.length;
     const bounds={wordLeft,wordRight,yMin:Math.max(yMin,lineTop),yMax:Math.min(yMax,lineBottom)};
     for(const candidate of candidates){
      const {a,b}=candidate;
      if(a.used||b.used)continue;
-     if(drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)){
-      a.used=true;b.used=true;joined++;break;
+     if(drawCurve(a,b,seed+'|'+k+'|'+pair,pair,bounds)){
+      a.used=true;b.used=true;joined++;
+      if(pairReport){pairReport.result='соединено';pairReport.selected={from:{x:a.x,y:a.y},to:{x:b.x,y:b.y},score:+candidate.score.toFixed(3)}}
+      break;
      }
     }
+    if(pairReport){
+     if(pairReport.result!=='соединено'){
+      if(!leftCandidates.length)pairReport.result='нет выходного конца у первой буквы';
+      else if(!rightCandidates.length)pairReport.result='нет входного конца у второй буквы';
+      else if(!candidates.length)pairReport.result='нет совместимых касательных или подходящего расстояния';
+      else pairReport.result='все найденные кривые отклонены геометрией';
+     }
+     wordReport.pairs.push(pairReport);
+    }
    }
+   if(wordReport)diagnostics.words.push(wordReport);
    cursor+=run.width;
    wordIndex++;
   }
@@ -1353,6 +1399,7 @@ function connectSchoolWordSkeletons(bin,w,h,model,geo,measure){
  measure.fontFeatureSettings='normal';measure.fontVariantLigatures='normal';measure.fontKerning='normal';
  if('letterSpacing' in measure)measure.letterSpacing='0px';
  if('wordSpacing' in measure)measure.wordSpacing='0px';
+ if(diagnostics)diagnostics.joined=joined;
  return joined;
 }
 function analyzeSkeleton(bin,w,h,paths,scale){
@@ -1463,9 +1510,10 @@ async function rasterOriginalFontText(model,token){
  for(let y=0;y<cropH;y++){const src=((y+y0)*w+x0)*4,dst=y*cropW;for(let x=0;x<cropW;x++)binary[dst+x]=pixels[src+x*4+3]>threshold?1:0}
  imageData=null;pixels=null;canvas.width=1;canvas.height=1;
  const thin=await skeletonizeAsync(binary,cropW,cropH,token);
- const connectionCount=connectSchoolWordSkeletons(thin.bin,cropW,cropH,model,{scale,originX,originY,cropX:x0,cropY:y0,fontPx,heightScale,widthScale},measure);
+ const connectionDiagnostics={};
+ const connectionCount=connectSchoolWordSkeletons(thin.bin,cropW,cropH,model,{scale,originX,originY,cropX:x0,cropY:y0,fontPx,heightScale,widthScale},measure,connectionDiagnostics);
  measureCanvas.width=1;measureCanvas.height=1;
- return {bin:thin.bin,w:cropW,h:cropH,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,connectionCount,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
+ return {bin:thin.bin,w:cropW,h:cropH,scale,offsetX:originX+x0,offsetY:originY+y0,iterations:thin.iterations,converged:thin.converged,connectionCount,connectionDiagnostics,pixelCount:w*h,fullPixelCount:Math.ceil(model.w*scale)*Math.ceil(model.h*scale),inkBounds:{left:(originX+minX)/scale,top:(originY+minY)/scale,right:(originX+maxX+1)/scale,bottom:(originY+maxY+1)/scale}};
 }
 async function rasterText(model,token){
  if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token);
@@ -1587,6 +1635,15 @@ async function renderSchoolStrokePreview(model,seq){
  paper.querySelectorAll('text[data-line]').forEach(node=>node.remove());
  const border=paper.lastElementChild;if(border)paper.insertBefore(group,border);else paper.appendChild(group);
  const joinStatus=$('schoolStrokeStatus');if(joinStatus)joinStatus.textContent=raster.connectionCount>0?`Соединено переходами: ${raster.connectionCount} пар соседних букв. Предпросмотр и G-code используют эти же центральные линии.`:'Для этих букв новых переходов не найдено; уже соприкасающиеся штрихи сохраняются.';
+ const diagnosticText=$('schoolJoinDiagnosticsText'),diagnostic=raster.connectionDiagnostics;
+ if(diagnosticText&&diagnostic){
+  const report=['КОМПОНЕНТЫ: '+diagnostic.components,'КОНЦЕВЫЕ ТОЧКИ: '+diagnostic.endpoints,'НЕОДНОЗНАЧНЫЕ КОМПОНЕНТЫ: '+diagnostic.ambiguousComponents,'ДОБАВЛЕНО СОЕДИНЕНИЙ: '+diagnostic.joined,diagnostic.stopReason||'','',...diagnostic.words.flatMap(word=>[
+   'Слово «'+word.text+'» (строка '+word.line+'): компоненты '+word.components+', назначено '+word.ownedComponents+', неоднозначно '+word.ambiguousComponents,
+   ...word.ownership.map(item=>'  Компонент #'+item.component+' → '+(item.owner||'не назначен')+'; центр ('+item.center.x+','+item.center.y+')'),
+   ...word.pairs.map(pair=>'  '+pair.pair+': '+pair.result+'; концы '+pair.leftEndpoints+'/'+pair.rightEndpoints+'; кандидаты '+pair.candidates+(pair.selected?'; ('+pair.selected.from.x+','+pair.selected.from.y+') → ('+pair.selected.to.x+','+pair.selected.to.y+')':''))
+  ])].filter(Boolean);
+  diagnosticText.textContent=report.join('\n');
+ }
 }
 function labelComponents(bin,w,h){
  const labels=new Int32Array(w*h),queue=new Int32Array(w*h),components=[];let id=0;
@@ -1883,7 +1940,7 @@ async function generateGcode(){
   const fmtZ=n=>Number(n).toFixed(3),workTitle=transliterateTitle(safeDocumentTitle());
   const head=[
   `; HEADER_BLOCK_START`,
-  `; generated by Bambu HandWrite 5.36.2`,
+  `; generated by Bambu HandWrite 5.36.3`,
   `; job_type = pen_plotter`,
   `; printer_model = Bambu Lab A1`,
   `; HEADER_BLOCK_END`,
@@ -1911,8 +1968,8 @@ async function generateGcode(){
   `; filament_diameter = 1.75`,
   `; CONFIG_BLOCK_END`,
   `; EXECUTABLE_BLOCK_START`,
-  `; Bambu HandWrite 5.36.2 - raw G-code for Bambu Lab A1`,
-  `; Generated by Bambu HandWrite 5.36.2`,
+  `; Bambu HandWrite 5.36.3 - raw G-code for Bambu Lab A1`,
+  `; Generated by Bambu HandWrite 5.36.3`,
   `; Title: ${workTitle}`,
   `; Page: ${m.physicalW} x ${m.physicalH} mm on plate; logical page ${m.w} x ${m.h} mm; orientation ${m.rotation}; top-left machine X${x.toFixed(3)} Y${y.toFixed(3)}`,
   `; Paragraph indent: ${m.indentEnabled?'ON':'OFF'} (${m.paraIndent.toFixed(1)} mm); line fill: ${m.justifyEnabled?'ON':'OFF'}`,
@@ -2014,7 +2071,7 @@ function clearTextWithHistory(){if(!$('txt').value)return;if(!window.confirm('О
 function projectSnapshot(){
  const settings={};for(const k of Object.keys(DEFAULTS).concat(['txt','scriptMode','handFont','documentTitle']))if($(k))settings[k]=$(k).value;
  settings.paragraphIndentEnabled=$('paragraphIndentToggle').checked;settings.justifyLines=$('justifyToggle').checked;settings.pitchCells=$('pitchCells').value;settings.letterVariety=$('letterVariety').checked;settings.wordBounce=$('wordBounce').checked;
- return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.36.2',exportedAt:new Date().toISOString(),settings};
+ return {format:'BambuHandWriteProject',formatVersion:2,appVersion:'5.36.3',exportedAt:new Date().toISOString(),settings};
 }
 function exportProjectBackup(){
  try{const data=projectSnapshot(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`Bambu_HandWrite_project_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('backupStatus').textContent='Резервная копия проекта сохранена. Храни JSON-файл отдельно от браузера.';}
