@@ -1,4 +1,4 @@
-name: Diagnose handwriting font connections
+name: Diagnose upright т and handwriting font variants
 on:
   push:
     paths:

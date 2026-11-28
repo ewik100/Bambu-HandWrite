@@ -110,7 +110,8 @@ sample_font = [
     ("B — альтернатива ss01 + контекст", ["+calt", "+ss01", "-ss02"]),
     ("C — альтернатива ss02 + контекст", ["+calt", "-ss01", "+ss02"]),
 ]
-width, height = 2300, 940
+section_height = 46 + len(SAMPLE) * 82 + 5
+width, height = 2300, 62 + len(sample_font) * section_height
 sheet = Image.new("RGB", (width, height), "#f7f5ef")
 draw = ImageDraw.Draw(sheet)
 draw.text((30, 16), "Bambu HandWrite — real OpenType letter variants", font=label_font, fill="#263b54")
