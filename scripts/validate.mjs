@@ -26,18 +26,29 @@ if (html) {
   if (!/<html\b[^>]*lang="ru"/i.test(html)) fail('The document language must be explicitly set to Russian (lang="ru").');
   else ok('Russian document language is set');
 
-  for (const marker of ['Bambu HandWrite 5.36.1', 'function schoolVariationChoice(', 'function schoolJoinVariety(){', 'function schoolJoinHandles(', 'id="schoolJoinVariety"', 'function schoolFeatureSettings(', 'async function rasterOriginalFontText(', "if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token)", 'Сравнение встроенных форм шрифта', 'АВТО · СМЕШИВАНИЕ ПО СЛОВАМ', 'ss01', 'ss02', './fonts/BambuHandWriteSchool-Regular.woff2', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'id="paperRotation"', "function getPaperPhysicalSize(w,h,rotation='none')", "function pageToPhysicalPoint(x,y,w,h,rotation='none')", "function physicalToPagePoint(x,y,w,h,rotation='none')", 'function mergeTouchingPaths(paths)', 'physicalW:physicalSize.width', 'page={x,y,w:m.physicalW,h:m.physicalH}', 'function validateTextRouteCommands(commands,zSettings)']) {
+  for (const marker of ['Bambu HandWrite 5.36.2', 'function schoolVariationChoice(', 'function schoolJoinVariety(){', 'function schoolJoinHandles(', 'id="schoolJoinVariety"', 'function schoolFeatureSettings(', 'async function rasterOriginalFontText(', "if(model.hand==='school'&&model.mode!=='print')return rasterOriginalFontText(model,token)", 'Сравнение встроенных форм шрифта', 'АВТО · СМЕШИВАНИЕ ПО СЛОВАМ', 'ss01', 'ss02', './fonts/BambuHandWriteSchool-Regular.woff2', 'function splitCaseSegments(text)', 'function uppercaseVerticalScale(context,runs,fontPx,lowercaseAscent)', 'function build(skipFitSuggestion=false,heightOverride=null,justifyScale=1,justifyPass=0)', "findLargestFittingTenth(original,value=>!clipsText(build(true,value)))", 'function withCanvasLineTransform(cx,x,y,width,heightScale,draw)', 'withCanvasLineTransform(cx,line.x*scale,baseline,width,sy,()=>{', 'id="pitchUnit"', 'id="pitchCells"', 'id="pitchMm"', 'function getLinePitchMm(cell)', 'getLinePitchCells()*cell', "function getPaperWritingBounds(width,type,red,cell,flip='right',leftInset=10)", "indent=isRussian&&paperFlip!=='left'?paraIndent:0", 'id="paperFlip"', 'id="paperRotation"', "function getPaperPhysicalSize(w,h,rotation='none')", "function pageToPhysicalPoint(x,y,w,h,rotation='none')", "function physicalToPagePoint(x,y,w,h,rotation='none')", 'function mergeTouchingPaths(paths)', 'physicalW:physicalSize.width', 'page={x,y,w:m.physicalW,h:m.physicalH}', 'function validateTextRouteCommands(commands,zSettings)']) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
-  if (!errors.length) ok('Version 5.26.0, Bambu HandWrite 5.31.0 with per-glyph Cyrillic alternates and conservative tangent-matched centerline joins, and existing page-layout features are present');
+  if (!errors.length) ok('Version 5.36.2, glyph-owned centerline joins and existing page-layout features are present');
   if (!['none','left-page','right-page'].every(mode => html.includes('value="'+mode+'"'))) fail('Normal, left-page and right-page placement modes must all be available.');
   else ok('Normal, left-page and right-page placement modes are available');
   if (!html.includes("rotation==='left-page'") || !html.includes("rotation==='right-page'") || !html.includes("physicalToPagePoint(physical.x,physical.y,model.w,model.h,rotation)")) fail('Rotated paper coordinates must be transformed and inverse-checked.');
   else ok('Both page rotations use reversible coordinate transforms');
   if (!html.includes('previous.slice(join,-1).reverse()')) fail('Existing skeleton-path merging must remain available.');
   else ok('Existing skeleton-path merging remains available');
-  if (!html.includes('function connectSchoolWordSkeletons(') || !html.includes('maxGap=Math.min(fontPx*.60') || !html.includes('paintLine(px,py,x,y)') || !html.includes('const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49') || !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)') || !html.includes("drawCurve(bestA,bestB,seed+'|'+k+'|'+left.char+right.char)") || !html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')) fail('Bambu HandWrite School must add bounded same-row centerline joins and isolate neighboring baselines.');
-  else ok('Bambu HandWrite School adds short, direction-matched centerline joins with deterministic shape variety between adjacent Cyrillic letters');
+  if (!html.includes('function connectSchoolWordSkeletons(') ||
+      !html.includes('maxGap=Math.min(fontPx*.60') ||
+      !html.includes('paintLine(px,py,x,y)') ||
+      !html.includes('const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49') ||
+      !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)') ||
+      !html.includes('const ownerByComponent=new Map();') ||
+      !html.includes('p.owner===k+1') ||
+      !html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;') ||
+      !html.includes('const joinMask=new Uint8Array(bin.length)') ||
+      !html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')) {
+    fail('Bambu HandWrite School must enforce one-glyph ownership, same-row geometry, tangent checks and collision-safe connectors.');
+  } else ok('Bambu HandWrite School assigns skeleton components to one glyph and rejects unsafe connector geometry');
+
   if (!html.includes("const twoCellInset=type==='math-notebook'?Math.min(30,Math.max(2,2*(Number(cell)||5))):10;") || !html.includes('rightX:redLineX-twoCellInset')) fail('Both red-line sides must keep a two-cell writing clearance.');
   else ok('Either binding-side red line keeps a two-cell clearance (10 mm for standard 5 mm grid)');
   if (!html.includes("function getBindingSideRedLine(rotation)") || !html.includes("rotation==='left-page'?'right':rotation==='right-page'?'left':null")) fail('Each sideways notebook leaf must automatically select its binding-side red line.');
@@ -59,7 +70,7 @@ if (html) {
   else ok('All nine handwriting profiles are available');
   if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
   else ok('All five language/script modes are available');
-  for (const marker of ['function schoolVariation(){return 0}', "schoolPreview=hand==='school'&&mode!=='print'", 'async function loadBambuOriginalFont()', 'function renderSchoolStrokePreview(', 'Неровность штрихов', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22', 'feDisplacementMap', 'schoolVariationStrength()', 'id="schoolVariationStrength"', 'id="schoolJoinVariety"', 'schoolJoinVarietyValue', 'id="schoolStrokeStatus"', 'function schoolWordMetrics(', 'const tangentMismatch=']) {
+  for (const marker of ['function schoolVariation(){return 0}', "schoolPreview=hand==='school'&&mode!=='print'", 'async function loadBambuOriginalFont()', 'function renderSchoolStrokePreview(', 'Неровность штрихов', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22', 'feDisplacementMap', 'schoolVariationStrength()', 'id="schoolVariationStrength"', 'id="schoolJoinVariety"', 'schoolJoinVarietyValue', 'id="schoolStrokeStatus"', 'function schoolWordMetrics(', 'const tangentDot=']) {
     if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
   if (!errors.length) ok('Eight handwriting profiles, Bambu font, contextual variation strength control, centerline joins, and route generation guard are present');

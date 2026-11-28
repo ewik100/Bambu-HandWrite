@@ -157,7 +157,9 @@ assert(originalFont.subarray(0,4).toString('ascii')==='wOF2','Original Bambu fon
 assert(html.includes('function connectSchoolWordSkeletons('),'The custom school font has a dedicated centerline connector');
 assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;'),'Glyph positioning uses shaped prefix/suffix measurements');
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
-assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(bestA,bestB,seed+'|'+k+'|'+left.char+right.char)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
+assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
+assert(html.includes('const ownerByComponent=new Map();')&&html.includes('p.owner===k')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Every candidate endpoint is assigned to one glyph owner and tangent direction is scored');
+assert(html.includes('const joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component'),'Connector geometry rejects collisions with unrelated skeletons and previous joins');
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
 const connectorEnd=html.indexOf('async function rasterOriginalFontText(',connectorStart);
 if(connectorStart<0||connectorEnd<=connectorStart)throw new Error('Could not extract school centerline connector.');
@@ -199,6 +201,18 @@ for(let x=2;x<=9;x++)punctuationMask[15*30+x]=1;
 for(let x=11;x<=19;x++)punctuationMask[15*30+x]=1;
 const punctuationCount=context.connectSchoolWordSkeletons(punctuationMask,30,24,{...mockModel,lines:[{blank:false,text:'а-а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
 assert(punctuationCount===0,'Connectors never skip punctuation to join non-adjacent letters');
+const latinMask=new Uint8Array(30*24);
+for(let x=2;x<=9;x++)latinMask[15*30+x]=1;
+for(let x=12;x<=18;x++)latinMask[15*30+x]=1;
+const latinCount=context.connectSchoolWordSkeletons(latinMask,30,24,{...mockModel,lines:[{blank:false,text:'aa',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+assert(latinCount===1,'Adjacent Latin letters can use the same conservative glyph-owned connector');
+const blockedMask=new Uint8Array(30*24);
+for(let x=2;x<=9;x++)blockedMask[15*30+x]=1;
+for(let x=12;x<=18;x++)blockedMask[15*30+x]=1;
+blockedMask[13*30+10]=1;
+const blockedCount=context.connectSchoolWordSkeletons(blockedMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+assert(blockedCount===0,'A connector is rejected when its curve passes too close to an unrelated stroke');
+
 
 
 assert(html.includes('async function loadBambuOriginalFont()')&&html.includes('./fonts/BambuHandWriteSchool-Regular.woff2'),'Bambu HandWrite School is loaded from the bundled local asset');
