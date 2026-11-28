@@ -46,16 +46,16 @@ if (html) {
   else ok('Existing skeleton-path merging remains available');
   if (!html.includes('function connectSchoolWordSkeletons(') ||
       !html.includes('maxGap=Math.min(fontPx*.60') ||
-      !html.includes('paintLine(px,py,x,y)') ||
-      !html.includes('const lineTop=baseline-pitchPx*.49,lineBottom=baseline+pitchPx*.49') ||
+      !html.includes('paintLine(points[n-1].x,points[n-1].y,points[n].x,points[n].y)') ||
+      !html.includes('const yMin=baseline-Math.min(fontPx*.78,pitchPx*.46),yMax=baseline+Math.min(fontPx*.42,pitchPx*.46)') ||
       !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed,pair)') ||
       !html.includes('const ownerByComponent=new Map();') ||
       !html.includes('function schoolJoinPairShape(pair){') ||
       !html.includes('id="schoolJoinDiagnosticsText"') ||
       !html.includes('diagnostics.words.push(wordReport)') ||
       !html.includes('p.owner===k+1') ||
-      !html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;') ||
-      !html.includes('joinMask=new Uint8Array(bin.length)') ||
+      !html.includes('directionPenalty=(1-ta.x)+(1-tb.x)') ||
+      !html.includes('if(component&&component!==a.component&&component!==b.component)return false;') ||
       !html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')) {
     fail('Bambu HandWrite School must enforce one-glyph ownership, same-row geometry, tangent checks and collision-safe connectors.');
   } else ok('Bambu HandWrite School assigns skeleton components to one glyph and rejects unsafe connector geometry');
@@ -81,7 +81,7 @@ if (html) {
   else ok('All nine handwriting profiles are available');
   if ((modeSelect.split('<option').length-1)!==5 || !['auto','ru','en','universal','print'].every(mode=>modeSelect.includes('value="'+mode+'"'))) fail('All five language/script modes must remain available.');
   else ok('All five language/script modes are available');
-  for (const marker of ['function schoolVariation(){return 0}', "schoolPreview=hand==='school'&&mode!=='print'", 'async function loadBambuOriginalFont()', 'function renderSchoolStrokePreview(', 'Неровность штрихов', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22', 'feDisplacementMap', 'schoolVariationStrength()', 'id="schoolVariationStrength"', 'id="schoolJoinVariety"', 'schoolJoinVarietyValue', 'id="schoolStrokeStatus"', 'function schoolWordMetrics(', 'const tangentDot=']) {
+  for (const marker of ['function schoolVariation(){return 0}', "schoolPreview=hand==='school'&&mode!=='print'", 'async function loadBambuOriginalFont()', 'function renderSchoolStrokePreview(', 'Неровность штрихов', 'Не удалось загрузить выбранный шрифт', "drawFeed:1450,rapidFeed:1900", 'routeTolerance:.07', 'maxScale=mobile?7:22', 'feDisplacementMap', 'schoolVariationStrength()', 'id="schoolVariationStrength"', 'id="schoolJoinVariety"', 'schoolJoinVarietyValue', 'id="schoolStrokeStatus"', 'function schoolWordMetrics(', 'directionPenalty=(1-ta.x)+(1-tb.x)']) {
     if (!html.includes(marker)) fail(`Missing handwriting feature: ${marker}`);
   }
   if (!errors.length) ok('Eight handwriting profiles, Bambu font, contextual variation strength control, centerline joins, and route generation guard are present');
