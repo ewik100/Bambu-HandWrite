@@ -165,7 +165,7 @@ const originalFont=fs.readFileSync(path.join(root,'fonts','BambuHandWriteSchool-
 assert(originalFont.length>6000,'Original Bambu font WOFF2 asset is present and non-empty');
 assert(originalFont.subarray(0,4).toString('ascii')==='wOF2','Original Bambu font has a valid WOFF2 signature');
 assert(html.includes('function connectSchoolWordSkeletons('),'The custom school font has a dedicated centerline connector');
-assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;'),'Glyph positioning uses shaped prefix/suffix measurements');
+assert(html.includes('function schoolTrySvgGlyphMetrics(ctx,word,choice,canvasWidth)')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5;'),'Glyph positioning prefers real SVG-shaped character positions and uses conservative shaped prefix/suffix fallback');
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
 assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
 assert(html.includes('function schoolAssignEndpointOwner(point,regions')&&html.includes('const owner=schoolAssignEndpointOwner(point,regions')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Endpoint ownership is resolved individually with confidence and tangent direction is scored');
