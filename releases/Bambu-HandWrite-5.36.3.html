@@ -239,7 +239,7 @@ textarea{line-height:1.55;resize:vertical}
 </head>
 <body>
 <header class="brand-header">
-  <div class="brand-lockup"><img class="brand-logo" src="../assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.31.0 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
+  <div class="brand-lockup"><img class="brand-logo" src="../assets/bambu-handwrite-logo.svg" alt="" width="58" height="58"><div class="brand-copy"><h1>Bambu HandWrite</h1><span class="brand-kicker">5.36.3 · СОБСТВЕННАЯ РУССКАЯ ПРОПИСЬ</span></div></div>
   <p class="sub">Редактор текста, школьных страниц и размещения бумаги на пластине Bambu Lab A1.</p>
   <p style="margin:10px 0 0"><span id="fontStatus" class="pill loading">Проверяю выбранный рукописный шрифт…</span></p>
 </header>
@@ -612,7 +612,7 @@ async function loadBambuOriginalFont(){
  if(bambuFontBase64&&document.fonts?.check('400 24px "Bambu HandWrite Original"','мама мыла раму'))return true;
  if(bambuFontPromise)return bambuFontPromise;
  bambuFontPromise=(async()=>{
-  const response=await fetch('../fonts/BambuHandWriteSchool-Regular.woff2?v=5.31.0',{cache:'reload'});
+  const response=await fetch('../fonts/BambuHandWriteSchool-Regular.woff2?v=5.36.3',{cache:'reload'});
   if(!response.ok)throw Error('Не удалось загрузить собственный шрифт Bambu HandWrite Original.');
   const buffer=await response.arrayBuffer();
   if(buffer.byteLength<8000)throw Error('Файл Bambu HandWrite Original повреждён или неполный.');
