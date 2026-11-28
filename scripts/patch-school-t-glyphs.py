@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Remove the rightward slant from lowercase Cyrillic т in all three font styles.
+"""Deskew lowercase Cyrillic т in the base and both stylistic alternates.
 
-Only uni0442, uni0442.ss01 and uni0442.ss02 are changed. Their original horizontal
-bounds, advance widths and left side bearings are preserved so existing OpenType
-variation, word widths, line wrapping and app-level joining remain stable.
+The glyphs are decomposed and sheared without compressing the result back to
+its old width. The advance width is expanded by the same amount, preventing
+the corrected upright stems from colliding with the following glyph.
 """
 from pathlib import Path
 import sys
@@ -12,7 +12,9 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.transformPen import TransformPen
 
-SHEAR = 0.38
+# Caveat's lowercase т has a pronounced rightward handwritten lean.
+# Apply the full affine correction; do not cancel it with a width rescale.
+SHEAR = 0.42
 TARGETS = ("uni0442", "uni0442.ss01", "uni0442.ss02")
 
 
@@ -31,34 +33,42 @@ def patch(path: Path) -> None:
         old = glyf[name]
         if old.numberOfContours == 0:
             raise SystemExit(f"Glyph {name} has no outline")
-        old_bounds = (old.xMin, old.yMin, old.xMax, old.yMax)
         old_width = old.xMax - old.xMin
         if old_width <= 0:
             raise SystemExit(f"Glyph {name} has invalid width")
 
         recording = DecomposingRecordingPen(glyph_set)
         old.draw(recording, glyf)
-        shear_pen = TTGlyphPen(glyph_set)
-        recording.replay(TransformPen(shear_pen, (1, 0, -SHEAR, 1, 0, 0)))
-        sheared = shear_pen.glyph()
-        sheared.recalcBounds(glyf)
-        sheared_width = sheared.xMax - sheared.xMin
-        if sheared_width <= 0:
-            raise SystemExit(f"Sheared glyph {name} has invalid width")
+        first = TTGlyphPen(glyph_set)
+        recording.replay(TransformPen(first, (1, 0, -SHEAR, 1, 0, 0)))
+        corrected = first.glyph()
+        corrected.recalcBounds(glyf)
+        new_width = corrected.xMax - corrected.xMin
+        if new_width <= 0:
+            raise SystemExit(f"Corrected glyph {name} has invalid width")
 
-        scale_x = old_width / sheared_width
-        translate_x = old.xMin - scale_x * sheared.xMin
+        # Keep the glyph visually centered while retaining the complete
+        # deskew transform. Width expansion is reflected in hmtx advance.
+        old_center = (old.xMin + old.xMax) * 0.5
+        new_center = (corrected.xMin + corrected.xMax) * 0.5
+        offset = old_center - new_center
         final_pen = TTGlyphPen(glyph_set)
-        recording.replay(TransformPen(final_pen, (scale_x, 0, -scale_x * SHEAR, 1, translate_x, 0)))
+        recording.replay(TransformPen(final_pen, (1, 0, -SHEAR, 1, offset, 0)))
         updated = final_pen.glyph()
         updated.recalcBounds(glyf)
-        if (updated.xMin, updated.xMax) != (old_bounds[0], old_bounds[2]):
-            raise SystemExit(f"Glyph {name} changed its horizontal bounds unexpectedly")
 
-        advance, _old_lsb = font["hmtx"][name]
+        advance, _ = font["hmtx"][name]
+        expanded_advance = max(advance + (new_width - old_width), updated.xMax - updated.xMin + 40)
         glyf[name] = updated
-        font["hmtx"][name] = (advance, updated.xMin)
-        report.append((name, old_bounds, (updated.xMin, updated.yMin, updated.xMax, updated.yMax), round(scale_x, 4)))
+        font["hmtx"][name] = (round(expanded_advance), updated.xMin)
+        report.append({
+            "glyph": name,
+            "old_bounds": [old.xMin, old.yMin, old.xMax, old.yMax],
+            "new_bounds": [updated.xMin, updated.yMin, updated.xMax, updated.yMax],
+            "old_advance": advance,
+            "new_advance": round(expanded_advance),
+            "shear": SHEAR,
+        })
 
     for glyph in glyf.glyphs.values():
         try:
@@ -72,7 +82,7 @@ def patch(path: Path) -> None:
     font["head"].yMax = max(glyph.yMax for glyph in bounded)
     if "hhea" in font:
         font["hhea"].recalc(font)
-    font["head"].fontRevision = max(float(font["head"].fontRevision), 1.1)
+    font["head"].fontRevision = max(float(font["head"].fontRevision), 1.2)
     font.save(path)
 
     check = TTFont(path)
@@ -80,10 +90,13 @@ def patch(path: Path) -> None:
         glyph = check["glyf"][name]
         if glyph.numberOfContours <= 0 or getattr(glyph, "components", None):
             raise SystemExit(f"Glyph {name} was not safely decomposed")
+        advance, _ = check["hmtx"][name]
+        if advance <= glyph.xMax - glyph.xMin:
+            raise SystemExit(f"Glyph {name} has insufficient advance after deskew")
     features = {record.FeatureTag for record in check["GSUB"].table.FeatureList.FeatureRecord}
     if not {"calt", "ss01", "ss02"}.issubset(features):
         raise SystemExit("Existing contextual and alternate features were lost")
-    print("Patched lowercase Cyrillic т glyphs:")
+    print("Deskewed lowercase Cyrillic т glyphs:")
     for row in report:
         print(" ", row)
     print("Preserved GSUB features:", ", ".join(sorted(features)))
