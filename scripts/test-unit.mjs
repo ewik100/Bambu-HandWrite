@@ -77,8 +77,18 @@ const schoolEnd=html.indexOf("const measureCanvas=document.createElement('canvas
 if(schoolStart<0||schoolEnd<=schoolStart)throw new Error('Could not extract Bambu handwriting helpers.');
 const schoolFunctions=html.slice(schoolStart,schoolEnd);
 vm.runInContext(schoolFunctions,context);
-const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout,joinVariety:schoolJoinVariety,joinHandles:schoolJoinHandles})',context);
+const schoolApi=vm.runInContext('({variation:schoolVariation,roughness:schoolRoughness,features:schoolFeatureSettings,glyphFeatures:schoolGlyphFeatureSettings,glyphMetrics:schoolGlyphMetrics,wordMetrics:schoolWordMetrics,noise:schoolNoise,layout:schoolWordLayout,joinVariety:schoolJoinVariety,joinHandles:schoolJoinHandles,transitionProfile:schoolJoinTransitionProfile,assignEndpointOwner:schoolAssignEndpointOwner})',context);
 assert(schoolApi.variation()===0,'Contextual alternates do not alter line wrapping or reserve extra width');
+const maProfile=schoolApi.transitionProfile('м','а','stable-seed');
+const stProfile=schoolApi.transitionProfile('с','т','stable-seed');
+const repeatedMaProfile=schoolApi.transitionProfile('м','а','stable-seed');
+assert(maProfile.kind==='low'&&stProfile.kind==='compact','Common Russian pairs receive different context-sensitive transition profiles');
+assert(maProfile.handleA===repeatedMaProfile.handleA&&maProfile.handleB===repeatedMaProfile.handleB,'Pair-profile variation is deterministic for the same pair and seed');
+const ownerRegions=[{index:0,left:2,right:10,advance:8,joinable:true,confidence:.97},{index:1,left:10,right:18,advance:8,joinable:true,confidence:.97}];
+const firstOwner=schoolApi.assignEndpointOwner({x:9,box:{minX:2,maxX:9}},ownerRegions,{scale:1});
+assert(firstOwner.owner===0&&firstOwner.confidence>.45,'An endpoint near the first glyph is assigned to its local glyph, not the whole component centroid');
+const ambiguousOwner=schoolApi.assignEndpointOwner({x:10,box:{minX:8,maxX:11}},ownerRegions,{scale:1});
+assert(ambiguousOwner.owner===-1&&ambiguousOwner.confidence===0,'A component straddling a glyph boundary is left unowned when evidence is ambiguous');
 joinVarietyInput='0';
 const uniformJoin=schoolApi.joinHandles(12,16,'same-pair');
 assert(schoolApi.joinVariety()===0&&Math.abs(uniformJoin.a-uniformJoin.b)<1e-9,'Join-variety slider at 0% keeps the neutral symmetric connector');
@@ -93,7 +103,7 @@ joinVarietyInput='70';
 const shapedCtx={fontKerning:'normal',fontVariantLigatures:'normal',fontFeatureSettings:'normal',letterSpacing:'0px',wordSpacing:'0px',measureText(value){const widths={'м':8,'а':8,'ма':13,'мам':20,'мама':28};return {width:widths[value]??Array.from(value).length*8};}};
 const shapedMetrics=schoolApi.glyphMetrics(shapedCtx,'мама','shaped-boundaries',true,1);
 assert(shapedMetrics.glyphs.length===4&&shapedMetrics.width===31,'Glyph metrics preserve shaped word width and explicit inter-letter spacing');
-assert(Math.abs(shapedMetrics.glyphs[1].x-7)<1e-9,'First glyph boundary uses shaped prefix and suffix widths');
+assert(Math.abs(shapedMetrics.glyphs[1].x-6)<1e-9,'Glyph boundary follows shaped prefix/suffix geometry without adding visual-only letter spacing');
 assert(shapedMetrics.glyphs.every((g,i)=>g.advance>=0&&(i===0?g.x===0:g.x>=shapedMetrics.glyphs[i-1].x)),'Shaped glyph boundaries remain ordered and non-negative');
 const baseFeatures=schoolApi.features(0,false);
 const contextualFeatures=schoolApi.features(0,true,true);
@@ -158,8 +168,9 @@ assert(html.includes('function connectSchoolWordSkeletons('),'The custom school 
 assert(html.includes('const prefixWidth=ctx.measureText(prefix).width,suffixWidth=ctx.measureText(suffix).width;')&&html.includes('const boundary=(prefixWidth+fullWidth-suffixWidth)*.5+letterSpacing*i;'),'Glyph positioning uses shaped prefix/suffix measurements');
 assert(html.includes('id="schoolJoinVariety"')&&html.includes('schoolJoinVarietyValue'),'A persistent user control exposes connector-shape variety');
 assert(html.includes('const handles=schoolJoinHandles(distance,fontPx,seed)')&&html.includes("drawCurve(a,b,seed+'|'+k+'|'+left.char+right.char,bounds)"),'Each adjacent letter pair uses its own deterministic tangent-preserving join profile');
-assert(html.includes('const ownerByComponent=new Map();')&&html.includes('p.owner===k')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Every candidate endpoint is assigned to one glyph owner and tangent direction is scored');
-assert(html.includes('joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component'),'Connector geometry rejects collisions with unrelated skeletons and previous joins');
+assert(html.includes('function schoolAssignEndpointOwner(point,regions')&&html.includes('const owner=schoolAssignEndpointOwner(point,regions')&&html.includes('const tangentDot=ta.x*tb.x+ta.y*tb.y;'),'Endpoint ownership is resolved individually with confidence and tangent direction is scored');
+assert(html.includes('joinMask=new Uint8Array(bin.length)')&&html.includes('component!==a.component&&component!==b.component')&&html.includes('candidates[1].score-candidates[0].score<ambiguityLimit'),'Connector geometry rejects collisions and ambiguous equally plausible candidates');
+assert(html.includes('id="schoolJoinDiagnosticsToggle"')&&html.includes('joinDiagnostics:connectionResult.diagnostics'),'The optional diagnostic overlay reports ownership, accepted joins and rejection reasons');
 const connectorStart=html.indexOf('function connectSchoolWordSkeletons(');
 const connectorEnd=html.indexOf('async function rasterOriginalFontText(',connectorStart);
 if(connectorStart<0||connectorEnd<=connectorStart)throw new Error('Could not extract school centerline connector.');
@@ -169,12 +180,14 @@ const mockMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)mockMask[15*30+x]=1;
 for(let x=12;x<=18;x++)mockMask[15*30+x]=1;
 const mockModel={fontSize:10,baseline0:15,pitch:8,profile:{letterSpacing:0,wordSpacing:0},lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]};
-const joinedCount=context.connectSchoolWordSkeletons(mockMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const joinedResult=context.connectSchoolWordSkeletons(mockMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const joinedCount=joinedResult.joined;
+assert(joinedResult.diagnostics.joined===1&&joinedResult.diagnostics.joins.length===1,'Successful connector returns structured diagnostics for the accepted pair');
 assert(joinedCount===1&&mockMask.slice(15*30+9,15*30+12).every(Boolean),'Adjacent Russian letter centerlines receive one bounded connecting stroke');
 const longGapMask=new Uint8Array(36*24);
 for(let x=2;x<=9;x++)longGapMask[15*36+x]=1;
 for(let x=16;x<=24;x++)longGapMask[15*36+x]=1;
-const longGapCount=context.connectSchoolWordSkeletons(longGapMask,36,24,{...mockModel,lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},{...mockMeasure,measureText:(value)=>({width:Array.from(value).length*11})});
+const longGapCount=context.connectSchoolWordSkeletons(longGapMask,36,24,{...mockModel,lines:[{blank:false,text:'аа',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},{...mockMeasure,measureText:(value)=>({width:Array.from(value).length*11})}).joined;
 assert(longGapCount===0,'Long gaps between letters remain separate instead of receiving artificial swooping bridges');
 
 // Two large neighboring rows can overlap inside a font-height bounding box.
@@ -188,29 +201,29 @@ const crossLineModel={...mockModel,baseline0:10,pitch:5,lines:[
  {blank:false,text:'аа',x:2,extraWordSpace:0}
 ]};
 const crossLineCount=context.connectSchoolWordSkeletons(crossLineMask,30,30,crossLineModel,
- {scale:1,fontPx:10,heightScale:2,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+ {scale:1,fontPx:10,heightScale:2,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure).joined;
 assert(crossLineCount===0,'Letters on different baselines are never joined, even when large glyph boxes overlap');
 
 const crossWordMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)crossWordMask[15*30+x]=1;
 for(let x=11;x<=19;x++)crossWordMask[15*30+x]=1;
-const crossWordCount=context.connectSchoolWordSkeletons(crossWordMask,30,24,{...mockModel,lines:[{blank:false,text:'а а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const crossWordCount=context.connectSchoolWordSkeletons(crossWordMask,30,24,{...mockModel,lines:[{blank:false,text:'а а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure).joined;
 assert(crossWordCount===0,'Letters in separate words are never joined across whitespace');
 const punctuationMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)punctuationMask[15*30+x]=1;
 for(let x=11;x<=19;x++)punctuationMask[15*30+x]=1;
-const punctuationCount=context.connectSchoolWordSkeletons(punctuationMask,30,24,{...mockModel,lines:[{blank:false,text:'а-а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const punctuationCount=context.connectSchoolWordSkeletons(punctuationMask,30,24,{...mockModel,lines:[{blank:false,text:'а-а',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure).joined;
 assert(punctuationCount===0,'Connectors never skip punctuation to join non-adjacent letters');
 const latinMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)latinMask[15*30+x]=1;
 for(let x=12;x<=18;x++)latinMask[15*30+x]=1;
-const latinCount=context.connectSchoolWordSkeletons(latinMask,30,24,{...mockModel,lines:[{blank:false,text:'aa',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const latinCount=context.connectSchoolWordSkeletons(latinMask,30,24,{...mockModel,lines:[{blank:false,text:'aa',x:2,extraWordSpace:0}]},{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure).joined;
 assert(latinCount===1,'Adjacent Latin letters can use the same conservative glyph-owned connector');
 const blockedMask=new Uint8Array(30*24);
 for(let x=2;x<=9;x++)blockedMask[15*30+x]=1;
 for(let x=12;x<=18;x++)blockedMask[15*30+x]=1;
 blockedMask[13*30+10]=1;
-const blockedCount=context.connectSchoolWordSkeletons(blockedMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure);
+const blockedCount=context.connectSchoolWordSkeletons(blockedMask,30,24,mockModel,{scale:1,fontPx:10,heightScale:1,widthScale:1,originX:0,originY:0,cropX:0,cropY:0},mockMeasure).joined;
 assert(blockedCount===0,'A connector is rejected when its curve passes too close to an unrelated stroke');
 
 
