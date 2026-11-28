@@ -30,6 +30,14 @@ if (html) {
     if (!html.includes(marker)) fail(`Missing required 4.8 line-spacing feature: ${marker}`);
   }
   if (!errors.length) ok('Version 5.36.2, glyph-owned centerline joins and existing page-layout features are present');
+  if (!html.includes('style="font-variant-ligatures:common-ligatures contextual;font-kerning:normal"') ||
+      html.includes('style="font-variant-ligatures:none;font-kerning:none"')) {
+    fail('The SVG handwriting preview must not disable contextual ligatures at the parent text node.');
+  } else ok('SVG handwriting preview keeps contextual ligatures enabled');
+  const fontWorkflow = read('.github/workflows/export-bambu-font.yml');
+  if (!fontWorkflow.includes('scripts/patch-school-t-glyphs.py')) {
+    fail('Changes to the lowercase т glyph patch must trigger a font rebuild.');
+  } else ok('Lowercase т glyph patch changes trigger the font rebuild');
   if (!['none','left-page','right-page'].every(mode => html.includes('value="'+mode+'"'))) fail('Normal, left-page and right-page placement modes must all be available.');
   else ok('Normal, left-page and right-page placement modes are available');
   if (!html.includes("rotation==='left-page'") || !html.includes("rotation==='right-page'") || !html.includes("physicalToPagePoint(physical.x,physical.y,model.w,model.h,rotation)")) fail('Rotated paper coordinates must be transformed and inverse-checked.');

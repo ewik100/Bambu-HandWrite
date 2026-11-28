@@ -4,6 +4,8 @@ on:
     paths:
       - ".github/workflows/export-bambu-font.yml"
       - "fonts/Caveat[wght].ttf.b64"
+      - "scripts/patch-school-t-glyphs.py"
+      - "scripts/diagnose-font-variants.py"
   workflow_dispatch:
 permissions:
   contents: write

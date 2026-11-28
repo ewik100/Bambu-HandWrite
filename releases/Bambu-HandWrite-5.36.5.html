@@ -1517,7 +1517,7 @@ async function rasterOriginalFontText(model,token){
    pen+=wordMetrics.width+letterSpacing*Math.max(0,Array.from(part).length-1);
    wordIndex++;
   }
-  textLines.push('<text xml:space="preserve" x="'+x.toFixed(3)+'" y="'+baseline.toFixed(3)+'" transform="matrix('+widthScale+',0,0,'+heightScale.toFixed(6)+','+tx.toFixed(3)+','+ty.toFixed(3)+')" font-family="Bambu HandWrite Original" font-size="'+fontPx.toFixed(3)+'" font-weight="400" fill="#000" xml:lang="ru" lang="ru" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:none;font-kerning:none">'+content+'</text>');
+  textLines.push('<text xml:space="preserve" x="'+x.toFixed(3)+'" y="'+baseline.toFixed(3)+'" transform="matrix('+widthScale+',0,0,'+heightScale.toFixed(6)+','+tx.toFixed(3)+','+ty.toFixed(3)+')" font-family="Bambu HandWrite Original" font-size="'+fontPx.toFixed(3)+'" font-weight="400" fill="#000" xml:lang="ru" lang="ru" letter-spacing="0" word-spacing="0" style="font-variant-ligatures:common-ligatures contextual;font-kerning:normal">'+content+'</text>');
   if(i%8===0)await new Promise(resolve=>setTimeout(resolve,0));
  }
  if(token!==generationToken)throw new DOMException('Генерация отменена из-за изменения настроек.','AbortError');
