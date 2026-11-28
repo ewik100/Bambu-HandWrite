@@ -14,6 +14,7 @@ from fontTools.pens.transformPen import TransformPen
 
 # Caveat's lowercase т has a pronounced rightward handwritten lean.
 # Apply the full affine correction; do not cancel it with a width rescale.
+# Rebuild the bundled WOFF2 after every outline correction.
 SHEAR = 0.42
 TARGETS = ("uni0442", "uni0442.ss01", "uni0442.ss02")
 
