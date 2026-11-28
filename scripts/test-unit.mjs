@@ -133,7 +133,7 @@ const baseLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,
 const sameLayout=schoolApi.layout(mockMetrics,'тетрадь',12,30,20,28,-.05,'test-seed','school');
 assert(baseLayout.endX===sameLayout.endX&&baseLayout.features===sameLayout.features,'Contextual shaping preserves word width and uses a stable OpenType feature set');
 assert(html.includes("esc(layout.features||schoolFeatureSettings(0,variantsOn))"),'SVG preview uses the exact per-word OpenType feature choice used by the G-code rasterizer');
-const measureMixedMatch=html.match(/function measureMixed\(t,mode,hand,size\)\{[\s\S]*?\n\}/);
+const measureMixedMatch=html.match(/function measureMixed\(t,mode,hand,size,seedPrefix=''\)\{[\s\S]*?\n\}/);
 if(!measureMixedMatch)throw new Error('Could not extract mixed-font width calculation.');
 context.FONT_PROFILES={school:{widthScale:1,letterSpacing:-.01,wordSpacing:.54}};
 context.runsFor=(text)=>[{text,font:'Bambu HandWrite Original'}];
