@@ -45,7 +45,7 @@ if (html) {
   if (!html.includes('previous.slice(join,-1).reverse()')) fail('Existing skeleton-path merging must remain available.');
   else ok('Existing skeleton-path merging remains available');
   if (!html.includes('function connectSchoolWordSkeletons(') ||
-      !html.includes('maxGap=Math.min(fontPx*.72') ||
+      !html.includes('maxGap=Math.min(fontPx*.60') ||
       !html.includes('paintLine(points[n-1].x,points[n-1].y,points[n].x,points[n].y)') ||
       !html.includes('const yMin=baseline-Math.min(fontPx*.78,pitchPx*.46),yMax=baseline+Math.min(fontPx*.42,pitchPx*.46)') ||
       !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed,pair)') ||
