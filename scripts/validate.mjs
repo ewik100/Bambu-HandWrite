@@ -46,7 +46,7 @@ if (html) {
   else ok('Existing skeleton-path merging remains available');
   if (!html.includes('function connectSchoolWordSkeletons(') ||
       !html.includes('maxGap=Math.min(fontPx*.72') ||
-      !html.includes('paintLine(px,py,x,y)') ||
+      !html.includes('paintLine(points[n-1].x,points[n-1].y,points[n].x,points[n].y)') ||
       !html.includes('const yMin=baseline-Math.min(fontPx*.78,pitchPx*.46),yMax=baseline+Math.min(fontPx*.42,pitchPx*.46)') ||
       !html.includes('const handles=schoolJoinHandles(distance,fontPx,seed,pair)') ||
       !html.includes('const ownerByComponent=new Map();') ||
